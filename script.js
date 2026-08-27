@@ -1,6 +1,7 @@
 import { CONFIG, STEPS } from "./config.js";
 import { renderFamilyGame } from "./family-game.js";
-import { openGalleryViewer } from "./gallery-viewer.js?v=1.1.1";
+import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
+import { openGalleryViewer } from "./gallery-viewer.js?v=1.2.1";
 import { renderRoadTrip } from "./road-trip.js";
 import { playTimeTravel } from "./time-travel.js";
 
@@ -13,6 +14,7 @@ const debugPanel = document.querySelector("#debugPanel");
 const debugMode = new URLSearchParams(location.search).get("debug") === "1";
 let cleanupCurrentScreen = null;
 let rendering = false;
+let activeSoundtrack = null;
 
 const defaultState = () => ({
   version: CONFIG.stateVersion,
@@ -116,6 +118,33 @@ function renderResolution(title, text, cta, next, options = {}) {
   bindAction("continue", () => navigate(next, { advance: true }));
 }
 
+function stopActiveSoundtrack() {
+  activeSoundtrack?.stop();
+  activeSoundtrack = null;
+}
+
+async function beginGallerySoundtrack(chapterId) {
+  const config = CONFIG.chapters[chapterId]?.soundtrack;
+  if (!config?.enabled || !config.src) return;
+  stopActiveSoundtrack();
+  const soundtrack = createGallerySoundtrack(config);
+  activeSoundtrack = soundtrack;
+  if (!await soundtrack.start()) {
+    soundtrack.stop();
+    if (activeSoundtrack === soundtrack) activeSoundtrack = null;
+  }
+}
+
+function renderGalleryResolution(chapterId, title, text, cta, next, options = {}) {
+  const soundtrack = CONFIG.chapters[chapterId]?.soundtrack;
+  if (!soundtrack?.enabled || !soundtrack.src) return renderResolution(title, text, cta, next, options);
+  app.innerHTML = page(title, `<p>${text}</p>${button("Continuer en musique", "continue")}`, options);
+  bindAction("continue", async () => {
+    await beginGallerySoundtrack(chapterId);
+    navigate(next, { advance: true });
+  });
+}
+
 function renderGalleryInvitation(chapterId, nextStep) {
   const chapter = CONFIG.chapters[chapterId];
   const namedGallery = chapterId === 1 || chapterId === 5;
@@ -136,9 +165,11 @@ function renderGalleryInvitation(chapterId, nextStep) {
     cleanupCurrentScreen = openGalleryViewer({
       accessibleLabel,
       images: chapter.gallery,
+      soundtrack: activeSoundtrack,
       placeholderLabel: namedGallery ? `PLACEHOLDER — ${chapter.title.toUpperCase()}` : "PLACEHOLDER — IMAGE À REMPLACER",
       onClose: () => {
         cleanupCurrentScreen = null;
+        stopActiveSoundtrack();
         state.galleryViewed[chapterId] = true;
         saveState();
         navigate(nextStep, { advance: true });
@@ -257,11 +288,11 @@ const renderers = {
   welcome: () => { app.innerHTML = page("Un voyage à ouvrir", `<p class="lead">Quelques souvenirs et un petit arc-en-ciel qui prétend connaître le chemin.</p>${button("Ouvrir le carnet", "open")}`, { className: "welcome-screen" }); bindAction("open", () => { state.started = true; saveState(); navigate("prologue", { advance: true }); }); },
   prologue: () => { app.innerHTML = page("Avant de partir", `${CONFIG.text.prologue.map((line) => `<p>${line}</p>`).join("")}${button("Tourner la page", "continue")}`, { guide: "Bonjour Marjolaine." }); bindAction("continue", () => navigate("challenge-1", { advance: true })); },
   "challenge-1": () => state.completedChallenges[1] ? navigate("resolution-1", { advance: true }) : renderChoiceSequence({ chapterId: 1, title: CONFIG.chapters[1].publicChallengeTitle, items: CONFIG.chapters[1].questions, enforceCorrect: true, onDone: () => completeChallenge(1, "resolution-1") }),
-  "resolution-1": () => renderResolution("Tu t’en souviens.", "Alors laisse-moi te montrer ce que tu n’avais jamais vu.", "Découvrir le souvenir", "gallery-1"),
+  "resolution-1": () => renderGalleryResolution(1, "Tu t’en souviens.", "Alors laisse-moi te montrer ce que tu n’avais jamais vu.", "Découvrir le souvenir", "gallery-1"),
   "gallery-1": () => renderGalleryInvitation(1, "handoff-1"),
   "handoff-1": () => renderHandoff(1, "challenge-8"),
   "challenge-8": () => state.completedChallenges[8] ? navigate("resolution-8", { advance: true }) : renderChoiceSequence({ chapterId: 8, title: "Blind test guitare", items: CONFIG.chapters[8].tracks, enforceCorrect: true, decorate: (track, index) => `<div class="audio-placeholder"><span>♫</span><button class="secondary-button" type="button" data-play>Écouter la piste ${index + 1}</button><small>Piste ${index + 1}</small></div>`, onDone: () => completeChallenge(8, "resolution-8") }),
-  "resolution-8": () => renderResolution("Celle-là, garde-la quelque part.", "Certaines chansons savent attendre longtemps.", "Continuer", "travel-future-large"),
+  "resolution-8": () => renderGalleryResolution(8, "Celle-là, garde-la quelque part.", "Certaines chansons savent attendre longtemps.", "Continuer", "travel-future-large"),
   "travel-future-large": () => renderTravel("future", "large", "gallery-8"),
   "gallery-8": () => renderGalleryInvitation(8, "handoff-8"),
   "handoff-8": () => renderHandoff(8, "thursday-lock"),
@@ -280,31 +311,31 @@ const renderers = {
   flight: () => { app.innerHTML = page("Quelque part au-dessus des nuages", `<div class="plane" aria-hidden="true">✈</div>${button("Poursuivre le voyage", "continue")}`, { guide: "Tu vois ? Même les nuages ont des pages." }); bindAction("continue", () => navigate("challenge-2", { advance: true })); },
   "challenge-2": () => state.completedChallenges[2] ? navigate("analysis-2", { advance: true }) : renderChoiceSequence({ chapterId: 2, title: "Notre profil de couple", items: CONFIG.chapters[2].questions, onDone: () => completeChallenge(2, "analysis-2") }),
   "analysis-2": renderAnalysis,
-  "resolution-2": () => renderResolution("Diagnostic", CONFIG.text.diagnostic, "Continuer", "travel-past-medium"),
+  "resolution-2": () => renderGalleryResolution(2, "Diagnostic", CONFIG.text.diagnostic, "Continuer", "travel-past-medium"),
   "travel-past-medium": () => renderTravel("past", "medium", "gallery-2"),
   "gallery-2": () => renderGalleryInvitation(2, "handoff-2"),
   "handoff-2": () => renderHandoff(2, "challenge-3"),
   "challenge-3": () => { if (state.completedChallenges[3]) return navigate("resolution-3", { advance: true }); const items = CONFIG.chapters[3].babyPhotos.map((photo) => ({ ...photo, prompt: "Lenny ou Milan ?", options: ["Lenny", "Milan"] })); renderChoiceSequence({ chapterId: 3, title: "Qui est qui ?", items, revealCorrect: true, decorate: (photo) => photo.src ? `<img class="baby-photo" src="${photo.src}" alt="${photo.alt}" />` : `<div class="baby-photo baby-photo--placeholder">${photo.alt}</div>`, onDone: () => completeChallenge(3, "resolution-3") }); },
-  "resolution-3": () => renderResolution("Bon…", "Tu reconnais quand même tes enfants.", "Continuer", "travel-future-small"),
+  "resolution-3": () => renderGalleryResolution(3, "Bon…", "Tu reconnais quand même tes enfants.", "Continuer", "travel-future-small"),
   "travel-future-small": () => renderTravel("future", "small", "gallery-3"),
   "gallery-3": () => renderGalleryInvitation(3, "handoff-3"),
   "handoff-3": () => renderHandoff(3, "friday-lock"),
   "friday-lock": () => renderDayLock("friday"),
   "saturday-intro": () => { app.innerHTML = page("Bonjour, samedi", `<p>Tu as bien dormi ? Moi, j’ai rêvé d’un camping-car.</p>${button("Prendre la route", "continue")}`); bindAction("continue", () => navigate("challenge-5", { advance: true })); },
   "challenge-5": () => { app.innerHTML = page("À toi de nous emmener à Stockholm", `<p>Il n’y a pas de bonne route vers le futur.</p><div id="roadTrip"></div>`); renderRoadTrip(app.querySelector("#roadTrip"), CONFIG.chapters[5].routeEvents, () => completeChallenge(5, "resolution-5")); },
-  "resolution-5": () => renderResolution("Voilà. On y est.", "L’arc-en-ciel prétend qu’il avait tout prévu.", "Continuer", "travel-future-small-5"),
+  "resolution-5": () => renderGalleryResolution(5, "Voilà. On y est.", "L’arc-en-ciel prétend qu’il avait tout prévu.", "Continuer", "travel-future-small-5"),
   "travel-future-small-5": () => renderTravel("future", "small", "reveal-5"),
   "reveal-5": () => renderResolution("Une vie possible.", "", "Regarder", "gallery-5"),
   "gallery-5": () => renderGalleryInvitation(5, "handoff-5"),
   "handoff-5": () => renderHandoff(5, "challenge-6"),
   "challenge-6": () => state.completedChallenges[6] ? navigate("resolution-6", { advance: true }) : renderChoiceSequence({ chapterId: 6, title: "Magie, histoire… ou les deux ?", items: CONFIG.chapters[6].questions.map((item) => ({ ...item, options: ["Magie", "Histoire", "Les deux"] })), revealCorrect: true, onDone: () => completeChallenge(6, "resolution-6") }),
-  "resolution-6": () => renderResolution("Finalement…", "Pourquoi choisir ?", "Continuer", "travel-future-medium-6"),
+  "resolution-6": () => renderGalleryResolution(6, "Finalement…", "Pourquoi choisir ?", "Continuer", "travel-future-medium-6"),
   "travel-future-medium-6": () => renderTravel("future", "medium", "reveal-6"),
   "reveal-6": () => renderResolution("Une autre vie possible.", "", "Regarder", "gallery-6"),
   "gallery-6": () => renderGalleryInvitation(6, "handoff-6"),
   "handoff-6": () => renderHandoff(6, "challenge-7"),
   "challenge-7": () => { app.innerHTML = page("Une minute en famille", `<p>Les règles changeront sûrement encore.</p><div id="familyGame"></div>`); cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7, "resolution-7")); },
-  "resolution-7": () => renderResolution("Bon.", "Pour les règles, on verra plus tard.", "Continuer", "travel-future-medium-7"),
+  "resolution-7": () => renderGalleryResolution(7, "Bon.", "Pour les règles, on verra plus tard.", "Continuer", "travel-future-medium-7"),
   "travel-future-medium-7": () => renderTravel("future", "medium", "gallery-7"),
   "gallery-7": () => renderGalleryInvitation(7, "handoff-7"),
   "handoff-7": () => renderHandoff(7, "travel-past-large-return"),
@@ -343,15 +374,17 @@ function setupDebug() {
   const select = debugPanel.querySelector("#debugStep");
   select.innerHTML = STEPS.map((step) => `<option value="${step.id}">${step.id}</option>`).join("");
   debugPanel.querySelector("#debugGo").addEventListener("click", () => {
+    stopActiveSoundtrack();
     state.currentStep = select.value;
     navigate(select.value);
   });
   debugPanel.querySelector("#debugUnlock").addEventListener("click", () => {
+    stopActiveSoundtrack();
     CONFIG.routeOrder.forEach((id) => { state.completedChallenges[id] = true; state.galleryViewed[id] = true; state.illustrations[id] = true; });
     Object.assign(state, { started: true, geoRiddleSolved: true, geoValidated: true, orderAnnounced: true, lettersFound: true, finalUnlocked: true, majorcaMomentSeen: true, currentStep: "final" });
     navigate("final");
   });
-  debugPanel.querySelector("#debugReset").addEventListener("click", () => { localStorage.removeItem(CONFIG.storageKey); state = defaultState(); history.replaceState(null, "", `${location.pathname}?debug=1#welcome`); render("welcome"); });
+  debugPanel.querySelector("#debugReset").addEventListener("click", () => { stopActiveSoundtrack(); localStorage.removeItem(CONFIG.storageKey); state = defaultState(); history.replaceState(null, "", `${location.pathname}?debug=1#welcome`); render("welcome"); });
 }
 
 window.addEventListener("hashchange", () => render(location.hash.slice(1) || state.currentStep));

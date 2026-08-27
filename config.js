@@ -43,6 +43,8 @@ export const CONFIG = {
         { src: null, label: "PLACEHOLDER — STRESA 1" },
         { src: null, label: "PLACEHOLDER — STRESA 2" },
       ],
+      // Option future : { enabled: true, src: "assets/audio/...", startMode: "user", volume: 0.8 }
+      soundtrack: null,
       questions: [
         { prompt: "PLACEHOLDER — question sur un lieu", options: ["Réponse A", "Réponse B", "Réponse C"], answer: 0 },
         { prompt: "PLACEHOLDER — question sur un objet", options: ["Réponse A", "Réponse B", "Réponse C"], answer: 1 },
@@ -58,6 +60,7 @@ export const CONFIG = {
       galleryTitle: "Regarde.",
       letter: "Y",
       gallery: [{ src: null, label: "PLACEHOLDER — VIE À TROIS" }],
+      soundtrack: null,
       questions: [
         { prompt: "PLACEHOLDER — Notre dimanche idéal commence par…", options: ["Un réveil lent", "Une aventure", "Un petit-déjeuner qui dure"] },
         { prompt: "PLACEHOLDER — Quand tout s’accélère, nous…", options: ["Improvisons", "Faisons une liste", "Rions d’abord"] },
@@ -70,6 +73,7 @@ export const CONFIG = {
       galleryTitle: "Regarde.",
       letter: "M",
       gallery: [{ src: null, label: "PLACEHOLDER — VIE À QUATRE" }],
+      soundtrack: null,
       babyPhotos: [
         { src: "assets/img/Lenny_1.png", answer: "Lenny", alt: "Photo de Lenny bébé" },
         { src: null, answer: "Milan", alt: "PLACEHOLDER — photo de Milan bébé" },
@@ -83,6 +87,7 @@ export const CONFIG = {
       galleryTitle: "Stockholm",
       letter: "V",
       gallery: [{ src: null, label: "PLACEHOLDER — STOCKHOLM" }],
+      soundtrack: null,
       routeEvents: [
         { text: "La route s’ouvre devant nous.", action: "Démarrer" },
         { text: "Une pause imprévue. L’arc-en-ciel prétend connaître un raccourci.", action: "Reprendre la route" },
@@ -95,6 +100,7 @@ export const CONFIG = {
       galleryTitle: "Regarde.",
       letter: "T",
       gallery: [{ src: null, label: "PLACEHOLDER — MAISON FAMILIALE" }],
+      soundtrack: null,
       questions: [
         { prompt: "PLACEHOLDER — Le premier matin dans notre maison", answer: "Les deux" },
         { prompt: "PLACEHOLDER — Un détail extraordinaire du quotidien", answer: "Magie" },
@@ -107,6 +113,7 @@ export const CONFIG = {
       galleryTitle: "Regarde.",
       letter: "M",
       gallery: [{ src: null, label: "PLACEHOLDER — ADOLESCENCE" }],
+      soundtrack: null,
     },
     8: {
       title: "Futur lointain",
@@ -114,6 +121,7 @@ export const CONFIG = {
       galleryTitle: "Regarde.",
       letter: "E",
       gallery: [{ src: null, label: "PLACEHOLDER — FUTUR LOINTAIN" }],
+      soundtrack: null,
       tracks: [
         { label: "Extrait guitare PLACEHOLDER 1", options: ["Morceau A", "Morceau B", "Morceau C"], answer: 0 },
         { label: "Extrait guitare PLACEHOLDER 2", options: ["Morceau D", "Morceau E", "Morceau F"], answer: 1 },
