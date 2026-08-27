@@ -1,22 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simple HTML Page</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f4ead8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Notre carnet de voyage</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="page-container">
-    <h1>Welcome to the Simple Page 3</h1>
-    <p>This page demonstrates a small layout with CSS and JavaScript.</p>
-    <button id="themeButton">Toggle theme</button>
-    <div class="card">
-      <h2>Interactive card</h2>
-      <p>Click the button to update this message.</p>
-      <button id="actionButton">Change text</button>
+  <div class="weather" aria-hidden="true">
+    <span class="weather__rain"></span>
+    <span class="weather__sun">☀</span>
+    <span class="weather__rainbow">⌒</span>
+  </div>
+
+  <header class="site-header" hidden>
+    <div class="progress" aria-label="Progression du voyage">
+      <span id="progressLabel">Le carnet</span>
+      <span class="progress__track"><span id="progressBar"></span></span>
     </div>
+    <span class="illustration-count" id="illustrationCount" hidden>Souvenirs</span>
+  </header>
+
+  <main id="app" class="app" aria-live="polite">
+    <section class="paper-card loading-card">
+      <p>Le carnet s’ouvre…</p>
+    </section>
   </main>
-  <script src="script.js"></script>
+
+  <aside id="debugPanel" class="debug-panel" hidden aria-label="Outils de test">
+    <details>
+      <summary>Mode test</summary>
+      <label for="debugStep">Aller à une étape</label>
+      <select id="debugStep"></select>
+      <div class="debug-actions">
+        <button id="debugGo" type="button">Ouvrir</button>
+        <button id="debugUnlock" type="button">Tout débloquer</button>
+        <button id="debugReset" class="button-danger" type="button">Reset complet</button>
+      </div>
+      <p>Horaires, GPS et timers longs sont automatiquement ignorés.</p>
+    </details>
+  </aside>
+
+  <noscript>Ce carnet a besoin de JavaScript pour raconter son histoire.</noscript>
+  <script type="module" src="script.js?v=1.1.2"></script>
 </body>
 </html>
