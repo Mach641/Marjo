@@ -120,8 +120,19 @@ function renderGalleryInvitation(chapterId, nextStep) {
   const chapter = CONFIG.chapters[chapterId];
   const namedGallery = chapterId === 1 || chapterId === 5;
   const accessibleLabel = namedGallery ? `Images — ${chapter.title}` : "Fenêtre sur votre histoire";
-  app.innerHTML = page(chapter.galleryTitle, `<p class="orientation-invite"><span aria-hidden="true">↻</span> Tourne-moi.</p>${button("Ouvrir la fenêtre", "open-viewer")}`, { guide: "Laisse l’image raconter le reste." });
-  bindAction("open-viewer", () => {
+  app.innerHTML = `<section class="paper-card screen orientation-screen"><p class="orientation-invite">Tourne-moi.</p>${button("Ouvrir quand même", "open-viewer", "quiet-button")}</section>`;
+
+  const landscape = matchMedia("(orientation: landscape)");
+  let opening = false;
+  const removeOrientationListeners = () => {
+    landscape.removeEventListener?.("change", handleOrientation);
+    window.removeEventListener("orientationchange", handleOrientation);
+    window.removeEventListener("resize", handleOrientation);
+  };
+  const openViewer = () => {
+    if (opening) return;
+    opening = true;
+    removeOrientationListeners();
     cleanupCurrentScreen = openGalleryViewer({
       accessibleLabel,
       images: chapter.gallery,
@@ -133,7 +144,17 @@ function renderGalleryInvitation(chapterId, nextStep) {
         navigate(nextStep, { advance: true });
       },
     });
-  });
+  };
+  function handleOrientation() {
+    if (landscape.matches || innerWidth > innerHeight) openViewer();
+  }
+
+  landscape.addEventListener?.("change", handleOrientation);
+  window.addEventListener("orientationchange", handleOrientation);
+  window.addEventListener("resize", handleOrientation);
+  cleanupCurrentScreen = removeOrientationListeners;
+  bindAction("open-viewer", openViewer);
+  handleOrientation();
 }
 
 function renderHandoff(chapterId, nextStep, message = "Vincent a quelque chose à te remettre.") {
@@ -168,7 +189,7 @@ function renderDayLock(kind) {
     app.innerHTML = page("Bonjour, samedi", `<p>Le carnet est prêt à reprendre la route.</p>${button("Ouvrir le carnet", "continue")}`, { guide: "Les pages ont attendu." });
     return bindAction("continue", () => navigate(next, { advance: true }));
   }
-  app.innerHTML = page("Referme-moi pour ce soir", `<p>${friday ? "Je crois qu’on est allés assez loin pour ce soir. Reviens me voir demain matin." : "C’est tout pour aujourd’hui. Profite un peu du vrai voyage. On reprend demain."}</p><p class="notice">Ta place est gardée.</p>`, { guide: "Même un carnet doit laisser respirer les histoires." });
+  app.innerHTML = page("Referme-moi pour ce soir", `<p>${friday ? "Je crois qu’on est allés assez loin pour ce soir. Reviens me voir demain matin." : "C’est tout pour aujourd’hui. Profite un peu du vrai voyage. On reprend demain."}</p><p class="notice"><strong>Ta progression est sauvegardée.</strong><br>Tu peux fermer Safari sans crainte.</p>`, { guide: "Même un carnet doit laisser respirer les histoires." });
 }
 
 function normalize(value) { return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, ""); }
@@ -238,10 +259,10 @@ const renderers = {
   "challenge-1": () => state.completedChallenges[1] ? navigate("resolution-1", { advance: true }) : renderChoiceSequence({ chapterId: 1, title: CONFIG.chapters[1].publicChallengeTitle, items: CONFIG.chapters[1].questions, enforceCorrect: true, onDone: () => completeChallenge(1, "resolution-1") }),
   "resolution-1": () => renderResolution("Tu t’en souviens.", "Alors laisse-moi te montrer ce que tu n’avais jamais vu.", "Découvrir le souvenir", "gallery-1"),
   "gallery-1": () => renderGalleryInvitation(1, "handoff-1"),
-  "handoff-1": () => renderHandoff(1, "travel-future-large"),
-  "travel-future-large": () => renderTravel("future", "large", "challenge-8"),
+  "handoff-1": () => renderHandoff(1, "challenge-8"),
   "challenge-8": () => state.completedChallenges[8] ? navigate("resolution-8", { advance: true }) : renderChoiceSequence({ chapterId: 8, title: "Blind test guitare", items: CONFIG.chapters[8].tracks, enforceCorrect: true, decorate: (track, index) => `<div class="audio-placeholder"><span>♫</span><button class="secondary-button" type="button" data-play>Écouter la piste ${index + 1}</button><small>Piste ${index + 1}</small></div>`, onDone: () => completeChallenge(8, "resolution-8") }),
-  "resolution-8": () => renderResolution("Celle-là, garde-la quelque part.", "Certaines chansons savent attendre longtemps.", "Regarder", "gallery-8"),
+  "resolution-8": () => renderResolution("Celle-là, garde-la quelque part.", "Certaines chansons savent attendre longtemps.", "Continuer", "travel-future-large"),
+  "travel-future-large": () => renderTravel("future", "large", "gallery-8"),
   "gallery-8": () => renderGalleryInvitation(8, "handoff-8"),
   "handoff-8": () => renderHandoff(8, "thursday-lock"),
   "thursday-lock": () => renderDayLock("thursday"),

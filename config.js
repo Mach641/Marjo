@@ -1,7 +1,7 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
-  stateVersion: 2,
+  stateVersion: 3,
   password: "MYMPVTME",
   routeOrder: [1, 8, 2, 3, 5, 6, 7, 4],
   chronologicalOrder: [1, 2, 3, 4, 5, 6, 7, 8],
@@ -125,7 +125,7 @@ export const CONFIG = {
 
 export const STEPS = [
   "welcome", "prologue", "challenge-1", "resolution-1", "gallery-1", "handoff-1",
-  "travel-future-large", "challenge-8", "resolution-8", "gallery-8", "handoff-8", "thursday-lock",
+  "challenge-8", "resolution-8", "travel-future-large", "gallery-8", "handoff-8", "thursday-lock",
   "travel-past-large", "friday-returned", "geo", "departure", "flight", "challenge-2", "analysis-2", "resolution-2",
   "travel-past-medium", "gallery-2", "handoff-2", "challenge-3", "resolution-3", "travel-future-small",
   "gallery-3", "handoff-3", "friday-lock", "saturday-intro", "challenge-5", "resolution-5",
