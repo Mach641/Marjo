@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.2.2";
+export const APP_VERSION = "1.3";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -134,13 +134,13 @@ export const CONFIG = {
 };
 
 export const STEPS = [
-  "welcome", "prologue", "challenge-1", "resolution-1", "gallery-1", "handoff-1",
-  "challenge-8", "resolution-8", "travel-future-large", "gallery-8", "handoff-8", "thursday-lock",
+  "welcome", "prologue", "challenge-1", "resolution-1", "gallery-1", "travel-past-medium-1", "handoff-1",
+  "challenge-8", "resolution-8", "gallery-8", "travel-future-large", "handoff-8", "thursday-lock",
   "travel-past-large", "friday-returned", "geo", "departure", "flight", "challenge-2", "analysis-2", "resolution-2",
-  "travel-past-medium", "gallery-2", "handoff-2", "challenge-3", "resolution-3", "travel-future-small",
-  "gallery-3", "handoff-3", "friday-lock", "saturday-intro", "challenge-5", "resolution-5",
-  "travel-future-small-5", "reveal-5", "gallery-5", "handoff-5", "challenge-6", "resolution-6",
-  "travel-future-medium-6", "reveal-6", "gallery-6", "handoff-6", "challenge-7", "resolution-7",
-  "travel-future-medium-7", "gallery-7", "handoff-7", "travel-past-large-return", "saturday-evening",
+  "gallery-2", "travel-past-medium", "handoff-2", "challenge-3", "resolution-3", "gallery-3",
+  "travel-future-small", "handoff-3", "friday-lock", "saturday-intro", "challenge-5", "resolution-5",
+  "reveal-5", "gallery-5", "travel-future-small-5", "handoff-5", "challenge-6", "resolution-6",
+  "reveal-6", "gallery-6", "travel-future-medium-6", "handoff-6", "challenge-7", "resolution-7",
+  "gallery-7", "travel-future-medium-7", "handoff-7", "travel-past-large-return", "saturday-evening",
   "majorca", "order", "letters-clue", "password", "final",
 ].map((id) => ({ id, label: id.replaceAll("-", " ") }));

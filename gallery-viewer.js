@@ -1,6 +1,6 @@
-export function openGalleryViewer({ accessibleLabel = "Fenêtre sur votre histoire", images, onClose, placeholderLabel = "PLACEHOLDER — IMAGE À REMPLACER", soundtrack = null }) {
+export function openGalleryViewer({ accessibleLabel = "Fenêtre sur votre histoire", images, onClose, placeholderLabel = "PLACEHOLDER — IMAGE À REMPLACER", reveal = false, soundtrack = null }) {
   const viewer = document.createElement("div");
-  viewer.className = "landscape-viewer";
+  viewer.className = `landscape-viewer${reveal ? " landscape-viewer--reveal" : ""}`;
   viewer.setAttribute("role", "dialog");
   viewer.setAttribute("aria-label", accessibleLabel);
   viewer.innerHTML = `
@@ -20,17 +20,35 @@ export function openGalleryViewer({ accessibleLabel = "Fenêtre sur votre histoi
   const mute = viewer.querySelector(".landscape-viewer__mute");
   let current = 0;
   let finished = false;
+  let closeTimer = null;
+
+  const hideClose = () => {
+    clearTimeout(closeTimer);
+    closeTimer = null;
+    close.classList.remove("landscape-viewer__close--visible");
+    close.hidden = true;
+  };
+
+  const scheduleClose = () => {
+    hideClose();
+    closeTimer = setTimeout(() => {
+      close.hidden = false;
+      requestAnimationFrame(() => close.classList.add("landscape-viewer__close--visible"));
+    }, 3000);
+  };
 
   const update = () => {
     current = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
-    close.hidden = current < images.length - 1;
+    if (current === images.length - 1) scheduleClose();
+    else hideClose();
   };
   track.addEventListener("scroll", update, { passive: true });
-  close.hidden = images.length > 1;
+  close.hidden = true;
 
   const finish = () => {
     if (finished) return;
     finished = true;
+    clearTimeout(closeTimer);
     viewer.remove();
     document.body.classList.remove("viewer-open");
     document.exitFullscreen?.().catch?.(() => {});

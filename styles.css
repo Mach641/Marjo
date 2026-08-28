@@ -233,10 +233,12 @@ blockquote { margin: 18px 0 28px; padding: 18px; border-left: 3px solid var(--te
 .box-placeholder b { padding: 8px 12px; border: 1px solid rgba(255,255,255,0.45); font-family: Georgia, serif; }
 .domain-reveal { margin-top: 35px; color: var(--terracotta); font: 600 clamp(1.4rem, 7vw, 2.3rem)/1.1 Georgia, serif; text-align: center; }
 
-.debug-panel { position: fixed; z-index: 50; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); width: min(320px, calc(100vw - 16px)); padding: 10px; border: 1px solid #30343b; border-radius: 8px; background: rgba(34, 38, 44, 0.96); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.35); font-size: 0.8rem; }
+.debug-panel { position: fixed; z-index: 50; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); width: auto; padding: 0; border: 1px solid #30343b; border-radius: 8px; background: rgba(34, 38, 44, 0.96); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.35); font-size: 0.8rem; }
+.debug-panel--open { width: min(320px, calc(100vw - 16px)); padding: 10px; }
 .debug-panel[hidden] { display: none; }
-.debug-panel .debug-version { margin: 0 0 7px; color: #fff; font-size: .72rem; font-weight: 700; letter-spacing: .02em; }
-.debug-panel summary { cursor: pointer; font-weight: 800; }
+.debug-panel summary { display: flex; align-items: center; min-height: 36px; padding: 7px 11px; cursor: pointer; font-weight: 800; white-space: nowrap; }
+.debug-panel--open summary { margin: -10px -10px 0; }
+.debug-panel summary::-webkit-details-marker { display: none; }
 .debug-panel label { display: block; margin: 10px 0 4px; }
 .debug-panel select { width: 100%; min-height: 36px; }
 .debug-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
@@ -266,24 +268,29 @@ noscript { display: block; margin: 30px; text-align: center; }
 .viewer-open { overflow: hidden; background: #000; }
 .viewer-open::before { display: none; }
 .viewer-open .site-header, .viewer-open .app, .viewer-open .weather, .viewer-open .debug-panel { visibility: hidden; }
-.landscape-viewer { position: fixed; z-index: 999; inset: 0; width: 100vw; height: 100vh; height: 100dvh; display: grid; grid-template-rows: 1fr auto; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); color: white; background: #000; }
+.landscape-viewer { position: fixed; z-index: 999; inset: 0; width: 100vw; height: 100vh; height: 100dvh; display: grid; grid-template-rows: 1fr; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); color: white; background: #000; }
 .landscape-viewer__track { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; min-width: 0; overflow-x: auto; overscroll-behavior: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .landscape-viewer__track::-webkit-scrollbar { display: none; }
 .landscape-viewer__slide { position: relative; display: grid; place-items: center; width: 100%; height: 100%; min-height: 0; margin: 0; scroll-snap-align: center; }
 .landscape-viewer__slide img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.landscape-viewer--reveal .landscape-viewer__slide:first-child { animation: gallery-reveal .55s ease both; }
+@keyframes gallery-reveal { from { opacity: 0; } to { opacity: 1; } }
 .landscape-viewer__slide figcaption { position: absolute; right: max(12px, env(safe-area-inset-right)); bottom: 10px; padding: 5px 8px; border-radius: 99px; background: rgba(0,0,0,.58); font-size: .72rem; }
 .landscape-viewer__placeholder { padding: 30px; color: #aaa; background: #111; font: 700 .8rem/1.5 monospace; text-align: center; }
 .landscape-viewer__mute { position: absolute; z-index: 3; top: max(10px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); min-height: 38px; padding: 7px 12px; border: 1px solid #555; border-radius: 99px; color: white; background: rgba(23,23,23,.82); font-size: .72rem; }
-.landscape-viewer__close { min-height: 48px; margin: 8px auto; padding: 10px 22px; border: 1px solid #555; border-radius: 99px; color: white; background: #171717; }
+.landscape-viewer__close { position: absolute; z-index: 3; left: 50%; bottom: max(10px, env(safe-area-inset-bottom)); min-height: 48px; padding: 10px 22px; border: 1px solid #555; border-radius: 99px; color: white; background: rgba(23,23,23,.9); opacity: 0; pointer-events: none; transform: translate(-50%, 8px); transition: opacity .35s ease, transform .35s ease; }
+.landscape-viewer__close--visible { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
 .landscape-viewer__orientation { display: none; position: absolute; z-index: 2; top: calc(10px + env(safe-area-inset-top)); left: 50%; padding: 6px 10px; border-radius: 99px; background: rgba(0,0,0,.68); transform: translateX(-50%); font-size: .75rem; }
 @media (orientation: portrait) { .landscape-viewer__orientation { display: block; } }
 
 .time-travel { display: grid; place-items: center; min-height: calc(100dvh - 110px); overflow: hidden; text-align: center; }
 .time-travel__book { position: relative; width: min(76vw, 360px); height: min(52vw, 245px); perspective: 900px; }
 .time-travel__book::before { content: ""; position: absolute; inset: 0; border: 1px solid var(--line); border-radius: 5px 12px 12px 5px; background: var(--paper); box-shadow: var(--shadow); }
-.time-travel__book i { position: absolute; inset: 3px; border: 1px solid rgba(120,95,65,.22); border-radius: 4px 10px 10px 4px; background: #fffaf0; transform-origin: left center; animation: turn-page 1s cubic-bezier(.45,.02,.4,1) both; animation-delay: calc(var(--page) * 70ms); }
+.time-travel__book i { position: absolute; inset: 3px; border: 1px solid rgba(120,95,65,.22); border-radius: 4px 10px 10px 4px; background: #fffaf0; transform-origin: left center; animation: turn-page 1.6s cubic-bezier(.45,.02,.4,1) both; animation-delay: calc(var(--page) * 180ms); }
 .time-travel--right .time-travel__book i { transform-origin: right center; animation-name: turn-page-right; }
-.time-travel--large .time-travel__book i { animation-duration: .72s; }
+.time-travel--medium .time-travel__book i { animation-duration: 1.8s; animation-delay: calc(var(--page) * 240ms); }
+.time-travel--large .time-travel__book i { animation-duration: 2.4s; animation-delay: calc(var(--page) * 200ms); }
+.time-travel--debug .time-travel__book i { animation-duration: .15s; animation-delay: calc(var(--page) * 10ms); }
 @keyframes turn-page { from { transform: rotateY(0); } to { transform: rotateY(-178deg); } }
 @keyframes turn-page-right { from { transform: rotateY(0); } to { transform: rotateY(178deg); } }
 

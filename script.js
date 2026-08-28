@@ -1,7 +1,7 @@
 import { APP_VERSION, CONFIG, STEPS } from "./config.js";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
-import { openGalleryViewer } from "./gallery-viewer.js?v=1.2.1";
+import { openGalleryViewer } from "./gallery-viewer.js?v=1.3";
 import { renderRoadTrip } from "./road-trip.js";
 import { playTimeTravel } from "./time-travel.js";
 
@@ -145,52 +145,56 @@ function renderGalleryResolution(chapterId, title, text, cta, next, options = {}
   });
 }
 
-function renderGalleryInvitation(chapterId, nextStep) {
-  const chapter = CONFIG.chapters[chapterId];
-  const namedGallery = chapterId === 1 || chapterId === 5;
-  const accessibleLabel = namedGallery ? `Images — ${chapter.title}` : "Fenêtre sur votre histoire";
-  app.innerHTML = `<section class="paper-card screen orientation-screen"><p class="orientation-invite">Tourne-moi.</p>${button("Ouvrir quand même", "open-viewer", "quiet-button")}</section>`;
+function renderGalleryInvitation(travelStep) {
+  app.innerHTML = `<section class="paper-card screen orientation-screen"><p class="orientation-invite">Tourne-moi.</p>${button("Ouvrir quand même", "continue", "quiet-button")}</section>`;
 
   const landscape = matchMedia("(orientation: landscape)");
-  let opening = false;
+  let travelling = false;
   const removeOrientationListeners = () => {
     landscape.removeEventListener?.("change", handleOrientation);
     window.removeEventListener("orientationchange", handleOrientation);
     window.removeEventListener("resize", handleOrientation);
   };
-  const openViewer = () => {
-    if (opening) return;
-    opening = true;
+  const startTravel = () => {
+    if (travelling) return;
+    travelling = true;
     removeOrientationListeners();
-    cleanupCurrentScreen = openGalleryViewer({
-      accessibleLabel,
-      images: chapter.gallery,
-      soundtrack: activeSoundtrack,
-      placeholderLabel: namedGallery ? `PLACEHOLDER — ${chapter.title.toUpperCase()}` : "PLACEHOLDER — IMAGE À REMPLACER",
-      onClose: () => {
-        cleanupCurrentScreen = null;
-        stopActiveSoundtrack();
-        state.galleryViewed[chapterId] = true;
-        saveState();
-        navigate(nextStep, { advance: true });
-      },
-    });
+    navigate(travelStep, { advance: true });
   };
   function handleOrientation() {
-    if (landscape.matches || innerWidth > innerHeight) openViewer();
+    if (landscape.matches || innerWidth > innerHeight) startTravel();
   }
 
   landscape.addEventListener?.("change", handleOrientation);
   window.addEventListener("orientationchange", handleOrientation);
   window.addEventListener("resize", handleOrientation);
   cleanupCurrentScreen = removeOrientationListeners;
-  bindAction("open-viewer", openViewer);
+  bindAction("continue", startTravel);
   handleOrientation();
 }
 
+function openChapterGallery(chapterId, nextStep) {
+  const chapter = CONFIG.chapters[chapterId];
+  const namedGallery = chapterId === 1 || chapterId === 5;
+  const accessibleLabel = namedGallery ? `Images — ${chapter.title}` : "Fenêtre sur votre histoire";
+  cleanupCurrentScreen = openGalleryViewer({
+    accessibleLabel,
+    images: chapter.gallery,
+    reveal: true,
+    soundtrack: activeSoundtrack,
+    placeholderLabel: namedGallery ? `PLACEHOLDER — ${chapter.title.toUpperCase()}` : "PLACEHOLDER — IMAGE À REMPLACER",
+    onClose: () => {
+      cleanupCurrentScreen = null;
+      stopActiveSoundtrack();
+      state.galleryViewed[chapterId] = true;
+      saveState();
+      navigate(nextStep, { advance: true });
+    },
+  });
+}
+
 function renderHandoff(chapterId, nextStep, message = "Vincent a quelque chose à te remettre.") {
-  const already = state.illustrations[chapterId];
-  app.innerHTML = page("Reviens au carnet", `<p>${message}</p>${already ? "<p>Tu l’as déjà entre les mains.</p>" : ""}${button(already ? "Continuer" : "Je l’ai", "have-it")}`, { guide: chapterId === 1 ? "Il en reste une." : "Garde-la près de toi." });
+  app.innerHTML = `<section class="paper-card screen">${rainbowGuide("Il en reste une.")}<p>${message}</p>${button("Je l’ai", "have-it")}</section>`;
   bindAction("have-it", () => {
     state.illustrations[chapterId] = true;
     saveState();
@@ -202,6 +206,13 @@ function renderTravel(direction, intensity, next) {
   cleanupCurrentScreen = playTimeTravel(app, { direction, intensity, visualDirections: CONFIG.timeTravel.visualDirections, debug: debugMode }, () => {
     cleanupCurrentScreen = null;
     navigate(next, { advance: true });
+  });
+}
+
+function renderTravelGallery(chapterId, direction, intensity, nextStep) {
+  cleanupCurrentScreen = playTimeTravel(app, { direction, intensity, visualDirections: CONFIG.timeTravel.visualDirections, debug: debugMode }, () => {
+    cleanupCurrentScreen = null;
+    openChapterGallery(chapterId, nextStep);
   });
 }
 
@@ -220,7 +231,7 @@ function renderDayLock(kind) {
     app.innerHTML = page("Bonjour, samedi", `<p>Le carnet est prêt à reprendre la route.</p>${button("Ouvrir le carnet", "continue")}`, { guide: "Les pages ont attendu." });
     return bindAction("continue", () => navigate(next, { advance: true }));
   }
-  app.innerHTML = page("Referme-moi pour ce soir", `<p>${friday ? "Je crois qu’on est allés assez loin pour ce soir. Reviens me voir demain matin." : "C’est tout pour aujourd’hui. Profite un peu du vrai voyage. On reprend demain."}</p><p class="notice"><strong>Ta progression est sauvegardée.</strong><br>Tu peux fermer Safari sans crainte.</p>`, { guide: "Même un carnet doit laisser respirer les histoires." });
+  app.innerHTML = page("Referme-moi pour ce soir", `<p>${friday ? "Je crois qu’on est allés assez loin pour ce soir. Reviens me voir demain matin." : "C’est tout pour aujourd’hui. Profite un peu du vrai voyage. On reprend demain."}</p><p class="notice"><strong>Ta progression est sauvegardée.</strong><br>Tu peux fermer le carnet sans crainte.</p>`, { guide: "Même un carnet doit laisser respirer les histoires." });
 }
 
 function normalize(value) { return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, ""); }
@@ -237,11 +248,14 @@ function renderGeo() {
     return bindAction("solve", () => {
       const accepted = new Set(["saintexupery", "aeroportsaintexupery", "lyonsaintexupery", "aeroportlyonsaintexupery"]);
       if (!accepted.has(normalize(app.querySelector("#destination").value))) return void (app.querySelector(".feedback").textContent = "Ce n’est pas encore le bon départ.");
-      state.geoRiddleSolved = true; saveState(); renderGeo();
+      state.geoRiddleSolved = true;
+      saveState();
+      app.innerHTML = page("Exact.", `<p>Encore faut-il y être…</p>${button("Continuer", "continue")}`);
+      bindAction("continue", renderGeo);
     }, false);
   }
   if (state.geoValidated) return navigate("departure", { advance: true });
-  app.innerHTML = page("Exact.", `<p>Encore faut-il y être…</p>${button(debugMode ? "Valider la position (test)" : "Vérifier ma position", "locate")}<p class="feedback" role="status"></p>`, { guide: "Tu sais où aller. Je t’attends là-bas." });
+  app.innerHTML = `<section class="paper-card screen">${button(debugMode ? "Valider la position (test)" : "Vérifier ma position", "locate")}<div class="feedback" role="status"></div></section>`;
   bindAction("locate", () => {
     if (debugMode) { state.geoValidated = true; saveState(); return navigate("departure", { advance: true }); }
     const feedback = app.querySelector(".feedback");
@@ -250,7 +264,7 @@ function renderGeo() {
     navigator.geolocation.getCurrentPosition(({ coords }) => {
       const distance = haversineKm(coords.latitude, coords.longitude, CONFIG.geo.latitude, CONFIG.geo.longitude);
       if (distance <= CONFIG.geo.radiusKm) { state.geoValidated = true; saveState(); navigate("departure", { advance: true }); }
-      else feedback.textContent = "Tu sais où aller. Je t’attends là-bas.";
+      else feedback.innerHTML = rainbowGuide("Tu sais où aller. Je t’attends là-bas.");
     }, (error) => { feedback.textContent = error.code === 1 ? "Localisation refusée. Tu pourras réessayer ici." : "Position indisponible. Réessaie dans un instant."; }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
   }, false);
 }
@@ -289,55 +303,56 @@ const renderers = {
   prologue: () => { app.innerHTML = page("Avant de partir", `${CONFIG.text.prologue.map((line) => `<p>${line}</p>`).join("")}${button("Tourner la page", "continue")}`, { guide: "Bonjour Marjolaine." }); bindAction("continue", () => navigate("challenge-1", { advance: true })); },
   "challenge-1": () => state.completedChallenges[1] ? navigate("resolution-1", { advance: true }) : renderChoiceSequence({ chapterId: 1, title: CONFIG.chapters[1].publicChallengeTitle, items: CONFIG.chapters[1].questions, enforceCorrect: true, onDone: () => completeChallenge(1, "resolution-1") }),
   "resolution-1": () => renderGalleryResolution(1, "Tu t’en souviens.", "Alors laisse-moi te montrer ce que tu n’avais jamais vu.", "Découvrir le souvenir", "gallery-1"),
-  "gallery-1": () => renderGalleryInvitation(1, "handoff-1"),
+  "gallery-1": () => renderGalleryInvitation("travel-past-medium-1"),
+  "travel-past-medium-1": () => renderTravelGallery(1, "past", "medium", "handoff-1"),
   "handoff-1": () => renderHandoff(1, "challenge-8"),
   "challenge-8": () => state.completedChallenges[8] ? navigate("resolution-8", { advance: true }) : renderChoiceSequence({ chapterId: 8, title: "Blind test guitare", items: CONFIG.chapters[8].tracks, enforceCorrect: true, decorate: (track, index) => `<div class="audio-placeholder"><span>♫</span><button class="secondary-button" type="button" data-play>Écouter la piste ${index + 1}</button><small>Piste ${index + 1}</small></div>`, onDone: () => completeChallenge(8, "resolution-8") }),
-  "resolution-8": () => renderGalleryResolution(8, "Celle-là, garde-la quelque part.", "Certaines chansons savent attendre longtemps.", "Continuer", "travel-future-large"),
-  "travel-future-large": () => renderTravel("future", "large", "gallery-8"),
-  "gallery-8": () => renderGalleryInvitation(8, "handoff-8"),
+  "resolution-8": () => renderGalleryResolution(8, "Celle-là, garde-la quelque part.", "Certaines chansons savent attendre longtemps.", "Continuer", "gallery-8"),
+  "gallery-8": () => renderGalleryInvitation("travel-future-large"),
+  "travel-future-large": () => renderTravelGallery(8, "future", "large", "handoff-8"),
   "handoff-8": () => renderHandoff(8, "thursday-lock"),
   "thursday-lock": () => renderDayLock("thursday"),
   "travel-past-large": () => renderTravel("past", "large", "friday-returned"),
-  "friday-returned": () => renderResolution("Retour au présent", "", "Continuer", "geo", { guide: "Bon. Revenons à aujourd’hui." }),
+  "friday-returned": () => { app.innerHTML = `<section class="paper-card screen">${rainbowGuide("Bon. Revenons à aujourd’hui.")}${button("Continuer", "continue")}</section>`; bindAction("continue", () => navigate("geo", { advance: true })); },
   geo: renderGeo,
   departure: () => {
     if (state.awaitingFlightReopen) {
       app.innerHTML = page("À bientôt là-haut.", `<p>Le carnet t’attendra.</p>${button("Rouvrir le carnet", "reopen-book")}`);
       return bindAction("reopen-book", () => { state.awaitingFlightReopen = false; saveState(); navigate("flight", { advance: true }); });
     }
-    app.innerHTML = page("Le départ", `<p>Tu es au bon endroit… prête à voyager ?</p><p>On se retrouve là-haut.</p>${button("Refermer le carnet", "close-book")}`, { guide: "À tout à l’heure." });
+    app.innerHTML = page("Le départ", `<p>Tu es au bon endroit… prête à voyager ?</p>${rainbowGuide("On se retrouve là-haut.")}${button("Refermer le carnet", "close-book")}`);
     bindAction("close-book", () => { state.awaitingFlightReopen = true; saveState(); renderers.departure(); });
   },
   flight: () => { app.innerHTML = page("Quelque part au-dessus des nuages", `<div class="plane" aria-hidden="true">✈</div>${button("Poursuivre le voyage", "continue")}`, { guide: "Tu vois ? Même les nuages ont des pages." }); bindAction("continue", () => navigate("challenge-2", { advance: true })); },
   "challenge-2": () => state.completedChallenges[2] ? navigate("analysis-2", { advance: true }) : renderChoiceSequence({ chapterId: 2, title: "Notre profil de couple", items: CONFIG.chapters[2].questions, onDone: () => completeChallenge(2, "analysis-2") }),
   "analysis-2": renderAnalysis,
-  "resolution-2": () => renderGalleryResolution(2, "Diagnostic", CONFIG.text.diagnostic, "Continuer", "travel-past-medium"),
-  "travel-past-medium": () => renderTravel("past", "medium", "gallery-2"),
-  "gallery-2": () => renderGalleryInvitation(2, "handoff-2"),
+  "resolution-2": () => renderGalleryResolution(2, "Diagnostic", CONFIG.text.diagnostic, "Continuer", "gallery-2"),
+  "gallery-2": () => renderGalleryInvitation("travel-past-medium"),
+  "travel-past-medium": () => renderTravelGallery(2, "past", "medium", "handoff-2"),
   "handoff-2": () => renderHandoff(2, "challenge-3"),
   "challenge-3": () => { if (state.completedChallenges[3]) return navigate("resolution-3", { advance: true }); const items = CONFIG.chapters[3].babyPhotos.map((photo) => ({ ...photo, prompt: "Lenny ou Milan ?", options: ["Lenny", "Milan"] })); renderChoiceSequence({ chapterId: 3, title: "Qui est qui ?", items, revealCorrect: true, decorate: (photo) => photo.src ? `<img class="baby-photo" src="${photo.src}" alt="${photo.alt}" />` : `<div class="baby-photo baby-photo--placeholder">${photo.alt}</div>`, onDone: () => completeChallenge(3, "resolution-3") }); },
-  "resolution-3": () => renderGalleryResolution(3, "Bon…", "Tu reconnais quand même tes enfants.", "Continuer", "travel-future-small"),
-  "travel-future-small": () => renderTravel("future", "small", "gallery-3"),
-  "gallery-3": () => renderGalleryInvitation(3, "handoff-3"),
+  "resolution-3": () => renderGalleryResolution(3, "Bon…", "Tu reconnais quand même tes enfants.", "Continuer", "gallery-3"),
+  "gallery-3": () => renderGalleryInvitation("travel-future-small"),
+  "travel-future-small": () => renderTravelGallery(3, "future", "small", "handoff-3"),
   "handoff-3": () => renderHandoff(3, "friday-lock"),
   "friday-lock": () => renderDayLock("friday"),
   "saturday-intro": () => { app.innerHTML = page("Bonjour, samedi", `<p>Tu as bien dormi ? Moi, j’ai rêvé d’un camping-car.</p>${button("Prendre la route", "continue")}`); bindAction("continue", () => navigate("challenge-5", { advance: true })); },
   "challenge-5": () => { app.innerHTML = page("À toi de nous emmener à Stockholm", `<p>Il n’y a pas de bonne route vers le futur.</p><div id="roadTrip"></div>`); renderRoadTrip(app.querySelector("#roadTrip"), CONFIG.chapters[5].routeEvents, () => completeChallenge(5, "resolution-5")); },
-  "resolution-5": () => renderGalleryResolution(5, "Voilà. On y est.", "L’arc-en-ciel prétend qu’il avait tout prévu.", "Continuer", "travel-future-small-5"),
-  "travel-future-small-5": () => renderTravel("future", "small", "reveal-5"),
+  "resolution-5": () => renderGalleryResolution(5, "Voilà. On y est.", "L’arc-en-ciel prétend qu’il avait tout prévu.", "Continuer", "reveal-5"),
   "reveal-5": () => renderResolution("Une vie possible.", "", "Regarder", "gallery-5"),
-  "gallery-5": () => renderGalleryInvitation(5, "handoff-5"),
+  "gallery-5": () => renderGalleryInvitation("travel-future-small-5"),
+  "travel-future-small-5": () => renderTravelGallery(5, "future", "small", "handoff-5"),
   "handoff-5": () => renderHandoff(5, "challenge-6"),
   "challenge-6": () => state.completedChallenges[6] ? navigate("resolution-6", { advance: true }) : renderChoiceSequence({ chapterId: 6, title: "Magie, histoire… ou les deux ?", items: CONFIG.chapters[6].questions.map((item) => ({ ...item, options: ["Magie", "Histoire", "Les deux"] })), revealCorrect: true, onDone: () => completeChallenge(6, "resolution-6") }),
-  "resolution-6": () => renderGalleryResolution(6, "Finalement…", "Pourquoi choisir ?", "Continuer", "travel-future-medium-6"),
-  "travel-future-medium-6": () => renderTravel("future", "medium", "reveal-6"),
+  "resolution-6": () => renderGalleryResolution(6, "Finalement…", "Pourquoi choisir ?", "Continuer", "reveal-6"),
   "reveal-6": () => renderResolution("Une autre vie possible.", "", "Regarder", "gallery-6"),
-  "gallery-6": () => renderGalleryInvitation(6, "handoff-6"),
+  "gallery-6": () => renderGalleryInvitation("travel-future-medium-6"),
+  "travel-future-medium-6": () => renderTravelGallery(6, "future", "medium", "handoff-6"),
   "handoff-6": () => renderHandoff(6, "challenge-7"),
   "challenge-7": () => { app.innerHTML = page("Une minute en famille", `<p>Les règles changeront sûrement encore.</p><div id="familyGame"></div>`); cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7, "resolution-7")); },
-  "resolution-7": () => renderGalleryResolution(7, "Bon.", "Pour les règles, on verra plus tard.", "Continuer", "travel-future-medium-7"),
-  "travel-future-medium-7": () => renderTravel("future", "medium", "gallery-7"),
-  "gallery-7": () => renderGalleryInvitation(7, "handoff-7"),
+  "resolution-7": () => renderGalleryResolution(7, "Bon.", "Pour les règles, on verra plus tard.", "Continuer", "gallery-7"),
+  "gallery-7": () => renderGalleryInvitation("travel-future-medium-7"),
+  "travel-future-medium-7": () => renderTravelGallery(7, "future", "medium", "handoff-7"),
   "handoff-7": () => renderHandoff(7, "travel-past-large-return"),
   "travel-past-large-return": () => renderTravel("past", "large", "saturday-evening"),
   "saturday-evening": renderSaturdayEvening,
@@ -372,6 +387,8 @@ function setupDebug() {
   if (!debugMode) return;
   debugPanel.hidden = false;
   debugPanel.querySelector("#debugVersion").textContent = `Version ${APP_VERSION}`;
+  const details = debugPanel.querySelector("details");
+  details.addEventListener("toggle", () => debugPanel.classList.toggle("debug-panel--open", details.open));
   const select = debugPanel.querySelector("#debugStep");
   select.innerHTML = STEPS.map((step) => `<option value="${step.id}">${step.id}</option>`).join("");
   debugPanel.querySelector("#debugGo").addEventListener("click", () => {
