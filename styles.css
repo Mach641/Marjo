@@ -290,7 +290,6 @@ noscript { display: block; margin: 30px; text-align: center; }
 .time-travel--right .time-travel__book i { transform-origin: right center; animation-name: turn-page-right; }
 .time-travel--medium .time-travel__book i { animation-duration: 1.8s; animation-delay: calc(var(--page) * 240ms); }
 .time-travel--large .time-travel__book i { animation-duration: 2.4s; animation-delay: calc(var(--page) * 200ms); }
-.time-travel--debug .time-travel__book i { animation-duration: .15s; animation-delay: calc(var(--page) * 10ms); }
 @keyframes turn-page { from { transform: rotateY(0); } to { transform: rotateY(-178deg); } }
 @keyframes turn-page-right { from { transform: rotateY(0); } to { transform: rotateY(178deg); } }
 
