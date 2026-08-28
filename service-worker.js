@@ -1,15 +1,15 @@
-const CACHE_NAME = "voyage-majorque-v1-3-1";
+const CACHE_NAME = "voyage-majorque-v1-3-2";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
-  "./script.js?v=1.3.1",
-  "./config.js",
+  "./script.js?v=1.3.2",
+  "./config.js?v=1.3.2",
   "./family-game.js",
   "./gallery-soundtrack.js?v=1.2.1",
-  "./gallery-viewer.js?v=1.3",
+  "./gallery-viewer.js?v=1.3.2",
   "./road-trip.js",
-  "./time-travel.js",
+  "./time-travel.js?v=1.3.2",
   "./assets/img/Lenny_1.png",
 ];
 
@@ -23,6 +23,16 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy));
+        return response;
+      }).catch(() => caches.match("./index.html")),
+    );
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
       const copy = response.clone();

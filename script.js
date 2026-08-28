@@ -1,9 +1,9 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.3.2";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
-import { openGalleryViewer } from "./gallery-viewer.js?v=1.3";
+import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";
 import { renderRoadTrip } from "./road-trip.js";
-import { playTimeTravel } from "./time-travel.js";
+import { playTimeTravel } from "./time-travel.js?v=1.3.2";
 
 const app = document.querySelector("#app");
 const header = document.querySelector(".site-header");
@@ -410,4 +410,12 @@ setupDebug();
 const initial = location.hash.slice(1);
 navigate(initial && (debugMode || stepIndex(initial) <= currentStepIndex()) ? initial : state.currentStep, { replace: !initial });
 
-if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch((error) => console.warn("Cache offline indisponible", error)));
+if ("serviceWorker" in navigator) window.addEventListener("load", () => {
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshing) return;
+    refreshing = true;
+    location.reload();
+  });
+  navigator.serviceWorker.register("./service-worker.js").then((registration) => registration.update()).catch((error) => console.warn("Cache offline indisponible", error));
+});
