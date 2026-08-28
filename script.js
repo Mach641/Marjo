@@ -1,4 +1,4 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.3.3";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.3.4";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";
@@ -401,6 +401,18 @@ function setupDebug() {
     CONFIG.routeOrder.forEach((id) => { state.completedChallenges[id] = true; state.galleryViewed[id] = true; state.illustrations[id] = true; });
     Object.assign(state, { started: true, geoRiddleSolved: true, geoValidated: true, orderAnnounced: true, lettersFound: true, finalUnlocked: true, majorcaMomentSeen: true, currentStep: "final" });
     navigate("final");
+  });
+  debugPanel.querySelector("#debugRefresh").addEventListener("click", async (event) => {
+    stopActiveSoundtrack();
+    event.currentTarget.disabled = true;
+    event.currentTarget.textContent = "Actualisation…";
+    try {
+      const registration = await navigator.serviceWorker?.getRegistration();
+      await registration?.update();
+    } catch {}
+    const refreshUrl = new URL(location.href);
+    refreshUrl.searchParams.set("refresh", Date.now().toString());
+    location.replace(refreshUrl);
   });
   debugPanel.querySelector("#debugReset").addEventListener("click", () => { stopActiveSoundtrack(); localStorage.removeItem(CONFIG.storageKey); state = defaultState(); history.replaceState(null, "", `${location.pathname}?debug=1#welcome`); render("welcome"); });
 }

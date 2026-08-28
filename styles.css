@@ -243,6 +243,7 @@ blockquote { margin: 18px 0 28px; padding: 18px; border-left: 3px solid var(--te
 .debug-panel select { width: 100%; min-height: 36px; }
 .debug-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
 .debug-actions button { min-height: 36px; border: 1px solid #737985; border-radius: 5px; background: #f7f7f8; color: #222; }
+.debug-actions .button-refresh { grid-column: 1 / -1; }
 .debug-actions .button-danger { grid-column: 1 / -1; background: #8e3d3d; color: white; }
 .debug-panel p { margin: 8px 0 0; line-height: 1.35; color: #cbd0d8; }
 
