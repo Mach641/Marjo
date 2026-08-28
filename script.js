@@ -1,4 +1,4 @@
-import { CONFIG, STEPS } from "./config.js";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.2.1";
@@ -371,6 +371,7 @@ function render(id) {
 function setupDebug() {
   if (!debugMode) return;
   debugPanel.hidden = false;
+  debugPanel.querySelector("#debugVersion").textContent = `Version ${APP_VERSION}`;
   const select = debugPanel.querySelector("#debugStep");
   select.innerHTML = STEPS.map((step) => `<option value="${step.id}">${step.id}</option>`).join("");
   debugPanel.querySelector("#debugGo").addEventListener("click", () => {
