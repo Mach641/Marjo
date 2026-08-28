@@ -273,7 +273,7 @@ noscript { display: block; margin: 30px; text-align: center; }
 .landscape-viewer__track::-webkit-scrollbar { display: none; }
 .landscape-viewer__slide { position: relative; display: grid; place-items: center; width: 100%; height: 100%; min-height: 0; margin: 0; scroll-snap-align: center; }
 .landscape-viewer__slide img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.landscape-viewer--reveal .landscape-viewer__slide:first-child { animation: gallery-reveal .55s ease both; }
+.landscape-viewer--reveal .landscape-viewer__slide:first-child { animation: gallery-reveal 1s ease both; }
 @keyframes gallery-reveal { from { opacity: 0; } to { opacity: 1; } }
 .landscape-viewer__slide figcaption { position: absolute; right: max(12px, env(safe-area-inset-right)); bottom: 10px; padding: 5px 8px; border-radius: 99px; background: rgba(0,0,0,.58); font-size: .72rem; }
 .landscape-viewer__placeholder { padding: 30px; color: #aaa; background: #111; font: 700 .8rem/1.5 monospace; text-align: center; }

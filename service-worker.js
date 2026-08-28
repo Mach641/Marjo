@@ -1,10 +1,10 @@
-const CACHE_NAME = "voyage-majorque-v1-3-2";
+const CACHE_NAME = "voyage-majorque-v1-3-3";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css",
-  "./script.js?v=1.3.2",
-  "./config.js?v=1.3.2",
+  "./styles.css?v=1.3.3",
+  "./script.js?v=1.3.3",
+  "./config.js?v=1.3.3",
   "./family-game.js",
   "./gallery-soundtrack.js?v=1.2.1",
   "./gallery-viewer.js?v=1.3.2",
