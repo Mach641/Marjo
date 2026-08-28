@@ -1,7 +1,8 @@
-const CACHE_NAME = "voyage-majorque-v1-3-4";
+const CACHE_NAME = "voyage-majorque-v1-3-4-icons-1";
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./manifest.webmanifest?v=icon-1",
   "./styles.css?v=1.3.4",
   "./script.js?v=1.3.4",
   "./config.js?v=1.3.4",
@@ -11,6 +12,9 @@ const APP_SHELL = [
   "./road-trip.js",
   "./time-travel.js?v=1.3.2",
   "./assets/img/Lenny_1.png",
+  "./assets/icons/icon-192-v1.png",
+  "./assets/icons/icon-512-v1.png",
+  "./assets/icons/apple-touch-icon-v1.png",
 ];
 
 self.addEventListener("install", (event) => {
