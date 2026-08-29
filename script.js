@@ -1,4 +1,4 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.0-book-1";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.1";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";
@@ -14,12 +14,12 @@ const debugPanel = document.querySelector("#debugPanel");
 const searchParams = new URLSearchParams(location.search);
 const debugMode = searchParams.get("debug") === "1";
 const displayModeOverride = debugMode ? searchParams.get("display") : null;
+const stateStorageKey = debugMode ? `${CONFIG.storageKey}-debug` : CONFIG.storageKey;
 const SPECIAL_ROUTES = new Set(["install", "book-closed", "book-open"]);
 const BROWSER_PREVIEW_KEY = "voyage-majorque-browser-preview";
 let cleanupCurrentScreen = null;
 let rendering = false;
 let activeSoundtrack = null;
-let debugForceDateLock = false;
 
 const defaultState = () => ({
   version: CONFIG.stateVersion,
@@ -38,11 +38,12 @@ const defaultState = () => ({
   finalUnlocked: false,
   majorcaMomentSeen: false,
   newMemoryChapterId: null,
+  debugDateLocked: false,
 });
 
 function loadState() {
   try {
-    const stored = JSON.parse(localStorage.getItem(CONFIG.storageKey));
+    const stored = JSON.parse(localStorage.getItem(stateStorageKey));
     if (stored?.version !== CONFIG.stateVersion) return defaultState();
     const migrated = { ...defaultState(), ...stored };
     // Les personnes ayant déjà commencé en V1.3 ne doivent pas revoir l'onboarding.
@@ -55,10 +56,8 @@ function loadState() {
 }
 
 let state = loadState();
-// Le debug manipule une copie en mémoire : seul le reset explicite touche au state de production.
-const saveState = () => {
-  if (!debugMode) localStorage.setItem(CONFIG.storageKey, JSON.stringify(state));
-};
+// Le debug persiste dans une clé dédiée et ne lit ni n'écrit jamais la progression normale.
+const saveState = () => localStorage.setItem(stateStorageKey, JSON.stringify(state));
 const stepIndex = (id) => STEPS.findIndex((step) => step.id === id);
 const currentStepIndex = () => Math.max(0, stepIndex(state.currentStep));
 const routeExists = (id) => stepIndex(id) >= 0 || SPECIAL_ROUTES.has(id);
@@ -118,11 +117,12 @@ function renderInstallGuide() {
     <h1>Installe-le sur ton iPhone</h1>
     <p>Cette histoire est faite pour être vécue comme une vraie webapp, depuis ton écran d’accueil.</p>
     <ol class="install-steps">
-      <li><span aria-hidden="true">↑</span><p>Dans Safari, touche <strong>Partager</strong>.</p></li>
-      <li><span aria-hidden="true">＋</span><p>Choisis <strong>Sur l’écran d’accueil</strong>.</p></li>
-      <li><span aria-hidden="true">✓</span><p>Touche <strong>Ajouter</strong>, puis ouvre le carnet depuis sa nouvelle icône.</p></li>
+      <li><span aria-hidden="true">1</span><p>Dans Safari, touche les <strong>…</strong> en bas à droite.</p></li>
+      <li><span aria-hidden="true">2</span><p>Choisis <strong>Partager</strong>.</p></li>
+      <li><span aria-hidden="true">3</span><p>Choisis <strong>Sur l’écran d’accueil</strong>.</p></li>
+      <li><span aria-hidden="true">4</span><p>Touche <strong>Ajouter</strong>, puis ouvre le carnet depuis sa nouvelle icône.</p></li>
     </ol>
-    ${button("Continuer dans Safari", "browser-preview", "secondary-button install-screen__continue")}
+    ${button("Continuer quand même dans Safari", "browser-preview", "install-screen__fallback")}
   </section>`;
   bindAction("browser-preview", () => { allowBrowserPreview(); navigate("welcome", { replace: true }); });
 }
@@ -369,7 +369,7 @@ function todayKey() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
-const dayIsOpen = (date) => (debugMode ? !debugForceDateLock : todayKey() >= date);
+const dayIsOpen = (date) => (debugMode ? !state.debugDateLocked : todayKey() >= date);
 
 function renderDayLock(kind) {
   const friday = kind === "thursday";
@@ -547,7 +547,9 @@ function setupDebug() {
   select.innerHTML = [...new Set(debugRoutes)].map((id) => `<option value="${id}">${id}</option>`).join("");
   debugPanel.querySelector("#debugGo").addEventListener("click", () => {
     stopActiveSoundtrack();
+    state.debugDateLocked = false;
     if (stepIndex(select.value) >= 0) state.currentStep = select.value;
+    saveState();
     navigate(select.value);
   });
   debugPanel.querySelector("#debugUnlock").addEventListener("click", () => {
@@ -557,19 +559,22 @@ function setupDebug() {
       state.illustrations[id] = true;
       if (CONFIG.chapters[id]?.gallery) state.galleryViewed[id] = true;
     });
-    Object.assign(state, { started: true, onboardingCompleted: true, geoRiddleSolved: true, geoValidated: true, orderAnnounced: true, lettersFound: true, finalUnlocked: true, majorcaMomentSeen: true, currentStep: "final" });
+    Object.assign(state, { started: true, onboardingCompleted: true, geoRiddleSolved: true, geoValidated: true, orderAnnounced: true, lettersFound: true, finalUnlocked: true, majorcaMomentSeen: true, currentStep: "final", debugDateLocked: false });
+    saveState();
     navigate("final");
   });
   debugPanel.querySelector("#debugOnboarding").addEventListener("click", () => {
     stopActiveSoundtrack();
     Object.assign(state, { started: false, onboardingCompleted: false, currentStep: "welcome" });
+    saveState();
     navigate("welcome", { replace: true });
   });
   debugPanel.querySelector("#debugBook").addEventListener("click", () => navigate("book-closed"));
   debugPanel.querySelector("#debugWait").addEventListener("click", () => {
-    debugForceDateLock = true;
+    state.debugDateLocked = true;
     state.onboardingCompleted = true;
     state.currentStep = ["thursday-lock", "friday-lock"].includes(select.value) ? select.value : "thursday-lock";
+    saveState();
     navigate("book-closed", { replace: true });
   });
 
@@ -589,7 +594,8 @@ function setupDebug() {
       state.illustrations[id] = true;
     });
     const nextSteps = ["challenge-1", "challenge-8", "thursday-lock", "challenge-3", "friday-lock", "challenge-6", "challenge-7", "travel-past-large-return"];
-    Object.assign(state, { started: true, onboardingCompleted: true, currentStep: nextSteps[count], newMemoryChapterId: count ? memoryIds[count - 1] : null });
+    Object.assign(state, { started: true, onboardingCompleted: true, currentStep: nextSteps[count], newMemoryChapterId: count ? memoryIds[count - 1] : null, debugDateLocked: false });
+    saveState();
     navigate("book-closed", { replace: true });
   });
 
@@ -616,7 +622,7 @@ function setupDebug() {
   });
   debugPanel.querySelector("#debugReset").addEventListener("click", () => {
     stopActiveSoundtrack();
-    localStorage.removeItem(CONFIG.storageKey);
+    localStorage.removeItem(stateStorageKey);
     try { sessionStorage.removeItem(BROWSER_PREVIEW_KEY); } catch {}
     state = defaultState();
     history.replaceState(null, "", `${location.pathname}?debug=1&display=pwa#welcome`);

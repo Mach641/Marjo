@@ -333,7 +333,7 @@ noscript { display: block; margin: 30px; text-align: center; }
 .install-steps li { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; padding: 13px 14px; border: 1px solid rgba(137,111,78,.24); border-radius: 13px 6px 13px 6px; background: rgba(255,250,240,.78); box-shadow: 0 7px 18px rgba(73,52,30,.07); }
 .install-steps li > span { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; color: var(--terracotta); background: var(--paper); font-size: 1.35rem; }
 .install-steps p { margin: 0; line-height: 1.45; }
-.install-screen__continue { display: block; max-width: 450px; margin: 0 auto; }
+.install-screen__fallback { display: block; width: auto; min-height: 44px; margin: 14px auto 0; padding: 8px 10px; border: 0; color: var(--muted); background: transparent; font-size: .78rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 
 .intro-stage { display: grid; place-items: center; min-height: calc(100dvh - 62px); }
 .intro-stage__rainbow { position: relative; width: 180px; height: 100px; overflow: hidden; filter: drop-shadow(0 12px 20px rgba(76,51,31,.12)); animation: intro-mark 1.8s .55s ease both; }
