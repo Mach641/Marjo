@@ -1,11 +1,11 @@
-const CACHE_NAME = "voyage-majorque-v1-3-4-icons-1";
+const CACHE_NAME = "voyage-majorque-v1-4-0-book-2";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest?v=icon-1",
-  "./styles.css?v=1.3.4",
-  "./script.js?v=1.3.4",
-  "./config.js?v=1.3.4",
+  "./styles.css?v=1.4.0-book-1",
+  "./script.js?v=1.4.0-book-1",
+  "./config.js?v=1.4.0-book-1",
   "./family-game.js",
   "./gallery-soundtrack.js?v=1.2.1",
   "./gallery-viewer.js?v=1.3.2",

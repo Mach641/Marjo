@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.webmanifest?v=icon-1" />
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192-v1.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v1.png" />
-  <link rel="stylesheet" href="styles.css?v=1.3.4" />
+  <link rel="stylesheet" href="styles.css?v=1.4.0-book-1" />
 </head>
 <body>
   <div class="weather" aria-hidden="true">
@@ -41,6 +41,25 @@
       <div class="debug-actions">
         <button id="debugGo" type="button">Ouvrir</button>
         <button id="debugUnlock" type="button">Tout débloquer</button>
+        <button id="debugOnboarding" type="button">Rejouer l’intro</button>
+        <button id="debugBook" type="button">Carnet fermé</button>
+        <button id="debugWait" class="button-wide" type="button">Simuler une attente</button>
+      </div>
+      <label for="debugMemories">Souvenirs débloqués</label>
+      <div class="debug-inline">
+        <select id="debugMemories"></select>
+        <button id="debugApplyMemories" type="button">Simuler</button>
+      </div>
+      <label for="debugDisplayMode">Contexte d’affichage</label>
+      <div class="debug-inline">
+        <select id="debugDisplayMode">
+          <option value="auto">Réel</option>
+          <option value="pwa">PWA</option>
+          <option value="browser">Safari</option>
+        </select>
+        <button id="debugApplyDisplay" type="button">Appliquer</button>
+      </div>
+      <div class="debug-actions">
         <button id="debugRefresh" class="button-refresh" type="button">Actualiser la webapp</button>
         <button id="debugReset" class="button-danger" type="button">Reset complet</button>
       </div>
@@ -49,6 +68,6 @@
   </aside>
 
   <noscript>Ce carnet a besoin de JavaScript pour raconter son histoire.</noscript>
-  <script type="module" src="script.js?v=1.3.4"></script>
+  <script type="module" src="script.js?v=1.4.0-book-1"></script>
 </body>
 </html>

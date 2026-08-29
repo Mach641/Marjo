@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.3.4";
+export const APP_VERSION = "1.4.0";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -24,9 +24,11 @@ export const CONFIG = {
   },
   text: {
     prologue: [
-      "PLACEHOLDER — TEXTE DU PROLOGUE À REMPLACER.",
-      "Je suis le petit arc-en-ciel de ce carnet. Je connais quelques détours de votre histoire.",
-      "Garde près de toi chaque illustration que l’on te remettra.",
+      "Moi, c’est l’arc-en-ciel.",
+      "Je suis l’esprit de ce carnet.",
+      "Dans les prochains jours, je te proposerai quelques défis. Chaque souvenir devra être gagné avant de trouver sa place entre ces pages.",
+      "Nous voyagerons dans votre passé, dans les vies qui auraient pu être les vôtres, dans le présent… et peut-être un peu plus loin.",
+      "Alors… tu veux commencer le voyage ?",
     ],
     analysis: [
       "Analyse de vos réponses…",

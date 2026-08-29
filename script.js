@@ -1,4 +1,4 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.3.4";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.0-book-1";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";
@@ -11,14 +11,20 @@ const progressBar = document.querySelector("#progressBar");
 const progressLabel = document.querySelector("#progressLabel");
 const illustrationCount = document.querySelector("#illustrationCount");
 const debugPanel = document.querySelector("#debugPanel");
-const debugMode = new URLSearchParams(location.search).get("debug") === "1";
+const searchParams = new URLSearchParams(location.search);
+const debugMode = searchParams.get("debug") === "1";
+const displayModeOverride = debugMode ? searchParams.get("display") : null;
+const SPECIAL_ROUTES = new Set(["install", "book-closed", "book-open"]);
+const BROWSER_PREVIEW_KEY = "voyage-majorque-browser-preview";
 let cleanupCurrentScreen = null;
 let rendering = false;
 let activeSoundtrack = null;
+let debugForceDateLock = false;
 
 const defaultState = () => ({
   version: CONFIG.stateVersion,
   started: false,
+  onboardingCompleted: false,
   currentStep: "welcome",
   completedChallenges: {},
   galleryViewed: {},
@@ -31,12 +37,20 @@ const defaultState = () => ({
   lettersFound: false,
   finalUnlocked: false,
   majorcaMomentSeen: false,
+  newMemoryChapterId: null,
 });
 
 function loadState() {
   try {
     const stored = JSON.parse(localStorage.getItem(CONFIG.storageKey));
-    return stored?.version === CONFIG.stateVersion ? { ...defaultState(), ...stored } : defaultState();
+    if (stored?.version !== CONFIG.stateVersion) return defaultState();
+    const migrated = { ...defaultState(), ...stored };
+    // Les personnes ayant déjà commencé en V1.3 ne doivent pas revoir l'onboarding.
+    if (typeof stored.onboardingCompleted !== "boolean") {
+      migrated.onboardingCompleted = Boolean(stored.started || stored.currentStep !== "welcome");
+      if (migrated.onboardingCompleted && ["welcome", "prologue"].includes(migrated.currentStep)) migrated.currentStep = "challenge-1";
+    }
+    return migrated;
   } catch { return defaultState(); }
 }
 
@@ -47,14 +61,32 @@ const saveState = () => {
 };
 const stepIndex = (id) => STEPS.findIndex((step) => step.id === id);
 const currentStepIndex = () => Math.max(0, stepIndex(state.currentStep));
+const routeExists = (id) => stepIndex(id) >= 0 || SPECIAL_ROUTES.has(id);
+
+export function isStandaloneApp() {
+  if (displayModeOverride === "pwa") return true;
+  if (displayModeOverride === "browser") return false;
+  return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+}
+
+function browserPreviewAllowed() {
+  try { return sessionStorage.getItem(BROWSER_PREVIEW_KEY) === "1"; }
+  catch { return false; }
+}
+
+function allowBrowserPreview() {
+  try { sessionStorage.setItem(BROWSER_PREVIEW_KEY, "1"); }
+  catch {}
+}
+
+function advanceStateTo(id) {
+  if (stepIndex(id) > currentStepIndex()) state.currentStep = id;
+}
 
 function navigate(id, { advance = false, replace = false } = {}) {
-  if (stepIndex(id) < 0) id = state.currentStep;
-  if (advance && stepIndex(id) > currentStepIndex()) {
-    state.currentStep = id;
-    saveState();
-  }
-  if (!debugMode && stepIndex(id) > currentStepIndex()) id = state.currentStep;
+  if (!routeExists(id)) id = state.currentStep;
+  if (advance && stepIndex(id) >= 0) { advanceStateTo(id); saveState(); }
+  if (!debugMode && stepIndex(id) >= 0 && stepIndex(id) > currentStepIndex()) id = state.currentStep;
   const hash = `#${id}`;
   if (replace) history.replaceState(null, "", hash);
   else if (location.hash !== hash) location.hash = id;
@@ -64,7 +96,7 @@ function navigate(id, { advance = false, replace = false } = {}) {
 
 function updateChrome(id) {
   const index = Math.max(0, stepIndex(id));
-  header.hidden = id === "welcome";
+  header.hidden = ["install", "welcome", "prologue", "book-closed", "book-open"].includes(id);
   progressLabel.textContent = "Le carnet";
   progressBar.style.width = `${Math.round((index / (STEPS.length - 1)) * 100)}%`;
   illustrationCount.hidden = true;
@@ -77,6 +109,104 @@ function bindAction(action, handler, once = true) {
   const node = app.querySelector(`[data-action="${action}"]`);
   node?.addEventListener("click", handler, { once });
   return node;
+}
+
+function renderInstallGuide() {
+  app.innerHTML = `<section class="install-screen screen">
+    <img class="install-screen__icon" src="assets/icons/apple-touch-icon-v1.png" alt="" />
+    <p class="kicker">Avant d’ouvrir le carnet</p>
+    <h1>Installe-le sur ton iPhone</h1>
+    <p>Cette histoire est faite pour être vécue comme une vraie webapp, depuis ton écran d’accueil.</p>
+    <ol class="install-steps">
+      <li><span aria-hidden="true">↑</span><p>Dans Safari, touche <strong>Partager</strong>.</p></li>
+      <li><span aria-hidden="true">＋</span><p>Choisis <strong>Sur l’écran d’accueil</strong>.</p></li>
+      <li><span aria-hidden="true">✓</span><p>Touche <strong>Ajouter</strong>, puis ouvre le carnet depuis sa nouvelle icône.</p></li>
+    </ol>
+    ${button("Continuer dans Safari", "browser-preview", "secondary-button install-screen__continue")}
+  </section>`;
+  bindAction("browser-preview", () => { allowBrowserPreview(); navigate("welcome", { replace: true }); });
+}
+
+function renderIntro() {
+  state.started = true;
+  saveState();
+  document.body.classList.add("intro-weather--active");
+  app.innerHTML = `<section class="intro-stage screen" aria-label="Le carnet se réveille"><div class="intro-stage__rainbow" aria-hidden="true"><i></i><i></i><i></i><i></i></div></section>`;
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const timer = setTimeout(() => navigate("prologue", { advance: true, replace: true }), reducedMotion ? 50 : 2600);
+  cleanupCurrentScreen = () => { clearTimeout(timer); document.body.classList.remove("intro-weather--active"); };
+}
+
+function renderPrologue() {
+  app.innerHTML = page("L’esprit du carnet", `${CONFIG.text.prologue.map((line) => `<p>${line}</p>`).join("")}${button("Commencer le voyage", "start-journey")}`, { guide: "Bonjour Marjolaine." });
+  bindAction("start-journey", () => {
+    state.started = true;
+    state.onboardingCompleted = true;
+    state.currentStep = "challenge-1";
+    saveState();
+    navigate("book-closed", { replace: true });
+  });
+}
+
+const unlockedMemoryIds = () => CONFIG.routeOrder.filter((id) => Boolean(state.galleryViewed[id] && CONFIG.chapters[id]?.gallery));
+
+function hubCopy() {
+  const firstChallenge = state.currentStep === "challenge-1" && !state.completedChallenges[1];
+  if (firstChallenge) return { message: "Bon… maintenant que les présentations sont faites. Tu es prête pour ton premier défi ?", cta: "Je suis prête" };
+  if (state.currentStep === "thursday-lock" && !dayIsOpen(CONFIG.schedule.fridayUnlockDate)) {
+    return { message: "C’est tout pour aujourd’hui. Garde le carnet près de toi, une nouvelle page s’ouvrira demain matin.", cta: null };
+  }
+  if (state.currentStep === "friday-lock" && !dayIsOpen(CONFIG.schedule.saturdayUnlockDate)) {
+    return { message: "Le carnet a encore quelque chose à te raconter, mais pas aujourd’hui. Profite du vrai voyage ; on reprend demain.", cta: null };
+  }
+  if (state.finalUnlocked || state.currentStep === "final") return { message: "La dernière page est ouverte.", cta: "La relire" };
+  if (state.awaitingFlightReopen && state.currentStep === "departure") return { message: "Je t’avais dit que le carnet t’attendrait là-haut.", cta: "Rouvrir le carnet" };
+  return { message: "Une nouvelle page t’attend quand tu seras prête.", cta: "Continuer le voyage" };
+}
+
+function notebookDecorations(count) {
+  const tabs = Array.from({ length: Math.min(4, count) }, (_, index) => `<i class="closed-notebook__tab closed-notebook__tab--${index + 1}"></i>`).join("");
+  const papers = Array.from({ length: Math.min(3, Math.max(0, count - 1)) }, (_, index) => `<i class="closed-notebook__paper closed-notebook__paper--${index + 1}"></i>`).join("");
+  return `${tabs}${papers}${count ? '<span class="closed-notebook__photo" aria-hidden="true"></span>' : ""}${count >= 4 ? '<span class="closed-notebook__flower" aria-hidden="true">✿</span>' : ""}`;
+}
+
+function renderClosedNotebook() {
+  const memories = unlockedMemoryIds();
+  const status = hubCopy();
+  const enriched = Boolean(state.newMemoryChapterId);
+  const book = `<span class="closed-notebook closed-notebook--level-${Math.min(4, memories.length)}${enriched ? " closed-notebook--new-memory" : ""}">
+    ${notebookDecorations(memories.length)}
+    <span class="closed-notebook__pages"></span>
+    <span class="closed-notebook__cover"><span class="closed-notebook__rainbow" aria-hidden="true">⌒</span><strong>Notre carnet</strong><small>Marjo &amp; Vincent</small><span class="closed-notebook__strap"></span></span>
+  </span>`;
+  app.innerHTML = `<section class="notebook-hub screen">
+    <div class="notebook-hub__guide">${rainbowGuide(status.message)}</div>
+    ${memories.length ? `<button class="notebook-touch" type="button" data-action="open-notebook" aria-label="Ouvrir le carnet et revoir mes souvenirs">${book}<span>Toucher le carnet pour le feuilleter</span></button>` : `<div class="notebook-touch notebook-touch--still">${book}</div>`}
+    ${status.cta ? button(status.cta, "continue-journey") : '<p class="notebook-hub__waiting">Le carnet se souviendra de l’endroit où vous vous êtes arrêtés.</p>'}
+  </section>`;
+  bindAction("open-notebook", () => navigate("book-open"));
+  bindAction("continue-journey", () => navigate(state.currentStep));
+  if (enriched) { state.newMemoryChapterId = null; saveState(); }
+}
+
+function renderMemoryCard(chapterId) {
+  const chapter = CONFIG.chapters[chapterId];
+  const image = chapter.gallery.find((item) => item.src);
+  const visual = image ? `<img src="${image.src}" alt="" />` : '<span class="memory-card__landscape" aria-hidden="true"><i></i></span>';
+  return `<button class="memory-card" type="button" data-memory="${chapterId}" aria-label="Revoir le souvenir ${chapter.title}">${visual}<strong>${chapter.title}</strong><small>Toucher pour se souvenir</small></button>`;
+}
+
+function renderOpenNotebook() {
+  const memories = unlockedMemoryIds();
+  const spreads = [];
+  for (let index = 0; index < memories.length; index += 2) spreads.push(memories.slice(index, index + 2));
+  const pages = spreads.map((spread) => `<section class="open-notebook__spread"><div class="open-notebook__page">${renderMemoryCard(spread[0])}<span class="paper-doodle" aria-hidden="true">⌒</span></div><div class="open-notebook__page">${spread[1] ? renderMemoryCard(spread[1]) : '<p class="notebook-soon">D’autres souvenirs arriveront bientôt…</p>'}</div></section>`).join("");
+  app.innerHTML = `<section class="open-notebook screen">
+    <header class="open-notebook__header"><div><p class="kicker">Carnet ouvert</p><h1>Mes souvenirs</h1></div><button class="open-notebook__close" type="button" data-action="close-notebook" aria-label="Refermer le carnet">Fermer <span aria-hidden="true">×</span></button></header>
+    ${memories.length ? `<div class="open-notebook__track">${pages}</div><p class="open-notebook__hint">Fais glisser pour feuilleter les pages.</p>` : '<div class="open-notebook__empty"><p>Les premières pages attendent encore leur histoire.</p></div>'}
+  </section>`;
+  bindAction("close-notebook", () => navigate("book-closed"));
+  app.querySelectorAll("[data-memory]").forEach((memory) => memory.addEventListener("click", () => openChapterGalleryReview(Number(memory.dataset.memory))));
 }
 
 function completeChallenge(id, resolutionStep) {
@@ -193,12 +323,31 @@ function openChapterGallery(chapterId, nextStep) {
   });
 }
 
+function openChapterGalleryReview(chapterId) {
+  const chapter = CONFIG.chapters[chapterId];
+  if (!state.galleryViewed[chapterId] || !chapter?.gallery) return navigate("book-open", { replace: true });
+  const namedGallery = chapterId === 1 || chapterId === 5;
+  cleanupCurrentScreen = openGalleryViewer({
+    accessibleLabel: `Souvenir — ${chapter.title}`,
+    images: chapter.gallery,
+    reveal: false,
+    placeholderLabel: namedGallery ? `PLACEHOLDER — ${chapter.title.toUpperCase()}` : "PLACEHOLDER — IMAGE À REMPLACER",
+    onClose: () => {
+      cleanupCurrentScreen = null;
+      stopActiveSoundtrack();
+      navigate("book-open", { replace: true });
+    },
+  });
+}
+
 function renderHandoff(chapterId, nextStep, message = "Vincent a quelque chose à te remettre.") {
   app.innerHTML = `<section class="paper-card screen">${rainbowGuide("Il en reste une.")}<p>${message}</p>${button("Je l’ai", "have-it")}</section>`;
   bindAction("have-it", () => {
     state.illustrations[chapterId] = true;
+    advanceStateTo(nextStep);
+    state.newMemoryChapterId = chapterId;
     saveState();
-    navigate(nextStep, { advance: true });
+    navigate("book-closed", { replace: true });
   });
 }
 
@@ -220,7 +369,7 @@ function todayKey() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
-const dayIsOpen = (date) => debugMode || todayKey() >= date;
+const dayIsOpen = (date) => (debugMode ? !debugForceDateLock : todayKey() >= date);
 
 function renderDayLock(kind) {
   const friday = kind === "thursday";
@@ -299,8 +448,11 @@ function renderSaturdayEvening() {
 }
 
 const renderers = {
-  welcome: () => { app.innerHTML = page("Un voyage à ouvrir", `<p class="lead">Quelques souvenirs et un petit arc-en-ciel qui prétend connaître le chemin.</p>${button("Ouvrir le carnet", "open")}`, { className: "welcome-screen" }); bindAction("open", () => { state.started = true; saveState(); navigate("prologue", { advance: true }); }); },
-  prologue: () => { app.innerHTML = page("Avant de partir", `${CONFIG.text.prologue.map((line) => `<p>${line}</p>`).join("")}${button("Tourner la page", "continue")}`, { guide: "Bonjour Marjolaine." }); bindAction("continue", () => navigate("challenge-1", { advance: true })); },
+  install: renderInstallGuide,
+  welcome: renderIntro,
+  prologue: renderPrologue,
+  "book-closed": renderClosedNotebook,
+  "book-open": renderOpenNotebook,
   "challenge-1": () => state.completedChallenges[1] ? navigate("resolution-1", { advance: true }) : renderChoiceSequence({ chapterId: 1, title: CONFIG.chapters[1].publicChallengeTitle, items: CONFIG.chapters[1].questions, enforceCorrect: true, onDone: () => completeChallenge(1, "resolution-1") }),
   "resolution-1": () => renderGalleryResolution(1, "Tu t’en souviens.", "Alors laisse-moi te montrer ce que tu n’avais jamais vu.", "Découvrir le souvenir", "gallery-1"),
   "gallery-1": () => renderGalleryInvitation("travel-past-medium-1"),
@@ -373,9 +525,10 @@ function render(id) {
   rendering = true;
   try {
     cleanupCurrentScreen?.(); cleanupCurrentScreen = null;
-    if (!debugMode && stepIndex(id) > currentStepIndex()) id = state.currentStep;
+    document.body.classList.remove("intro-weather--active");
+    if (!debugMode && stepIndex(id) >= 0 && stepIndex(id) > currentStepIndex()) id = state.currentStep;
     updateChrome(id); scrollTo(0, 0);
-    (renderers[id] || renderers[state.currentStep] || renderers.welcome)();
+    (renderers[id] || renderers[state.currentStep] || renderers["book-closed"])();
   } catch (error) {
     console.error(error);
     app.innerHTML = page("Le carnet a perdu sa page", `<p>Ta progression est toujours là.</p>${button("Retrouver ma page", "recover")}`);
@@ -390,17 +543,64 @@ function setupDebug() {
   const details = debugPanel.querySelector("details");
   details.addEventListener("toggle", () => debugPanel.classList.toggle("debug-panel--open", details.open));
   const select = debugPanel.querySelector("#debugStep");
-  select.innerHTML = STEPS.map((step) => `<option value="${step.id}">${step.id}</option>`).join("");
+  const debugRoutes = ["install", "book-closed", "book-open", ...STEPS.map((step) => step.id)];
+  select.innerHTML = [...new Set(debugRoutes)].map((id) => `<option value="${id}">${id}</option>`).join("");
   debugPanel.querySelector("#debugGo").addEventListener("click", () => {
     stopActiveSoundtrack();
-    state.currentStep = select.value;
+    if (stepIndex(select.value) >= 0) state.currentStep = select.value;
     navigate(select.value);
   });
   debugPanel.querySelector("#debugUnlock").addEventListener("click", () => {
     stopActiveSoundtrack();
-    CONFIG.routeOrder.forEach((id) => { state.completedChallenges[id] = true; state.galleryViewed[id] = true; state.illustrations[id] = true; });
-    Object.assign(state, { started: true, geoRiddleSolved: true, geoValidated: true, orderAnnounced: true, lettersFound: true, finalUnlocked: true, majorcaMomentSeen: true, currentStep: "final" });
+    CONFIG.routeOrder.forEach((id) => {
+      state.completedChallenges[id] = true;
+      state.illustrations[id] = true;
+      if (CONFIG.chapters[id]?.gallery) state.galleryViewed[id] = true;
+    });
+    Object.assign(state, { started: true, onboardingCompleted: true, geoRiddleSolved: true, geoValidated: true, orderAnnounced: true, lettersFound: true, finalUnlocked: true, majorcaMomentSeen: true, currentStep: "final" });
     navigate("final");
+  });
+  debugPanel.querySelector("#debugOnboarding").addEventListener("click", () => {
+    stopActiveSoundtrack();
+    Object.assign(state, { started: false, onboardingCompleted: false, currentStep: "welcome" });
+    navigate("welcome", { replace: true });
+  });
+  debugPanel.querySelector("#debugBook").addEventListener("click", () => navigate("book-closed"));
+  debugPanel.querySelector("#debugWait").addEventListener("click", () => {
+    debugForceDateLock = true;
+    state.onboardingCompleted = true;
+    state.currentStep = ["thursday-lock", "friday-lock"].includes(select.value) ? select.value : "thursday-lock";
+    navigate("book-closed", { replace: true });
+  });
+
+  const memoriesSelect = debugPanel.querySelector("#debugMemories");
+  const memoryIds = CONFIG.routeOrder.filter((id) => CONFIG.chapters[id]?.gallery);
+  memoriesSelect.innerHTML = Array.from({ length: memoryIds.length + 1 }, (_, count) => `<option value="${count}">${count}</option>`).join("");
+  memoriesSelect.value = String(unlockedMemoryIds().length);
+  debugPanel.querySelector("#debugApplyMemories").addEventListener("click", () => {
+    stopActiveSoundtrack();
+    const count = Number(memoriesSelect.value);
+    state.completedChallenges = {};
+    state.galleryViewed = {};
+    state.illustrations = {};
+    memoryIds.slice(0, count).forEach((id) => {
+      state.completedChallenges[id] = true;
+      state.galleryViewed[id] = true;
+      state.illustrations[id] = true;
+    });
+    const nextSteps = ["challenge-1", "challenge-8", "thursday-lock", "challenge-3", "friday-lock", "challenge-6", "challenge-7", "travel-past-large-return"];
+    Object.assign(state, { started: true, onboardingCompleted: true, currentStep: nextSteps[count], newMemoryChapterId: count ? memoryIds[count - 1] : null });
+    navigate("book-closed", { replace: true });
+  });
+
+  const displaySelect = debugPanel.querySelector("#debugDisplayMode");
+  displaySelect.value = displayModeOverride === "pwa" ? "pwa" : displayModeOverride === "browser" ? "browser" : "auto";
+  debugPanel.querySelector("#debugApplyDisplay").addEventListener("click", () => {
+    const url = new URL(location.href);
+    if (displaySelect.value === "auto") url.searchParams.delete("display");
+    else url.searchParams.set("display", displaySelect.value);
+    url.hash = displaySelect.value === "browser" ? "install" : "book-closed";
+    location.replace(url);
   });
   debugPanel.querySelector("#debugRefresh").addEventListener("click", async (event) => {
     stopActiveSoundtrack();
@@ -414,13 +614,25 @@ function setupDebug() {
     refreshUrl.searchParams.set("refresh", Date.now().toString());
     location.replace(refreshUrl);
   });
-  debugPanel.querySelector("#debugReset").addEventListener("click", () => { stopActiveSoundtrack(); localStorage.removeItem(CONFIG.storageKey); state = defaultState(); history.replaceState(null, "", `${location.pathname}?debug=1#welcome`); render("welcome"); });
+  debugPanel.querySelector("#debugReset").addEventListener("click", () => {
+    stopActiveSoundtrack();
+    localStorage.removeItem(CONFIG.storageKey);
+    try { sessionStorage.removeItem(BROWSER_PREVIEW_KEY); } catch {}
+    state = defaultState();
+    history.replaceState(null, "", `${location.pathname}?debug=1&display=pwa#welcome`);
+    render("welcome");
+  });
 }
 
 window.addEventListener("hashchange", () => render(location.hash.slice(1) || state.currentStep));
 setupDebug();
 const initial = location.hash.slice(1);
-navigate(initial && (debugMode || stepIndex(initial) <= currentStepIndex()) ? initial : state.currentStep, { replace: !initial });
+let initialRoute;
+if (!isStandaloneApp() && !browserPreviewAllowed()) initialRoute = "install";
+else if (debugMode && initial && routeExists(initial)) initialRoute = initial;
+else if (!state.onboardingCompleted) initialRoute = "welcome";
+else initialRoute = "book-closed";
+navigate(initialRoute, { replace: true });
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => {
   let refreshing = false;
