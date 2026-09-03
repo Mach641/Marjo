@@ -3,10 +3,11 @@ const layer = (level, needed, content) => level >= needed ? `<g class="sketch-la
 const wash = (solved, content) => solved ? `<g class="sketch-watercolor" aria-hidden="true">${content}</g>` : "";
 
 function ruleOne(level, solved) {
-  return svg(`${wash(solved, '<ellipse cx="160" cy="120" rx="112" ry="76" fill="#f2c783"/><path d="M64 167 Q160 205 257 164" fill="none" stroke="#d98576" stroke-width="25"/>')}
-    ${layer(level, 1, '<text x="160" y="128" text-anchor="middle" class="sketch-number">1</text><text x="160" y="164" text-anchor="middle" class="sketch-small">NUMÉRO</text>')}
-    ${layer(level, 2, '<text x="160" y="38" text-anchor="middle" class="sketch-title">RÈGLE</text><circle cx="82" cy="114" r="25"/><path d="M58 107q24-39 50 0M60 142q22-23 44 0"/>')}
-    ${layer(level, 3, '<path d="M128 62l14-25 18 18 19-22 16 29zM128 63h68"/>')}`, "Une règle numéro un, Marjolaine et une couronne");
+  const name = solved ? "solved" : `level-${level}`;
+  const alt = solved
+    ? "Le croquis de Marjolaine et de sa couronne, rehaussé d’aquarelle"
+    : ["Numéro 1 écrit à la main", "Règle numéro 1 et un croquis de Marjolaine", "Règle numéro 1, Marjolaine et une couronne"][level - 1];
+  return `<img class="rule-sketch rule-sketch--asset${solved ? " rule-sketch--solved" : ""}" src="assets/challenge-1/rule-1/${name}.jpg" alt="${alt}" />`;
 }
 
 function ruleTwo(level, solved) {
@@ -47,9 +48,8 @@ function ruleSix(level, solved) {
 const drawings = [ruleOne, ruleTwo, ruleThree, ruleFour, ruleFive, ruleSix];
 
 function doorSketch(id, opened) {
-  const tops = ["M22 78V38Q60 3 98 38V78", "M22 78V26H98V78", "M22 78V42Q60-3 98 42V78", "M18 78V31L60 11l42 20v47", "M22 78V23H98V78M22 35h76", "M22 78V43Q60 13 98 43V78M31 28q29-25 58 0"];
-  const panels = ["M38 34h44v31H38z", "M35 38h50M35 55h50", "M60 25v43M35 46h50", "M35 41l25-14 25 14v25H35z", "M34 30h52v36H34zM34 48h52", "M39 37q21-18 42 0v30H39z"];
-  return `<svg viewBox="0 0 120 88" aria-hidden="true"><path class="door-frame" d="${tops[id - 1]}"/><g class="door-leaf${opened ? " door-leaf--open" : ""}"><path d="M29 78V31H91V78z"/><path d="${panels[id - 1]}"/><circle cx="80" cy="56" r="2.5"/></g>${opened ? '<path class="door-wash" d="M31 73V35H86V74z"/>' : ""}</svg>`;
+  const state = opened && id === 1 ? "open" : "closed";
+  return `<img src="assets/challenge-1/doors/door-${id}-${state}.jpg" alt="" aria-hidden="true" />`;
 }
 
 const normalize = (progress = {}) => ({

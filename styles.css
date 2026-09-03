@@ -257,13 +257,13 @@ blockquote { margin: 18px 0 28px; padding: 18px; border-left: 3px solid var(--te
 .debug-challenge-one select { min-width: 0; }
 .debug-challenge-one button { min-height: 36px; border: 1px solid #737985; border-radius: 5px; background: #f7f7f8; color: #222; }
 
-/* V1.4.2 — Les règles de notre monde */
+/* V1.4.3 — Les règles de notre monde */
 .rules-intro, .rules-doors, .rule-page { display: flex; flex-direction: column; min-height: min(680px, calc(100dvh - 112px)); }
 .rules-intro { justify-content: center; text-align: center; }
 .rules-intro h1, .rules-doors h1, .rule-page h1 { font-size: clamp(2rem, 9vw, 3.4rem); }
 .rules-intro__copy { margin: 8px 0 30px; font: italic clamp(1.05rem, 4.6vw, 1.3rem)/1.65 Georgia, serif; }
 .rules-intro__doors { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; width: min(100%, 350px); margin: 6px auto 22px; color: var(--terracotta-dark); opacity: .65; }
-.rules-intro__doors svg { width: 100%; }
+.rules-intro__doors img { display: block; width: 100%; border-radius: 4px; mix-blend-mode: multiply; }
 
 .rules-note { min-height: 40px; margin: -8px 0 15px; color: var(--muted); font: italic .94rem/1.4 Georgia, serif; }
 .door-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; margin: 0 auto; width: min(100%, 390px); }
@@ -273,16 +273,12 @@ blockquote { margin: 18px 0 28px; padding: 18px; border-left: 3px solid var(--te
 .rule-door:nth-child(4) { border-radius: 5px 5px 14px 14px; }
 .rule-door:nth-child(5) { border: 2px double rgba(117, 86, 54, .42); border-radius: 2px; }
 .rule-door:nth-child(6) { border-radius: 38% 38% 7px 7px / 20% 20% 7px 7px; }
-.rule-door svg { width: 100%; max-height: 82px; overflow: visible; }
+.rule-door img { display: block; width: 100%; height: 82px; object-fit: contain; object-position: center; border-radius: 3px; mix-blend-mode: multiply; }
 .rule-door span { font: italic .78rem Georgia, serif; }
 .rule-door:disabled { cursor: default; }
 .rule-door:not(:disabled):active { transform: translateY(2px); }
 .rule-door--open { border-color: rgba(113, 134, 106, .55); background: linear-gradient(145deg, rgba(245, 214, 162, .48), rgba(163, 196, 184, .36)); opacity: 1 !important; }
 .rule-door--open span { color: var(--sage); font-weight: 700; }
-.door-frame, .door-leaf path, .door-leaf circle { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.door-leaf { transform-origin: 29px 54px; transition: transform .45s ease; }
-.door-leaf--open { transform: perspective(80px) rotateY(-58deg); }
-.door-wash { fill: #db9a78; opacity: .28; }
 
 .rules-final { margin-top: 22px; padding-top: 12px; border-top: 1px dashed var(--line); text-align: center; animation: rules-arrive .7s ease both; }
 .rules-final p { margin: 2px 0 16px; font: italic 1.05rem/1.5 Georgia, serif; }
@@ -295,6 +291,7 @@ blockquote { margin: 18px 0 28px; padding: 18px; border-left: 3px solid var(--te
 .rule-page h1 { margin-bottom: 12px; font-size: clamp(1.75rem, 7.5vw, 2.7rem); }
 .rule-drawing { display: grid; place-items: center; min-height: 258px; margin: 4px 0 12px; padding: 8px; border: 1px dashed rgba(117, 86, 54, .24); border-radius: 47% 43% 45% 40% / 8% 10% 7% 9%; background: radial-gradient(ellipse, rgba(255,255,255,.55), transparent 68%); }
 .rule-sketch { display: block; width: min(100%, 350px); max-height: 240px; overflow: visible; }
+.rule-sketch--asset { height: 240px; object-fit: contain; mix-blend-mode: multiply; }
 .rule-sketch > .sketch-layer { fill: none; stroke: var(--ink); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
 .rule-sketch text { fill: var(--ink); stroke: none; font-family: Georgia, serif; font-style: italic; }
 .sketch-number { font-size: 92px; }
@@ -319,7 +316,7 @@ blockquote { margin: 18px 0 28px; padding: 18px; border-left: 3px solid var(--te
   .rules-doors, .rule-page { padding: 24px 20px 28px; }
   .rules-doors h1 { margin-bottom: 14px; }
   .rule-door { min-height: 105px; }
-  .rule-door svg { max-height: 70px; }
+  .rule-door img { height: 70px; }
   .rule-drawing { min-height: 225px; }
   .debug-challenge-one { grid-template-columns: 1fr 1fr; }
   .debug-challenge-one button { grid-column: 1 / -1; }
