@@ -3,11 +3,11 @@ const layer = (level, needed, content) => level >= needed ? `<g class="sketch-la
 const wash = (solved, content) => solved ? `<g class="sketch-watercolor" aria-hidden="true">${content}</g>` : "";
 
 function ruleOne(level, solved) {
-  const name = solved ? "solved" : `level-0${level}`;
+  const name = `rule-1-level-${solved ? 3 : level}`;
   const alt = solved
-    ? "Le croquis de Marjolaine et de sa couronne, rehaussé d’aquarelle"
+    ? "Le croquis de Marjolaine avec sa couronne"
     : ["Numéro 1 écrit à la main", "Règle numéro 1 et un croquis de Marjolaine", "Règle numéro 1, Marjolaine et une couronne"][level - 1];
-  return `<img class="rule-sketch rule-sketch--asset${solved ? " rule-sketch--solved" : ""}" src="assets/challenge-1/rule-01/${name}.png" alt="${alt}" />`;
+  return `<img class="rule-sketch rule-sketch--asset${solved ? " rule-sketch--solved" : ""}" src="assets/challenge-1/v1-4-5/${name}.png" alt="${alt}" />`;
 }
 
 function ruleTwo(level, solved) {
@@ -48,8 +48,8 @@ function ruleSix(level, solved) {
 const drawings = [ruleOne, ruleTwo, ruleThree, ruleFour, ruleFive, ruleSix];
 
 function doorSketch(id, opened) {
-  const state = opened && id === 1 ? "open" : "closed";
-  return `<img src="assets/challenge-1/doors/door-${id}-${state}.jpg" alt="" aria-hidden="true" />`;
+  const state = opened ? "open" : "closed";
+  return `<img src="assets/challenge-1/v1-4-5/${state}-door-${id}.png" alt="" aria-hidden="true" />`;
 }
 
 const normalize = (progress = {}) => ({
@@ -69,7 +69,7 @@ export function renderChallengeOne(root, options) {
   const selected = () => options.rules.find((rule) => rule.id === current.selectedRule);
 
   function renderIntro() {
-    root.innerHTML = `<section class="paper-card screen rules-intro"><p class="kicker">Premier défi</p><h1>Les règles de notre monde</h1><div class="rules-intro__doors" aria-hidden="true">${[1,2,3,4,5,6].map((id) => doorSketch(id, false)).join("")}</div><p class="rules-intro__copy">Avant de parcourir notre histoire…<br>voyons si tu connais encore<br>les règles de notre monde à nous.</p><button class="primary-button" data-rules-action="discover">Découvrir les règles</button></section>`;
+    root.innerHTML = `<section class="paper-card screen rules-intro"><p class="kicker">Premier défi</p><h1>Les règles de notre monde</h1><img class="rules-intro__door" src="assets/challenge-1/v1-4-5/intro-door.png" alt="" aria-hidden="true" /><p class="rules-intro__copy">Avant de parcourir notre histoire…<br>voyons si tu connais encore<br>les règles de notre monde à nous.</p><button class="primary-button" data-rules-action="discover">Découvrir les règles</button></section>`;
   }
 
   function renderDoors() {
@@ -86,9 +86,7 @@ export function renderChallengeOne(root, options) {
 
   function renderRule() {
     const lastLevel = current.revealLevel === 3;
-    const actions = `<div class="rule-actions${current.selectedRule === 1 ? " rule-actions--asset-rule" : ""}"><button class="primary-button" data-rules-action="know">Je connais la règle</button><button class="secondary-button" data-rules-action="more">${lastLevel ? "Donne-moi un indice" : "Dessine-moi encore un peu"}</button></div>`;
-    const drawingClass = current.selectedRule === 1 ? ` rule-drawing--asset-rule rule-drawing--level-${current.revealLevel}` : "";
-    root.innerHTML = `<section class="paper-card screen rule-page${current.selectedRule === 1 ? " rule-page--question-asset" : ""}"><p class="kicker">Règle n°${current.selectedRule}</p><h1>Quelle règle se cache derrière ce dessin ?</h1><div class="rule-drawing${drawingClass}">${drawings[current.selectedRule - 1](current.revealLevel, false)}${current.selectedRule === 1 ? actions : ""}</div>${current.hintVisible ? `<p class="rule-hint">${selected().hint}</p>` : ""}${current.selectedRule === 1 ? "" : actions}</section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page"><p class="kicker">Règle n°${current.selectedRule}</p><h1>Quelle règle se cache derrière ce dessin ?</h1><div class="rule-drawing">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div>${current.hintVisible ? `<p class="rule-hint">${selected().hint}</p>` : ""}<div class="rule-actions"><button class="primary-button" data-rules-action="know">Je connais la règle</button><button class="secondary-button" data-rules-action="more">${lastLevel ? "Donne-moi un indice" : "Dessine-moi encore un peu"}</button></div></section>`;
   }
 
   function renderSpeak() {
@@ -96,7 +94,7 @@ export function renderChallengeOne(root, options) {
   }
 
   function renderReward() {
-    root.innerHTML = `<section class="paper-card screen rule-page rule-page--reward"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing rule-drawing--solved${current.selectedRule === 1 ? " rule-drawing--asset-solved" : ""}">${drawings[current.selectedRule - 1](3, true)}</div><p class="rule-reveal">${selected().text}</p><button class="primary-button rule-reward-next" data-rules-action="continue" hidden>Continuer</button></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page rule-page--reward"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing rule-drawing--solved">${drawings[current.selectedRule - 1](3, true)}</div><p class="rule-reveal">${selected().text}</p><button class="primary-button rule-reward-next" data-rules-action="continue" hidden>Continuer</button></section>`;
     later(() => { const button = root.querySelector('[data-rules-action="continue"]'); if (button) button.hidden = false; }, options.debug ? 120 : 950);
   }
 

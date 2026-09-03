@@ -12,13 +12,13 @@
       const isDebugInstall = new URLSearchParams(location.search).get("debug") === "1";
       const manifest = document.createElement("link");
       manifest.rel = "manifest";
-      manifest.href = isDebugInstall ? "manifest-debug.webmanifest?v=1.4.4" : "manifest.webmanifest?v=1.4.4";
+      manifest.href = isDebugInstall ? "manifest-debug.webmanifest?v=1.4.5" : "manifest.webmanifest?v=1.4.5";
       document.head.append(manifest);
     })();
   </script>
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192-v1.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v1.png" />
-  <link rel="stylesheet" href="styles.css?v=1.4.4" />
+  <link rel="stylesheet" href="styles.css?v=1.4.5" />
 </head>
 <body>
   <div class="weather" aria-hidden="true">
@@ -90,6 +90,6 @@
   </aside>
 
   <noscript>Ce carnet a besoin de JavaScript pour raconter son histoire.</noscript>
-  <script type="module" src="script.js?v=1.4.4"></script>
+  <script type="module" src="script.js?v=1.4.5"></script>
 </body>
 </html>
