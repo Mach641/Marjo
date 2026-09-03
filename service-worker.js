@@ -1,13 +1,13 @@
-const CACHE_NAME = "voyage-majorque-v1-4-3-challenge-one-assets";
+const CACHE_NAME = "voyage-majorque-v1-4-4-challenge-one-assets";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./manifest.webmanifest?v=1.4.3",
-  "./manifest-debug.webmanifest?v=1.4.3",
-  "./styles.css?v=1.4.3",
-  "./script.js?v=1.4.3",
-  "./config.js?v=1.4.3",
-  "./challenge-one.js?v=1.4.3",
+  "./manifest.webmanifest?v=1.4.4",
+  "./manifest-debug.webmanifest?v=1.4.4",
+  "./styles.css?v=1.4.4",
+  "./script.js?v=1.4.4",
+  "./config.js?v=1.4.4",
+  "./challenge-one.js?v=1.4.4",
   "./family-game.js",
   "./gallery-soundtrack.js?v=1.2.1",
   "./gallery-viewer.js?v=1.3.2",
@@ -24,10 +24,10 @@ const APP_SHELL = [
   "./assets/challenge-1/doors/door-4-closed.jpg",
   "./assets/challenge-1/doors/door-5-closed.jpg",
   "./assets/challenge-1/doors/door-6-closed.jpg",
-  "./assets/challenge-1/rule-1/level-1.jpg",
-  "./assets/challenge-1/rule-1/level-2.jpg",
-  "./assets/challenge-1/rule-1/level-3.jpg",
-  "./assets/challenge-1/rule-1/solved.jpg",
+  "./assets/challenge-1/rule-01/level-01.png",
+  "./assets/challenge-1/rule-01/level-02.png",
+  "./assets/challenge-1/rule-01/level-03.png",
+  "./assets/challenge-1/rule-01/solved.png",
 ];
 
 self.addEventListener("install", (event) => {
