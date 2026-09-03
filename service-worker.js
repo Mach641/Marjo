@@ -1,12 +1,13 @@
-const CACHE_NAME = "voyage-majorque-v1-4-1-debug-pwa";
+const CACHE_NAME = "voyage-majorque-v1-4-2-challenge-one";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./manifest.webmanifest?v=1.4.1",
-  "./manifest-debug.webmanifest?v=1.4.1",
-  "./styles.css?v=1.4.1",
-  "./script.js?v=1.4.1",
-  "./config.js?v=1.4.1",
+  "./manifest.webmanifest?v=1.4.2",
+  "./manifest-debug.webmanifest?v=1.4.2",
+  "./styles.css?v=1.4.2",
+  "./script.js?v=1.4.2",
+  "./config.js?v=1.4.2",
+  "./challenge-one.js?v=1.4.2",
   "./family-game.js",
   "./gallery-soundtrack.js?v=1.2.1",
   "./gallery-viewer.js?v=1.3.2",

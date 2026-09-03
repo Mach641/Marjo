@@ -12,13 +12,13 @@
       const isDebugInstall = new URLSearchParams(location.search).get("debug") === "1";
       const manifest = document.createElement("link");
       manifest.rel = "manifest";
-      manifest.href = isDebugInstall ? "manifest-debug.webmanifest?v=1.4.1" : "manifest.webmanifest?v=1.4.1";
+      manifest.href = isDebugInstall ? "manifest-debug.webmanifest?v=1.4.2" : "manifest.webmanifest?v=1.4.2";
       document.head.append(manifest);
     })();
   </script>
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192-v1.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v1.png" />
-  <link rel="stylesheet" href="styles.css?v=1.4.1" />
+  <link rel="stylesheet" href="styles.css?v=1.4.2" />
 </head>
 <body>
   <div class="weather" aria-hidden="true">
@@ -53,6 +53,20 @@
         <button id="debugBook" type="button">Carnet fermé</button>
         <button id="debugWait" class="button-wide" type="button">Simuler une attente</button>
       </div>
+      <label for="debugChallengeOneRule">Défi 1 — règle et écran</label>
+      <div class="debug-challenge-one">
+        <select id="debugChallengeOneRule" aria-label="Règle du défi 1">
+          <option value="1">Règle 1</option><option value="2">Règle 2</option><option value="3">Règle 3</option>
+          <option value="4">Règle 4</option><option value="5">Règle 5</option><option value="6">Règle 6</option>
+        </select>
+        <select id="debugChallengeOneStage" aria-label="Écran du défi 1">
+          <option value="intro">Introduction</option><option value="doors">Portes initiales</option>
+          <option value="level1">Dessin niveau 1</option><option value="level2">Dessin niveau 2</option><option value="level3">Dessin niveau 3</option>
+          <option value="hint">Indice</option><option value="speak">Réponse orale</option><option value="reward">Révélation</option>
+          <option value="one">Une porte ouverte</option><option value="five">Cinq portes ouvertes</option><option value="six">Six portes ouvertes</option>
+        </select>
+        <button id="debugChallengeOneApply" type="button">Tester</button>
+      </div>
       <label for="debugMemories">Souvenirs débloqués</label>
       <div class="debug-inline">
         <select id="debugMemories"></select>
@@ -76,6 +90,6 @@
   </aside>
 
   <noscript>Ce carnet a besoin de JavaScript pour raconter son histoire.</noscript>
-  <script type="module" src="script.js?v=1.4.1"></script>
+  <script type="module" src="script.js?v=1.4.2"></script>
 </body>
 </html>

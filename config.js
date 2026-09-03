@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.1";
+export const APP_VERSION = "1.4.2";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -10,6 +10,16 @@ export const CONFIG = {
   timeTravel: {
     // Inverser ces deux valeurs suffit à retourner le langage visuel passé/futur.
     visualDirections: { past: "right", future: "left" },
+  },
+  challengeOne: {
+    rules: [
+      { id: 1, text: "Marjolaine a toujours raison.", hint: "Avec Marjo, mieux vaut être d’accord !" },
+      { id: 2, text: "Vincent doit éplucher et couper les pommes de Marjolaine.", hint: "Vincent n’a qu’une mission : les éplucher, les couper et les lui servir." },
+      { id: 3, text: "Marjolaine a le droit de tremper son chocolat dans le café de Vincent.", hint: "Ce café appartient à Vincent. Le chocolat, beaucoup moins…" },
+      { id: 4, text: "Tous les chats sont beaux.", hint: "Cet air ronchon ne change rien : il fait partie de la règle !" },
+      { id: 5, text: "On ne doit jamais se coucher en étant fâchés.", hint: "Même dos à dos, la nuit mérite de retrouver un peu de douceur." },
+      { id: 6, text: "À la maison, on porte toujours ses chaussons. On ne marche pas pieds nus.", hint: "À la maison, il y a une seule façon de circuler…" },
+    ],
   },
   geo: {
     name: "Aéroport Lyon Saint-Exupéry",
@@ -40,7 +50,7 @@ export const CONFIG = {
   chapters: {
     1: {
       title: "Stresa",
-      publicChallengeTitle: "Les six portes de notre mémoire",
+      publicChallengeTitle: "Les règles de notre monde",
       galleryTitle: "Stresa",
       letter: "M",
       gallery: [
@@ -49,14 +59,6 @@ export const CONFIG = {
       ],
       // Option future : { enabled: true, src: "assets/audio/...", startMode: "user", volume: 0.8 }
       soundtrack: null,
-      questions: [
-        { prompt: "PLACEHOLDER — question sur un lieu", options: ["Réponse A", "Réponse B", "Réponse C"], answer: 0 },
-        { prompt: "PLACEHOLDER — question sur un objet", options: ["Réponse A", "Réponse B", "Réponse C"], answer: 1 },
-        { prompt: "PLACEHOLDER — question sur une phrase", options: ["Réponse A", "Réponse B", "Réponse C"], answer: 2 },
-        { prompt: "PLACEHOLDER — question sur un détail", options: ["Réponse A", "Réponse B", "Réponse C"], answer: 0 },
-        { prompt: "PLACEHOLDER — question sur un goût ou un geste", options: ["Réponse A", "Réponse B", "Réponse C"], answer: 1 },
-        { prompt: "PLACEHOLDER — question sur une image", options: ["Réponse A", "Réponse B", "Réponse C"], answer: 2 },
-      ],
     },
     2: {
       title: "La vie à trois",

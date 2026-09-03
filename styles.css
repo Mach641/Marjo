@@ -252,6 +252,78 @@ blockquote { margin: 18px 0 28px; padding: 18px; border-left: 3px solid var(--te
 .debug-inline { display: grid; grid-template-columns: 1fr auto; gap: 6px; }
 .debug-inline button { min-height: 36px; border: 1px solid #737985; border-radius: 5px; background: #f7f7f8; color: #222; }
 .debug-panel p { margin: 8px 0 0; line-height: 1.35; color: #cbd0d8; }
+.debug-panel--open details { max-height: min(780px, calc(100dvh - 36px)); overflow-y: auto; }
+.debug-challenge-one { display: grid; grid-template-columns: .72fr 1.28fr auto; gap: 5px; }
+.debug-challenge-one select { min-width: 0; }
+.debug-challenge-one button { min-height: 36px; border: 1px solid #737985; border-radius: 5px; background: #f7f7f8; color: #222; }
+
+/* V1.4.2 — Les règles de notre monde */
+.rules-intro, .rules-doors, .rule-page { display: flex; flex-direction: column; min-height: min(680px, calc(100dvh - 112px)); }
+.rules-intro { justify-content: center; text-align: center; }
+.rules-intro h1, .rules-doors h1, .rule-page h1 { font-size: clamp(2rem, 9vw, 3.4rem); }
+.rules-intro__copy { margin: 8px 0 30px; font: italic clamp(1.05rem, 4.6vw, 1.3rem)/1.65 Georgia, serif; }
+.rules-intro__doors { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; width: min(100%, 350px); margin: 6px auto 22px; color: var(--terracotta-dark); opacity: .65; }
+.rules-intro__doors svg { width: 100%; }
+
+.rules-note { min-height: 40px; margin: -8px 0 15px; color: var(--muted); font: italic .94rem/1.4 Georgia, serif; }
+.door-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; margin: 0 auto; width: min(100%, 390px); }
+.rule-door { position: relative; z-index: 2; display: grid; place-items: center; min-height: 118px; padding: 6px 10px 8px; border: 1px solid rgba(117, 86, 54, .38); border-radius: 48% 48% 5px 5px / 17% 17% 5px 5px; color: var(--ink); background: rgba(255, 253, 248, .72); box-shadow: inset 0 0 22px rgba(118, 83, 47, .07), 0 5px 10px rgba(71, 48, 26, .08); cursor: pointer; }
+.rule-door:nth-child(2) { border-radius: 4px; }
+.rule-door:nth-child(3) { border-radius: 50% 50% 3px 3px / 28% 28% 3px 3px; }
+.rule-door:nth-child(4) { border-radius: 5px 5px 14px 14px; }
+.rule-door:nth-child(5) { border: 2px double rgba(117, 86, 54, .42); border-radius: 2px; }
+.rule-door:nth-child(6) { border-radius: 38% 38% 7px 7px / 20% 20% 7px 7px; }
+.rule-door svg { width: 100%; max-height: 82px; overflow: visible; }
+.rule-door span { font: italic .78rem Georgia, serif; }
+.rule-door:disabled { cursor: default; }
+.rule-door:not(:disabled):active { transform: translateY(2px); }
+.rule-door--open { border-color: rgba(113, 134, 106, .55); background: linear-gradient(145deg, rgba(245, 214, 162, .48), rgba(163, 196, 184, .36)); opacity: 1 !important; }
+.rule-door--open span { color: var(--sage); font-weight: 700; }
+.door-frame, .door-leaf path, .door-leaf circle { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.door-leaf { transform-origin: 29px 54px; transition: transform .45s ease; }
+.door-leaf--open { transform: perspective(80px) rotateY(-58deg); }
+.door-wash { fill: #db9a78; opacity: .28; }
+
+.rules-final { margin-top: 22px; padding-top: 12px; border-top: 1px dashed var(--line); text-align: center; animation: rules-arrive .7s ease both; }
+.rules-final p { margin: 2px 0 16px; font: italic 1.05rem/1.5 Georgia, serif; }
+.rules-rainbow { height: 33px; overflow: hidden; color: var(--terracotta); font: 900 4.3rem/.58 Georgia, serif; letter-spacing: -.12em; text-align: center; }
+.rules-rainbow::after { content: "⌒⌒"; color: #d8a33c; opacity: .65; }
+.rules-rainbow--small { margin: 4px auto 18px; }
+@keyframes rules-arrive { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+
+.rule-page { text-align: center; }
+.rule-page h1 { margin-bottom: 12px; font-size: clamp(1.75rem, 7.5vw, 2.7rem); }
+.rule-drawing { display: grid; place-items: center; min-height: 258px; margin: 4px 0 12px; padding: 8px; border: 1px dashed rgba(117, 86, 54, .24); border-radius: 47% 43% 45% 40% / 8% 10% 7% 9%; background: radial-gradient(ellipse, rgba(255,255,255,.55), transparent 68%); }
+.rule-sketch { display: block; width: min(100%, 350px); max-height: 240px; overflow: visible; }
+.rule-sketch > .sketch-layer { fill: none; stroke: var(--ink); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.rule-sketch text { fill: var(--ink); stroke: none; font-family: Georgia, serif; font-style: italic; }
+.sketch-number { font-size: 92px; }
+.sketch-small { font-size: 15px; letter-spacing: 4px; }
+.sketch-title { font-size: 24px; letter-spacing: 3px; }
+.sketch-layer--2, .sketch-layer--3 { stroke-dasharray: 900; stroke-dashoffset: 900; animation: sketch-draw .9s ease forwards; }
+.sketch-layer--3 { animation-duration: 1.15s; }
+.sketch-watercolor { opacity: .42; filter: saturate(.85); animation: watercolor-in .8s ease both; }
+@keyframes sketch-draw { to { stroke-dashoffset: 0; } }
+@keyframes watercolor-in { from { opacity: 0; } to { opacity: .42; } }
+.rule-actions { display: grid; gap: 9px; margin-top: auto; }
+.rule-hint { margin: -2px 0 14px; padding: 11px 13px; border-left: 3px solid #d7a540; background: rgba(241, 204, 120, .18); font: italic .95rem/1.45 Georgia, serif; text-align: left; }
+.rule-page--speak { justify-content: center; }
+.rule-page--speak h1 { margin: 0 0 28px; }
+.rule-page--reward { justify-content: center; }
+.rule-drawing--solved { border-style: solid; border-color: rgba(113,134,106,.3); }
+.rule-reveal { margin: 5px 0 28px; color: var(--terracotta-dark); font: 600 clamp(1.28rem, 5.5vw, 1.8rem)/1.42 Georgia, serif; }
+.rule-reward-next { animation: rules-arrive .35s ease both; }
+
+@media (max-width: 430px) {
+  .rules-intro, .rules-doors, .rule-page { min-height: calc(100dvh - 106px); }
+  .rules-doors, .rule-page { padding: 24px 20px 28px; }
+  .rules-doors h1 { margin-bottom: 14px; }
+  .rule-door { min-height: 105px; }
+  .rule-door svg { max-height: 70px; }
+  .rule-drawing { min-height: 225px; }
+  .debug-challenge-one { grid-template-columns: 1fr 1fr; }
+  .debug-challenge-one button { grid-column: 1 / -1; }
+}
 
 .loading-card { display: grid; place-items: center; }
 noscript { display: block; margin: 30px; text-align: center; }

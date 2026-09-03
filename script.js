@@ -1,4 +1,5 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.1";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.2";
+import { renderChallengeOne } from "./challenge-one.js?v=1.4.2";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";
@@ -27,6 +28,14 @@ const defaultState = () => ({
   onboardingCompleted: false,
   currentStep: "welcome",
   completedChallenges: {},
+  challengeOne: {
+    started: false,
+    phase: "intro",
+    openedDoors: [],
+    selectedRule: 1,
+    revealLevel: 1,
+    hintVisible: false,
+  },
   galleryViewed: {},
   illustrations: {},
   answers: {},
@@ -46,6 +55,8 @@ function loadState() {
     const stored = JSON.parse(localStorage.getItem(stateStorageKey));
     if (stored?.version !== CONFIG.stateVersion) return defaultState();
     const migrated = { ...defaultState(), ...stored };
+    migrated.challengeOne = { ...defaultState().challengeOne, ...(stored.challengeOne || {}) };
+    migrated.challengeOne.openedDoors = [...new Set((migrated.challengeOne.openedDoors || []).map(Number).filter((id) => id >= 1 && id <= 6))];
     // Les personnes ayant déjà commencé en V1.3 ne doivent pas revoir l'onboarding.
     if (typeof stored.onboardingCompleted !== "boolean") {
       migrated.onboardingCompleted = Boolean(stored.started || stored.currentStep !== "welcome");
@@ -95,7 +106,7 @@ function navigate(id, { advance = false, replace = false } = {}) {
 
 function updateChrome(id) {
   const index = Math.max(0, stepIndex(id));
-  header.hidden = ["install", "welcome", "prologue", "book-closed", "book-open"].includes(id);
+  header.hidden = ["install", "welcome", "prologue", "book-closed", "book-open", "challenge-1"].includes(id);
   progressLabel.textContent = "Le carnet";
   progressBar.style.width = `${Math.round((index / (STEPS.length - 1)) * 100)}%`;
   illustrationCount.hidden = true;
@@ -453,7 +464,21 @@ const renderers = {
   prologue: renderPrologue,
   "book-closed": renderClosedNotebook,
   "book-open": renderOpenNotebook,
-  "challenge-1": () => state.completedChallenges[1] ? navigate("resolution-1", { advance: true }) : renderChoiceSequence({ chapterId: 1, title: CONFIG.chapters[1].publicChallengeTitle, items: CONFIG.chapters[1].questions, enforceCorrect: true, onDone: () => completeChallenge(1, "resolution-1") }),
+  "challenge-1": () => {
+    if (state.completedChallenges[1]) return navigate("gallery-1", { advance: true });
+    cleanupCurrentScreen = renderChallengeOne(app, {
+      progress: state.challengeOne,
+      rules: CONFIG.challengeOne.rules,
+      debug: debugMode,
+      onChange: (progress) => { state.challengeOne = progress; saveState(); },
+      onComplete: () => {
+        state.completedChallenges[1] = true;
+        state.currentStep = "gallery-1";
+        saveState();
+        navigate("gallery-1", { advance: true });
+      },
+    });
+  },
   "resolution-1": () => renderGalleryResolution(1, "Tu t’en souviens.", "Alors laisse-moi te montrer ce que tu n’avais jamais vu.", "Découvrir le souvenir", "gallery-1"),
   "gallery-1": () => renderGalleryInvitation("travel-past-medium-1"),
   "travel-past-medium-1": () => renderTravelGallery(1, "past", "medium", "handoff-1"),
@@ -576,6 +601,33 @@ function setupDebug() {
     state.currentStep = ["thursday-lock", "friday-lock"].includes(select.value) ? select.value : "thursday-lock";
     saveState();
     navigate("book-closed", { replace: true });
+  });
+
+  const ruleSelect = debugPanel.querySelector("#debugChallengeOneRule");
+  const stageSelect = debugPanel.querySelector("#debugChallengeOneStage");
+  debugPanel.querySelector("#debugChallengeOneApply").addEventListener("click", () => {
+    stopActiveSoundtrack();
+    const selectedRule = Number(ruleSelect.value);
+    const stage = stageSelect.value;
+    const prerequisites = selectedRule === 1 ? [] : [1];
+    const presets = {
+      intro: { phase: "intro", openedDoors: [], revealLevel: 1, hintVisible: false },
+      doors: { phase: "doors", openedDoors: [], revealLevel: 1, hintVisible: false },
+      level1: { phase: "rule", openedDoors: prerequisites, revealLevel: 1, hintVisible: false },
+      level2: { phase: "rule", openedDoors: prerequisites, revealLevel: 2, hintVisible: false },
+      level3: { phase: "rule", openedDoors: prerequisites, revealLevel: 3, hintVisible: false },
+      hint: { phase: "rule", openedDoors: prerequisites, revealLevel: 3, hintVisible: true },
+      speak: { phase: "speak", openedDoors: prerequisites, revealLevel: 3, hintVisible: false },
+      reward: { phase: "reward", openedDoors: [...prerequisites, selectedRule], revealLevel: 3, hintVisible: false },
+      one: { phase: "doors", openedDoors: [1], revealLevel: 1, hintVisible: false },
+      five: { phase: "doors", openedDoors: [1, 2, 3, 4, 5], revealLevel: 1, hintVisible: false },
+      six: { phase: "doors", openedDoors: [1, 2, 3, 4, 5, 6], revealLevel: 1, hintVisible: false },
+    };
+    state.challengeOne = { ...defaultState().challengeOne, started: stage !== "intro", selectedRule, ...presets[stage] };
+    state.completedChallenges[1] = false;
+    Object.assign(state, { started: true, onboardingCompleted: true, currentStep: "challenge-1", debugDateLocked: false });
+    saveState();
+    navigate("challenge-1");
   });
 
   const memoriesSelect = debugPanel.querySelector("#debugMemories");
