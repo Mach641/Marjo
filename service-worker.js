@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-8-challenge-one-rules-3-6";
+const CACHE_NAME = "voyage-majorque-v1-4-8-challenge-one-assets-refresh-1";
 const APP_SHELL = [
   "./",
   "./index.html",
