@@ -1,5 +1,5 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.7";
-import { renderChallengeOne } from "./challenge-one.js?v=1.4.7";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.8";
+import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";

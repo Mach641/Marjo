@@ -23,32 +23,45 @@ function ruleTwo(level, solved) {
   return `<img class="rule-sketch rule-sketch--asset rule-sketch--rule-2${solved ? " rule-sketch--solved" : ""}" src="assets/challenge-1/v1-4-7/rule-2-level-${stage}.png" alt="${alt}" />`;
 }
 
+function assetRule(ruleId, level, solved, alts) {
+  const stage = solved ? 4 : level;
+  return `<img class="rule-sketch rule-sketch--asset rule-sketch--rule-${ruleId}${solved ? " rule-sketch--solved" : ""}" src="assets/challenge-1/v1-4-8/rule-${ruleId}-level-${stage}.png" alt="${alts[stage - 1]}" />`;
+}
+
 function ruleThree(level, solved) {
-  return svg(`${wash(solved, '<ellipse cx="152" cy="159" rx="104" ry="43" fill="#9db9be"/><rect x="87" y="83" width="123" height="83" rx="14" fill="#c79a71"/>')}
-    ${layer(level, 1, '<path d="M93 91h114v66q0 23-23 23h-68q-23 0-23-23zM208 108q45-7 45 23t-45 25M77 185h149"/>')}
-    ${layer(level, 2, '<path d="M104 107q47 15 91 0M119 66q-13-16 2-29M151 66q-13-16 2-29M183 66q-13-16 2-29"/>')}
-    ${layer(level, 3, '<path d="M242 40q-15 47-45 91"/><rect x="204" y="31" width="54" height="36" rx="4" transform="rotate(20 231 49)"/><path d="M250 61q19 18 30 43"/>')}`, "Une tablette de chocolat trempée dans une tasse de café");
+  return assetRule(3, level, solved, [
+    "Le début d’une tasse et sa vapeur",
+    "Une tasse de café fumante",
+    "Une main trempe du chocolat dans une tasse de café",
+    "Une main trempe du chocolat dans une tasse de café en aquarelle",
+  ]);
 }
 
 function ruleFour(level, solved) {
-  return svg(`${wash(solved, '<ellipse cx="160" cy="139" rx="83" ry="73" fill="#d5ae7d"/><circle cx="74" cy="69" r="19" fill="#d9887b"/><circle cx="253" cy="65" r="15" fill="#d9887b"/>')}
-    ${layer(level, 1, '<path d="M105 103l-8-48 42 25q21-8 43 0l42-25-7 51q18 23 5 61-14 43-65 43-54 0-67-43-10-36 15-64z"/>')}
-    ${layer(level, 2, '<path d="M120 125l18-5M181 120l19 6M143 145q17 12 34 0M158 139v12M94 140l-42-8M95 152l-44 8M219 141l45-9M218 154l44 10"/><path d="M112 84l14 13M206 83l-15 14"/>')}
-    ${layer(level, 3, '<path d="M118 207q-17 13-8 25M199 205q19 11 12 27M105 214q53 22 106 0"/><path d="M62 69c-19-20-38 8 2 34 38-27 18-53-2-34zM253 65c-15-17-31 6 1 28 31-21 15-45-1-28z"/>')}`, "Un chat ronchon entouré de petits cœurs");
+  return assetRule(4, level, solved, [
+    "Le début du visage et les oreilles d’un chat",
+    "Un chat au regard légèrement ronchon",
+    "Un chat au regard légèrement ronchon entouré de cœurs",
+    "Un chat entouré de cœurs en aquarelle",
+  ]);
 }
 
 function ruleFive(level, solved) {
-  return svg(`${wash(solved, '<rect x="43" y="83" width="234" height="113" rx="18" fill="#9babb8"/><ellipse cx="160" cy="202" rx="117" ry="18" fill="#e7bd83"/>')}
-    ${layer(level, 1, '<path d="M45 195V93q0-20 20-20h190q20 0 20 20v102M44 169h232M61 88h86v61H61zM173 88h86v61h-86z"/>')}
-    ${layer(level, 2, '<circle cx="113" cy="111" r="16"/><path d="M110 128q-24 16-20 41M103 139q17 1 25 17"/><circle cx="207" cy="111" r="16"/><path d="M210 128q24 16 20 41M217 139q-17 1-25 17"/>')}
-    ${layer(level, 3, '<path d="M126 157q25 21 36 4 11-17 32-3M142 163q19 24 37 0"/><path d="M155 198q5-11 11 0"/>')}`, "Deux personnes se réconcilient avant de dormir");
+  return assetRule(5, level, solved, [
+    "Un lit vu de face",
+    "Vincent et Marjolaine couchés dos à dos",
+    "Vincent et Marjolaine se tiennent la main entre leurs lits",
+    "Vincent et Marjolaine se tiennent la main en aquarelle",
+  ]);
 }
 
 function ruleSix(level, solved) {
-  return svg(`${wash(solved, '<ellipse cx="160" cy="180" rx="111" ry="35" fill="#99b9ad"/><path d="M77 173q32-34 72 4M171 177q38-38 73-4" fill="none" stroke="#d98e70" stroke-width="28"/>')}
-    ${layer(level, 1, '<path d="M74 165q37-42 76 4v25H66q-12-12 8-29zM174 169q38-46 76-3 18 18 4 29h-88v-18"/>')}
-    ${layer(level, 2, '<path d="M66 195q41 12 84 0M166 195q44 12 88 0M92 161q17 13 37 2M193 163q18 11 38-1"/>')}
-    ${layer(level, 3, '<path d="M105 153q-9-53 7-86M128 157q12-47 5-88M204 155q-12-49-2-88M229 158q15-48 3-91"/><path d="M96 67h43M195 67h43"/>')}`, "Deux paires de pieds devant leurs chaussons");
+  return assetRule(6, level, solved, [
+    "Les contours très légers d’une paire de chaussons",
+    "Une paire de chaussons",
+    "Des pieds en chaussettes derrière une paire de chaussons",
+    "Des pieds dans des chaussons en aquarelle",
+  ]);
 }
 
 const drawings = [ruleOne, ruleTwo, ruleThree, ruleFour, ruleFive, ruleSix];
@@ -92,15 +105,15 @@ export function renderChallengeOne(root, options) {
 
   function renderRule() {
     const lastLevel = current.revealLevel === 3;
-    root.innerHTML = `<section class="paper-card screen rule-page"><p class="kicker">Règle n°${current.selectedRule}</p><h1>Quelle règle se cache derrière ce dessin ?</h1><div class="rule-drawing${current.selectedRule <= 2 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div>${current.hintVisible ? `<p class="rule-hint">${selected().hint}</p>` : ""}<div class="rule-actions"><button class="primary-button" data-rules-action="know">Je connais la règle</button><button class="secondary-button" data-rules-action="more">${lastLevel ? "Donne-moi un indice" : "Dessine-moi encore un peu"}</button></div></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page"><p class="kicker">Règle n°${current.selectedRule}</p><h1>Quelle règle se cache derrière ce dessin ?</h1><div class="rule-drawing rule-drawing--transparent">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div>${current.hintVisible ? `<p class="rule-hint">${selected().hint}</p>` : ""}<div class="rule-actions"><button class="primary-button" data-rules-action="know">Je connais la règle</button><button class="secondary-button" data-rules-action="more">${lastLevel ? "Donne-moi un indice" : "Dessine-moi encore un peu"}</button></div></section>`;
   }
 
   function renderSpeak() {
-    root.innerHTML = `<section class="paper-card screen rule-page rule-page--speak"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing${current.selectedRule <= 2 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div><div class="rules-rainbow rules-rainbow--small" aria-hidden="true">⌒</div><h1>Alors dis-la à Vincent.</h1><button class="primary-button" data-rules-action="found">J’ai trouvé</button></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page rule-page--speak"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing rule-drawing--transparent">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div><div class="rules-rainbow rules-rainbow--small" aria-hidden="true">⌒</div><h1>Alors dis-la à Vincent.</h1><button class="primary-button" data-rules-action="found">J’ai trouvé</button></section>`;
   }
 
   function renderReward() {
-    root.innerHTML = `<section class="paper-card screen rule-page rule-page--reward"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing rule-drawing--solved${current.selectedRule === 2 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](3, true)}</div><p class="rule-reveal">${selected().text}</p><button class="primary-button rule-reward-next" data-rules-action="continue" hidden>Continuer</button></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page rule-page--reward"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing rule-drawing--solved${current.selectedRule >= 2 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](3, true)}</div><p class="rule-reveal">${selected().text}</p><button class="primary-button rule-reward-next" data-rules-action="continue" hidden>Continuer</button></section>`;
     later(() => { const button = root.querySelector('[data-rules-action="continue"]'); if (button) button.hidden = false; }, options.debug ? 120 : 950);
   }
 

@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.7";
+export const APP_VERSION = "1.4.8";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -15,10 +15,10 @@ export const CONFIG = {
     rules: [
       { id: 1, text: "Marjolaine a toujours raison.", hint: "Avec Marjo, mieux vaut être d’accord !" },
       { id: 2, text: "Vincent doit éplucher<br>et couper les pommes<br>de Marjolaine.", hint: "Vincent n’a qu’une mission :<br>les éplucher, les couper,<br>et les lui servir." },
-      { id: 3, text: "Marjolaine a le droit de tremper son chocolat dans le café de Vincent.", hint: "Ce café appartient à Vincent. Le chocolat, beaucoup moins…" },
-      { id: 4, text: "Tous les chats sont beaux.", hint: "Cet air ronchon ne change rien : il fait partie de la règle !" },
-      { id: 5, text: "On ne doit jamais se coucher en étant fâchés.", hint: "Même dos à dos, la nuit mérite de retrouver un peu de douceur." },
-      { id: 6, text: "À la maison, on porte toujours ses chaussons. On ne marche pas pieds nus.", hint: "À la maison, il y a une seule façon de circuler…" },
+      { id: 3, text: "Marjolaine a le droit de tremper<br>son chocolat dans le café de Vincent.", hint: "Ce café appartient à Vincent.<br>Le chocolat, beaucoup moins..." },
+      { id: 4, text: "Tous les chats sont beaux.", hint: "Cet air ronchon ne change rien :<br>il fait partie de la règle !" },
+      { id: 5, text: "On ne doit jamais se coucher<br>en étant fâchés.", hint: "Notre lit est tout petit<br>pour notre amour.<br>Pas question d’y ajouter<br>notre fierté." },
+      { id: 6, text: "À la maison, on porte toujours<br>ses chaussons.", hint: "À la maison, il y a<br>une seule façon de circuler...<br>Vincent le sait bien !" },
     ],
   },
   geo: {
