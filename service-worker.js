@@ -1,13 +1,13 @@
-const CACHE_NAME = "voyage-majorque-v1-4-5-challenge-one-assets";
+const CACHE_NAME = "voyage-majorque-v1-4-6-challenge-one-assets";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./manifest.webmanifest?v=1.4.5",
-  "./manifest-debug.webmanifest?v=1.4.5",
-  "./styles.css?v=1.4.5",
-  "./script.js?v=1.4.5",
-  "./config.js?v=1.4.5",
-  "./challenge-one.js?v=1.4.5",
+  "./manifest.webmanifest?v=1.4.6",
+  "./manifest-debug.webmanifest?v=1.4.6",
+  "./styles.css?v=1.4.6",
+  "./script.js?v=1.4.6",
+  "./config.js?v=1.4.6",
+  "./challenge-one.js?v=1.4.6",
   "./family-game.js",
   "./gallery-soundtrack.js?v=1.2.1",
   "./gallery-viewer.js?v=1.3.2",
@@ -17,7 +17,7 @@ const APP_SHELL = [
   "./assets/icons/icon-192-v1.png",
   "./assets/icons/icon-512-v1.png",
   "./assets/icons/apple-touch-icon-v1.png",
-  "./assets/challenge-1/v1-4-5/intro-door.png",
+  "./assets/challenge-1/v1-4-6/intro-door.png",
   "./assets/challenge-1/v1-4-5/closed-door-1.png",
   "./assets/challenge-1/v1-4-5/closed-door-2.png",
   "./assets/challenge-1/v1-4-5/closed-door-3.png",
@@ -30,9 +30,10 @@ const APP_SHELL = [
   "./assets/challenge-1/v1-4-5/open-door-4.png",
   "./assets/challenge-1/v1-4-5/open-door-5.png",
   "./assets/challenge-1/v1-4-5/open-door-6.png",
-  "./assets/challenge-1/v1-4-5/rule-1-level-1.png",
-  "./assets/challenge-1/v1-4-5/rule-1-level-2.png",
   "./assets/challenge-1/v1-4-5/rule-1-level-3.png",
+  "./assets/challenge-1/v1-4-6/rule-1-level-1.png",
+  "./assets/challenge-1/v1-4-6/rule-1-level-2.png",
+  "./assets/challenge-1/v1-4-6/rule-1-level-3.png",
 ];
 
 self.addEventListener("install", (event) => {

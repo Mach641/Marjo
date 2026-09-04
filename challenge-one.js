@@ -3,11 +3,13 @@ const layer = (level, needed, content) => level >= needed ? `<g class="sketch-la
 const wash = (solved, content) => solved ? `<g class="sketch-watercolor" aria-hidden="true">${content}</g>` : "";
 
 function ruleOne(level, solved) {
-  const name = `rule-1-level-${solved ? 3 : level}`;
+  const src = solved
+    ? "assets/challenge-1/v1-4-5/rule-1-level-3.png"
+    : `assets/challenge-1/v1-4-6/rule-1-level-${level}.png`;
   const alt = solved
     ? "Le croquis de Marjolaine avec sa couronne"
     : ["Numéro 1 écrit à la main", "Règle numéro 1 et un croquis de Marjolaine", "Règle numéro 1, Marjolaine et une couronne"][level - 1];
-  return `<img class="rule-sketch rule-sketch--asset${solved ? " rule-sketch--solved" : ""}" src="assets/challenge-1/v1-4-5/${name}.png" alt="${alt}" />`;
+  return `<img class="rule-sketch rule-sketch--asset${solved ? " rule-sketch--solved" : ""}" src="${src}" alt="${alt}" />`;
 }
 
 function ruleTwo(level, solved) {
@@ -69,7 +71,7 @@ export function renderChallengeOne(root, options) {
   const selected = () => options.rules.find((rule) => rule.id === current.selectedRule);
 
   function renderIntro() {
-    root.innerHTML = `<section class="paper-card screen rules-intro"><p class="kicker">Premier défi</p><h1>Les règles de notre monde</h1><img class="rules-intro__door" src="assets/challenge-1/v1-4-5/intro-door.png" alt="" aria-hidden="true" /><p class="rules-intro__copy">Avant de parcourir notre histoire…<br>voyons si tu connais encore<br>les règles de notre monde à nous.</p><button class="primary-button" data-rules-action="discover">Découvrir les règles</button></section>`;
+    root.innerHTML = `<section class="paper-card screen rules-intro"><p class="kicker">Premier défi</p><h1>Les règles de notre monde</h1><img class="rules-intro__door" src="assets/challenge-1/v1-4-6/intro-door.png" alt="" aria-hidden="true" /><p class="rules-intro__copy">Avant de parcourir notre histoire…<br>voyons si tu connais encore<br>les règles de notre monde à nous.</p><button class="primary-button" data-rules-action="discover">Découvrir les règles</button></section>`;
   }
 
   function renderDoors() {
@@ -86,11 +88,11 @@ export function renderChallengeOne(root, options) {
 
   function renderRule() {
     const lastLevel = current.revealLevel === 3;
-    root.innerHTML = `<section class="paper-card screen rule-page"><p class="kicker">Règle n°${current.selectedRule}</p><h1>Quelle règle se cache derrière ce dessin ?</h1><div class="rule-drawing">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div>${current.hintVisible ? `<p class="rule-hint">${selected().hint}</p>` : ""}<div class="rule-actions"><button class="primary-button" data-rules-action="know">Je connais la règle</button><button class="secondary-button" data-rules-action="more">${lastLevel ? "Donne-moi un indice" : "Dessine-moi encore un peu"}</button></div></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page"><p class="kicker">Règle n°${current.selectedRule}</p><h1>Quelle règle se cache derrière ce dessin ?</h1><div class="rule-drawing${current.selectedRule === 1 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div>${current.hintVisible ? `<p class="rule-hint">${selected().hint}</p>` : ""}<div class="rule-actions"><button class="primary-button" data-rules-action="know">Je connais la règle</button><button class="secondary-button" data-rules-action="more">${lastLevel ? "Donne-moi un indice" : "Dessine-moi encore un peu"}</button></div></section>`;
   }
 
   function renderSpeak() {
-    root.innerHTML = `<section class="paper-card screen rule-page rule-page--speak"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div><div class="rules-rainbow rules-rainbow--small" aria-hidden="true">⌒</div><h1>Alors dis-la à Vincent.</h1><button class="primary-button" data-rules-action="found">J’ai trouvé</button></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page rule-page--speak"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing${current.selectedRule === 1 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div><div class="rules-rainbow rules-rainbow--small" aria-hidden="true">⌒</div><h1>Alors dis-la à Vincent.</h1><button class="primary-button" data-rules-action="found">J’ai trouvé</button></section>`;
   }
 
   function renderReward() {
