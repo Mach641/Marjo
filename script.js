@@ -1,4 +1,4 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.10";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.11";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -252,6 +252,64 @@ function renderChoiceSequence({ chapterId, title, items, enforceCorrect = false,
     }));
   };
   draw();
+}
+
+function coupleProfileProgress() {
+  const stored = state.answers["chapter-2"];
+  if (!stored || Array.isArray(stored)) {
+    state.answers["chapter-2"] = { questionIndex: 0, activePlayer: "marjolaine", marjolaine: [], vincent: [] };
+  }
+  const progress = state.answers["chapter-2"];
+  progress.questionIndex = Math.min(CONFIG.chapters[2].questions.length, Math.max(0, Number(progress.questionIndex) || 0));
+  progress.activePlayer = progress.activePlayer === "vincent" ? "vincent" : "marjolaine";
+  progress.marjolaine = Array.isArray(progress.marjolaine) ? progress.marjolaine : [];
+  progress.vincent = Array.isArray(progress.vincent) ? progress.vincent : [];
+  return progress;
+}
+
+function renderCoupleProfileChallenge() {
+  const questions = CONFIG.chapters[2].questions;
+  const progress = coupleProfileProgress();
+  if (progress.questionIndex >= questions.length) return completeChallenge(2, "analysis-2");
+  const question = questions[progress.questionIndex];
+  const playerName = progress.activePlayer === "marjolaine" ? "Marjolaine" : "Vincent";
+  app.innerHTML = page("Notre profil de couple", `<div class="question-meta">${progress.questionIndex + 1} / ${questions.length}</div><p class="couple-player" data-couple-player>Réponse de ${playerName}</p><h2>${question.prompt}</h2><div class="choice-list">${question.options.map((choice) => `<button class="choice couple-choice" type="button" data-profile="${choice.profile}"><span class="couple-choice__symbol" aria-hidden="true">${choice.symbol}</span><span>${choice.text}</span></button>`).join("")}</div>`);
+  app.querySelectorAll("[data-profile]").forEach((choice) => choice.addEventListener("click", () => {
+    const activePlayer = progress.activePlayer;
+    progress[activePlayer][progress.questionIndex] = choice.dataset.profile;
+    if (activePlayer === "marjolaine") {
+      progress.activePlayer = "vincent";
+      saveState();
+      app.querySelector("[data-couple-player]").textContent = "Réponse de Vincent";
+      return;
+    }
+    progress.questionIndex += 1;
+    progress.activePlayer = "marjolaine";
+    saveState();
+    if (progress.questionIndex >= questions.length) completeChallenge(2, "analysis-2");
+    else renderCoupleProfileChallenge();
+  }));
+}
+
+function dominantCoupleProfile(answers) {
+  const scores = { A: 0, B: 0, C: 0, D: 0 };
+  answers.forEach((profile) => { if (profile in scores) scores[profile] += 1; });
+  const highest = Math.max(...Object.values(scores));
+  for (let index = answers.length - 1; index >= 0; index -= 1) {
+    if (scores[answers[index]] === highest) return answers[index];
+  }
+  return "A";
+}
+
+function renderCoupleProfileResults() {
+  const progress = coupleProfileProgress();
+  const profiles = CONFIG.chapters[2].profiles;
+  const marjolaineKey = dominantCoupleProfile(progress.marjolaine);
+  const vincentKey = dominantCoupleProfile(progress.vincent);
+  const result = (name, key) => `<article class="couple-result"><h2>${name}</h2><div class="couple-result__symbol" aria-hidden="true">${profiles[key].symbol}</div><h3>${profiles[key].name}</h3><p>${profiles[key].description}</p></article>`;
+  const crossedComment = marjolaineKey === vincentKey ? "Même profil.<br>Ça explique probablement beaucoup de choses." : "Pas tout à fait le même profil…<br>mais visiblement la même équipe.";
+  app.innerHTML = page("Votre profil de couple", `<div class="couple-results">${result("Marjolaine", marjolaineKey)}${result("Vincent", vincentKey)}</div><p class="couple-results__comment">${crossedComment}</p><p class="couple-results__diagnostic">${CONFIG.text.diagnostic}</p>${button("Continuer", "continue")}`);
+  bindAction("continue", () => navigate("gallery-2", { advance: true }));
 }
 
 function renderBlindTest({ chapterId, songs, onDone }) {
@@ -523,9 +581,9 @@ const renderers = {
     bindAction("close-book", () => { state.awaitingFlightReopen = true; saveState(); renderers.departure(); });
   },
   flight: () => { app.innerHTML = page("Quelque part au-dessus des nuages", `<div class="plane" aria-hidden="true">✈</div>${button("Poursuivre le voyage", "continue")}`, { guide: "Tu vois ? Même les nuages ont des pages." }); bindAction("continue", () => navigate("challenge-2", { advance: true })); },
-  "challenge-2": () => state.completedChallenges[2] ? navigate("analysis-2", { advance: true }) : renderChoiceSequence({ chapterId: 2, title: "Notre profil de couple", items: CONFIG.chapters[2].questions, onDone: () => completeChallenge(2, "analysis-2") }),
+  "challenge-2": () => state.completedChallenges[2] ? navigate("analysis-2", { advance: true }) : renderCoupleProfileChallenge(),
   "analysis-2": renderAnalysis,
-  "resolution-2": () => renderGalleryResolution(2, "Diagnostic", CONFIG.text.diagnostic, "Continuer", "gallery-2"),
+  "resolution-2": renderCoupleProfileResults,
   "gallery-2": () => renderGalleryInvitation("travel-past-medium"),
   "travel-past-medium": () => renderTravelGallery(2, "past", "medium", "handoff-2"),
   "handoff-2": () => renderHandoff(2, "challenge-3"),

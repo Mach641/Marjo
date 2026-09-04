@@ -1,12 +1,12 @@
-const CACHE_NAME = "voyage-majorque-v1-4-10-blind-test-layout";
+const CACHE_NAME = "voyage-majorque-v1-4-11-couple-profile";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.10",
-  "./script.js?v=1.4.10",
-  "./config.js?v=1.4.10",
+  "./styles.css?v=1.4.11",
+  "./script.js?v=1.4.11",
+  "./config.js?v=1.4.11",
   "./challenge-one.js?v=1.4.8",
   "./family-game.js",
   "./gallery-soundtrack.js?v=1.2.1",

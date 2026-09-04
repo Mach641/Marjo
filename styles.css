@@ -169,6 +169,18 @@ p { margin: 0 0 20px; line-height: 1.68; }
 .choice { border: 1px solid var(--line); background: #fffdf8; color: var(--ink); text-align: left; }
 .choice:hover { border-color: var(--terracotta); background: #fff8ef; }
 .choice--wrong { animation: shake 0.32s ease; border-color: #a84b43; background: #fff0ed; }
+.couple-player { margin: 8px 0 20px; padding: 12px 14px; border: 1px solid rgba(169, 82, 62, .34); background: rgba(169, 82, 62, .09); color: var(--terracotta-dark); font: 800 1.05rem/1.25 Georgia, serif; text-align: center; }
+.couple-choice { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 10px; }
+.couple-choice__symbol { color: var(--terracotta-dark); font-size: 1.25rem; text-align: center; }
+.couple-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 18px 0; }
+.couple-result { padding: 18px 14px; border: 1px solid var(--line); background: rgba(255, 253, 248, .72); text-align: center; }
+.couple-result h2 { margin-bottom: 8px; font-size: .82rem; letter-spacing: .11em; text-transform: uppercase; }
+.couple-result h3 { margin: 6px 0 12px; font: 700 1.12rem/1.3 Georgia, serif; }
+.couple-result p { margin: 0; font-size: .9rem; }
+.couple-result__symbol { color: var(--terracotta); font-size: 2.25rem; }
+.couple-results__comment, .couple-results__diagnostic { text-align: center; }
+.couple-results__comment { font: italic 1.05rem/1.5 Georgia, serif; }
+.couple-results__diagnostic { color: var(--terracotta-dark); font: 700 1.2rem/1.4 Georgia, serif; }
 
 .question-meta { float: right; margin: -4px 0 8px 10px; color: var(--muted); font-size: 0.75rem; font-weight: 800; }
 .feedback { min-height: 28px; margin-top: 14px; color: var(--terracotta-dark); font-weight: 700; }
@@ -315,6 +327,7 @@ blockquote { margin: 18px 0 28px; padding: 18px; border-left: 3px solid var(--te
 .rule-reward-next { animation: rules-arrive .35s ease both; }
 
 @media (max-width: 430px) {
+  .couple-results { grid-template-columns: 1fr; }
   .rules-intro, .rules-doors, .rule-page { min-height: calc(100dvh - 106px); }
   .rules-doors, .rule-page { padding: 24px 20px 28px; }
   .rules-doors h1 { margin-bottom: 14px; }
