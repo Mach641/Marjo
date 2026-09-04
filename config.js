@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.6";
+export const APP_VERSION = "1.4.7";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -14,7 +14,7 @@ export const CONFIG = {
   challengeOne: {
     rules: [
       { id: 1, text: "Marjolaine a toujours raison.", hint: "Avec Marjo, mieux vaut être d’accord !" },
-      { id: 2, text: "Vincent doit éplucher et couper les pommes de Marjolaine.", hint: "Vincent n’a qu’une mission : les éplucher, les couper et les lui servir." },
+      { id: 2, text: "Vincent doit éplucher<br>et couper les pommes<br>de Marjolaine.", hint: "Vincent n’a qu’une mission :<br>les éplucher, les couper,<br>et les lui servir." },
       { id: 3, text: "Marjolaine a le droit de tremper son chocolat dans le café de Vincent.", hint: "Ce café appartient à Vincent. Le chocolat, beaucoup moins…" },
       { id: 4, text: "Tous les chats sont beaux.", hint: "Cet air ronchon ne change rien : il fait partie de la règle !" },
       { id: 5, text: "On ne doit jamais se coucher en étant fâchés.", hint: "Même dos à dos, la nuit mérite de retrouver un peu de douceur." },

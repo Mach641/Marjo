@@ -257,7 +257,7 @@ blockquote { margin: 18px 0 28px; padding: 18px; border-left: 3px solid var(--te
 .debug-challenge-one select { min-width: 0; }
 .debug-challenge-one button { min-height: 36px; border: 1px solid #737985; border-radius: 5px; background: #f7f7f8; color: #222; }
 
-/* V1.4.6 — Les règles de notre monde */
+/* V1.4.7 — Les règles de notre monde */
 .rules-intro, .rules-doors, .rule-page { display: flex; flex-direction: column; min-height: min(680px, calc(100dvh - 112px)); }
 .rules-intro { justify-content: center; text-align: center; }
 .rules-intro h1, .rules-doors h1, .rule-page h1 { font-size: clamp(2rem, 9vw, 3.4rem); }

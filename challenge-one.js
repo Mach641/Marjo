@@ -13,10 +13,14 @@ function ruleOne(level, solved) {
 }
 
 function ruleTwo(level, solved) {
-  return svg(`${wash(solved, '<circle cx="154" cy="120" r="72" fill="#d8836f"/><path d="M205 105q55 24 19 86" fill="none" stroke="#efc66f" stroke-width="18"/>')}
-    ${layer(level, 1, '<path d="M160 62c-14-20-43-9-48 10-33-7-57 18-55 55 2 45 40 78 94 76 53 3 93-29 96-73 3-40-27-66-63-56-7-10-14-12-24-12zM160 62q2-25 20-34M170 42q18-13 34-4"/>')}
-    ${layer(level, 2, '<path d="M211 87q32 22 9 49t17 51q15 14-2 28"/><path d="M222 96q23-7 31 8"/>')}
-    ${layer(level, 3, '<path d="M116 112q15 13 39 4M156 116q22 14 43-1M155 117v72M106 178q49-18 98 0"/>')}`, "Une pomme progressivement épluchée et coupée");
+  const stage = solved ? 4 : level;
+  const alt = [
+    "Une pomme entière",
+    "Une pomme en cours d’épluchage",
+    "Des mains coupent une pomme épluchée",
+    "Des pommes préparées avec un bol, un couteau et des épluchures",
+  ][stage - 1];
+  return `<img class="rule-sketch rule-sketch--asset rule-sketch--rule-2${solved ? " rule-sketch--solved" : ""}" src="assets/challenge-1/v1-4-7/rule-2-level-${stage}.png" alt="${alt}" />`;
 }
 
 function ruleThree(level, solved) {
@@ -88,15 +92,15 @@ export function renderChallengeOne(root, options) {
 
   function renderRule() {
     const lastLevel = current.revealLevel === 3;
-    root.innerHTML = `<section class="paper-card screen rule-page"><p class="kicker">Règle n°${current.selectedRule}</p><h1>Quelle règle se cache derrière ce dessin ?</h1><div class="rule-drawing${current.selectedRule === 1 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div>${current.hintVisible ? `<p class="rule-hint">${selected().hint}</p>` : ""}<div class="rule-actions"><button class="primary-button" data-rules-action="know">Je connais la règle</button><button class="secondary-button" data-rules-action="more">${lastLevel ? "Donne-moi un indice" : "Dessine-moi encore un peu"}</button></div></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page"><p class="kicker">Règle n°${current.selectedRule}</p><h1>Quelle règle se cache derrière ce dessin ?</h1><div class="rule-drawing${current.selectedRule <= 2 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div>${current.hintVisible ? `<p class="rule-hint">${selected().hint}</p>` : ""}<div class="rule-actions"><button class="primary-button" data-rules-action="know">Je connais la règle</button><button class="secondary-button" data-rules-action="more">${lastLevel ? "Donne-moi un indice" : "Dessine-moi encore un peu"}</button></div></section>`;
   }
 
   function renderSpeak() {
-    root.innerHTML = `<section class="paper-card screen rule-page rule-page--speak"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing${current.selectedRule === 1 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div><div class="rules-rainbow rules-rainbow--small" aria-hidden="true">⌒</div><h1>Alors dis-la à Vincent.</h1><button class="primary-button" data-rules-action="found">J’ai trouvé</button></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page rule-page--speak"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing${current.selectedRule <= 2 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div><div class="rules-rainbow rules-rainbow--small" aria-hidden="true">⌒</div><h1>Alors dis-la à Vincent.</h1><button class="primary-button" data-rules-action="found">J’ai trouvé</button></section>`;
   }
 
   function renderReward() {
-    root.innerHTML = `<section class="paper-card screen rule-page rule-page--reward"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing rule-drawing--solved">${drawings[current.selectedRule - 1](3, true)}</div><p class="rule-reveal">${selected().text}</p><button class="primary-button rule-reward-next" data-rules-action="continue" hidden>Continuer</button></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page rule-page--reward"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing rule-drawing--solved${current.selectedRule === 2 ? " rule-drawing--transparent" : ""}">${drawings[current.selectedRule - 1](3, true)}</div><p class="rule-reveal">${selected().text}</p><button class="primary-button rule-reward-next" data-rules-action="continue" hidden>Continuer</button></section>`;
     later(() => { const button = root.querySelector('[data-rules-action="continue"]'); if (button) button.hidden = false; }, options.debug ? 120 : 950);
   }
 
