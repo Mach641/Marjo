@@ -1,4 +1,4 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.9";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.10";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -258,7 +258,8 @@ function renderBlindTest({ chapterId, songs, onDone }) {
   const progressKey = `blind-test-${chapterId}`;
   let index = Math.min(Number(state.answers[progressKey]) || 0, songs.length - 1);
   const drawSong = () => {
-    app.innerHTML = page("Blind test guitare", `<div class="question-meta">${index + 1} / ${songs.length}</div>${button("J’ai trouvé", "reveal-song")}`);
+    const progress = songs.map((_, songIndex) => `<span class="blind-test-progress__dot${songIndex === index ? " blind-test-progress__dot--active" : ""}"></span>`).join("");
+    app.innerHTML = `<section class="paper-card screen blind-test-song"><p class="kicker">Défi 8</p><div class="blind-test-progress" aria-hidden="true">${progress}</div><h1>Chanson ${index + 1}</h1><h2>À toi de jouer !</h2><img class="blind-test-song__art" src="assets/challenge-8/v1-4-10/music-note.png" alt="" aria-hidden="true" /><p class="blind-test-song__copy">Vincent lance la musique sur la playlist<br>Deezer, écoute bien…</p>${button("J’ai trouvé !", "reveal-song")}</section>`;
     bindAction("reveal-song", () => {
       const song = songs[index];
       app.innerHTML = page("Révélation", `<div class="notice"><p><strong>Titre</strong><br>${song.title}</p><p><strong>Artiste</strong><br>${song.artist}</p></div>${button("Chanson suivante", "next-song")}`);
@@ -271,7 +272,8 @@ function renderBlindTest({ chapterId, songs, onDone }) {
       });
     });
   };
-  drawSong();
+  app.innerHTML = page("Le blind test", `<p class="blind-test-intro__subtitle">Des chansons qui ont accompagné<br>notre histoire.</p><img class="blind-test-intro__art" src="assets/challenge-8/v1-4-10/guitar.png" alt="" aria-hidden="true" /><p class="blind-test-intro__copy">Écoute bien, fais confiance<br>à ta mémoire… et à ton cœur.</p>${button("Commencer le blind test", "start-blind-test")}`, { kicker: "Défi 8", className: "blind-test-intro" });
+  bindAction("start-blind-test", drawSong);
 }
 
 function renderResolution(title, text, cta, next, options = {}) {

@@ -198,6 +198,14 @@ p { margin: 0 0 20px; line-height: 1.68; }
 .audio-placeholder { display: grid; place-items: center; gap: 10px; margin: 16px 0; padding: 20px; border: 1px dashed var(--line); background: #f8f1e5; }
 .audio-placeholder > span { font-size: 2rem; color: var(--terracotta); }
 .audio-placeholder small { color: var(--muted); }
+.blind-test-intro, .blind-test-song { text-align: center; }
+.blind-test-intro { justify-content: center; }
+.blind-test-intro__subtitle, .blind-test-intro__copy, .blind-test-song__copy { font: italic 1.05rem/1.55 Georgia, serif; }
+.blind-test-intro__art { display: block; width: min(68%, 240px); max-height: 320px; margin: 14px auto; object-fit: contain; }
+.blind-test-progress { display: flex; justify-content: center; gap: 8px; margin: 4px 0 22px; }
+.blind-test-progress__dot { width: 8px; height: 8px; border: 1px solid var(--terracotta); border-radius: 50%; }
+.blind-test-progress__dot--active { background: var(--terracotta); }
+.blind-test-song__art { display: block; width: min(72%, 240px); max-height: 260px; margin: 18px auto; object-fit: contain; }
 .baby-photo { display: block; width: min(100%, 330px); aspect-ratio: 1 / 1; margin: 16px auto; border: 8px solid white; outline: 1px solid var(--line); object-fit: cover; box-shadow: 0 9px 22px rgba(65, 45, 25, 0.14); transform: rotate(-1deg); }
 .baby-photo--placeholder { display: grid; place-items: center; padding: 22px; color: var(--muted); background: #e8decc; text-align: center; }
 
