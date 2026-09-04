@@ -1,4 +1,4 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.8";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.9";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -254,6 +254,26 @@ function renderChoiceSequence({ chapterId, title, items, enforceCorrect = false,
   draw();
 }
 
+function renderBlindTest({ chapterId, songs, onDone }) {
+  const progressKey = `blind-test-${chapterId}`;
+  let index = Math.min(Number(state.answers[progressKey]) || 0, songs.length - 1);
+  const drawSong = () => {
+    app.innerHTML = page("Blind test guitare", `<div class="question-meta">${index + 1} / ${songs.length}</div>${button("J’ai trouvé", "reveal-song")}`);
+    bindAction("reveal-song", () => {
+      const song = songs[index];
+      app.innerHTML = page("Révélation", `<div class="notice"><p><strong>Titre</strong><br>${song.title}</p><p><strong>Artiste</strong><br>${song.artist}</p></div>${button("Chanson suivante", "next-song")}`);
+      bindAction("next-song", () => {
+        index += 1;
+        state.answers[progressKey] = index;
+        saveState();
+        if (index >= songs.length) onDone();
+        else drawSong();
+      });
+    });
+  };
+  drawSong();
+}
+
 function renderResolution(title, text, cta, next, options = {}) {
   app.innerHTML = page(title, `<p>${text}</p>${button(cta, "continue")}`, options);
   bindAction("continue", () => navigate(next, { advance: true }));
@@ -483,7 +503,7 @@ const renderers = {
   "gallery-1": () => renderGalleryInvitation("travel-past-medium-1"),
   "travel-past-medium-1": () => renderTravelGallery(1, "past", "medium", "handoff-1"),
   "handoff-1": () => renderHandoff(1, "challenge-8"),
-  "challenge-8": () => state.completedChallenges[8] ? navigate("resolution-8", { advance: true }) : renderChoiceSequence({ chapterId: 8, title: "Blind test guitare", items: CONFIG.chapters[8].tracks, enforceCorrect: true, decorate: (track, index) => `<div class="audio-placeholder"><span>♫</span><button class="secondary-button" type="button" data-play>Écouter la piste ${index + 1}</button><small>Piste ${index + 1}</small></div>`, onDone: () => completeChallenge(8, "resolution-8") }),
+  "challenge-8": () => state.completedChallenges[8] ? navigate("resolution-8", { advance: true }) : renderBlindTest({ chapterId: 8, songs: CONFIG.chapters[8].songs, onDone: () => completeChallenge(8, "resolution-8") }),
   "resolution-8": () => renderGalleryResolution(8, "Celle-là, garde-la quelque part.", "Certaines chansons savent attendre longtemps.", "Continuer", "gallery-8"),
   "gallery-8": () => renderGalleryInvitation("travel-future-large"),
   "travel-future-large": () => renderTravelGallery(8, "future", "large", "handoff-8"),

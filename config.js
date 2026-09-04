@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.8";
+export const APP_VERSION = "1.4.9";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -128,10 +128,10 @@ export const CONFIG = {
       letter: "E",
       gallery: [{ src: null, label: "PLACEHOLDER — FUTUR LOINTAIN" }],
       soundtrack: null,
-      tracks: [
-        { label: "Extrait guitare PLACEHOLDER 1", options: ["Morceau A", "Morceau B", "Morceau C"], answer: 0 },
-        { label: "Extrait guitare PLACEHOLDER 2", options: ["Morceau D", "Morceau E", "Morceau F"], answer: 1 },
-        { label: "Extrait guitare PLACEHOLDER 3", options: ["Can’t Help Falling in Love", "Morceau PLACEHOLDER G", "Morceau PLACEHOLDER H"], answer: 0 },
+      songs: [
+        { title: "À définir", artist: "À définir" },
+        { title: "À définir", artist: "À définir" },
+        { title: "À définir", artist: "À définir" },
       ],
     },
   },

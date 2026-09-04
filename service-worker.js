@@ -1,12 +1,12 @@
-const CACHE_NAME = "voyage-majorque-v1-4-8-challenge-one-assets-refresh-1";
+const CACHE_NAME = "voyage-majorque-v1-4-9-blind-test";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
   "./styles.css?v=1.4.8",
-  "./script.js?v=1.4.8",
-  "./config.js?v=1.4.8",
+  "./script.js?v=1.4.9",
+  "./config.js?v=1.4.9",
   "./challenge-one.js?v=1.4.8",
   "./family-game.js",
   "./gallery-soundtrack.js?v=1.2.1",
