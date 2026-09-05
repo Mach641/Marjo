@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.11";
+export const APP_VERSION = "1.4.12";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",

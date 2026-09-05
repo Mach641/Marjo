@@ -170,6 +170,12 @@ p { margin: 0 0 20px; line-height: 1.68; }
 .choice:hover { border-color: var(--terracotta); background: #fff8ef; }
 .choice--wrong { animation: shake 0.32s ease; border-color: #a84b43; background: #fff0ed; }
 .couple-player { margin: 8px 0 20px; padding: 12px 14px; border: 1px solid rgba(169, 82, 62, .34); background: rgba(169, 82, 62, .09); color: var(--terracotta-dark); font: 800 1.05rem/1.25 Georgia, serif; text-align: center; }
+.couple-profile-intro { justify-content: center; text-align: center; }
+.couple-profile-intro__subtitle, .couple-profile-intro__copy { font: italic 1.05rem/1.55 Georgia, serif; }
+.couple-profile-intro__art { display: block; width: min(88%, 360px); max-height: 330px; margin: 14px auto; object-fit: contain; }
+.couple-profile-progress { gap: 5px; margin-bottom: 18px; }
+.couple-profile-progress .blind-test-progress__dot { width: 6px; height: 6px; flex: 0 0 6px; border-color: var(--line); }
+.couple-profile-progress .blind-test-progress__dot--active { border-color: var(--terracotta); }
 .couple-choice { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 10px; }
 .couple-choice__symbol { color: var(--terracotta-dark); font-size: 1.25rem; text-align: center; }
 .couple-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 18px 0; }
@@ -218,6 +224,9 @@ p { margin: 0 0 20px; line-height: 1.68; }
 .blind-test-progress__dot { width: 8px; height: 8px; border: 1px solid var(--terracotta); border-radius: 50%; }
 .blind-test-progress__dot--active { background: var(--terracotta); }
 .blind-test-song__art { display: block; width: min(72%, 240px); max-height: 260px; margin: 18px auto; object-fit: contain; }
+@media (hover: none) {
+  .couple-choice:hover { border-color: var(--line); background: #fffdf8; }
+}
 .baby-photo { display: block; width: min(100%, 330px); aspect-ratio: 1 / 1; margin: 16px auto; border: 8px solid white; outline: 1px solid var(--line); object-fit: cover; box-shadow: 0 9px 22px rgba(65, 45, 25, 0.14); transform: rotate(-1deg); }
 .baby-photo--placeholder { display: grid; place-items: center; padding: 22px; color: var(--muted); background: #e8decc; text-align: center; }
 

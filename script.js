@@ -1,4 +1,4 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.11";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.12";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -267,19 +267,30 @@ function coupleProfileProgress() {
   return progress;
 }
 
+function renderCoupleProfileIntro() {
+  app.innerHTML = page("Notre profil de couple", `<p class="couple-profile-intro__subtitle">Un test très scientifique. Évidemment.</p><img class="couple-profile-intro__art" src="assets/challenge-2/v1-4-12/couple-profile-notebook.png" alt="" aria-hidden="true" /><p class="couple-profile-intro__copy"><strong>20 questions. Deux réponses à chaque fois.</strong><br><em>D’abord Marjolaine. Puis Vincent.</em></p>${button("Commencer le test", "start-couple-profile")}`, { kicker: "Défi 2", className: "couple-profile-intro" });
+  bindAction("start-couple-profile", renderCoupleProfileChallenge);
+}
+
 function renderCoupleProfileChallenge() {
   const questions = CONFIG.chapters[2].questions;
   const progress = coupleProfileProgress();
   if (progress.questionIndex >= questions.length) return completeChallenge(2, "analysis-2");
   const question = questions[progress.questionIndex];
   const playerName = progress.activePlayer === "marjolaine" ? "Marjolaine" : "Vincent";
-  app.innerHTML = page("Notre profil de couple", `<div class="question-meta">${progress.questionIndex + 1} / ${questions.length}</div><p class="couple-player" data-couple-player>Réponse de ${playerName}</p><h2>${question.prompt}</h2><div class="choice-list">${question.options.map((choice) => `<button class="choice couple-choice" type="button" data-profile="${choice.profile}"><span class="couple-choice__symbol" aria-hidden="true">${choice.symbol}</span><span>${choice.text}</span></button>`).join("")}</div>`);
+  const questionProgress = questions.map((_, index) => `<span class="blind-test-progress__dot${index === progress.questionIndex ? " blind-test-progress__dot--active" : ""}"></span>`).join("");
+  app.innerHTML = page("Notre profil de couple", `<div class="blind-test-progress couple-profile-progress" role="img" aria-label="Question ${progress.questionIndex + 1} sur ${questions.length}">${questionProgress}</div><p class="couple-player" data-couple-player>Réponse de ${playerName}</p><h2>${question.prompt}</h2><div class="choice-list">${question.options.map((choice) => `<button class="choice couple-choice" type="button" data-profile="${choice.profile}"><span class="couple-choice__symbol" aria-hidden="true">${choice.symbol}</span><span>${choice.text}</span></button>`).join("")}</div>`);
   app.querySelectorAll("[data-profile]").forEach((choice) => choice.addEventListener("click", () => {
     const activePlayer = progress.activePlayer;
     progress[activePlayer][progress.questionIndex] = choice.dataset.profile;
     if (activePlayer === "marjolaine") {
       progress.activePlayer = "vincent";
       saveState();
+      app.querySelectorAll("[data-profile]").forEach((node) => {
+        node.classList.remove("choice--selected");
+        node.removeAttribute("aria-pressed");
+        node.blur();
+      });
       app.querySelector("[data-couple-player]").textContent = "Réponse de Vincent";
       return;
     }
@@ -511,6 +522,7 @@ function renderGeo() {
 
 function renderAnalysis() {
   let index = 0;
+  const startedAt = Date.now();
   app.innerHTML = page("Un instant…", `<div class="analysis-lines" aria-live="polite"></div>`);
   const target = app.querySelector(".analysis-lines");
   const interval = setInterval(() => {
@@ -518,9 +530,10 @@ function renderAnalysis() {
     index += 1;
     if (index >= CONFIG.text.analysis.length) {
       clearInterval(interval);
-      setTimeout(() => navigate("resolution-2", { advance: true }), debugMode ? 250 : 700);
+      const remaining = Math.max(0, 3000 - (Date.now() - startedAt));
+      setTimeout(() => navigate("resolution-2", { advance: true }), remaining);
     }
-  }, debugMode ? 120 : 700);
+  }, 700);
   cleanupCurrentScreen = () => clearInterval(interval);
 }
 
@@ -581,7 +594,7 @@ const renderers = {
     bindAction("close-book", () => { state.awaitingFlightReopen = true; saveState(); renderers.departure(); });
   },
   flight: () => { app.innerHTML = page("Quelque part au-dessus des nuages", `<div class="plane" aria-hidden="true">✈</div>${button("Poursuivre le voyage", "continue")}`, { guide: "Tu vois ? Même les nuages ont des pages." }); bindAction("continue", () => navigate("challenge-2", { advance: true })); },
-  "challenge-2": () => state.completedChallenges[2] ? navigate("analysis-2", { advance: true }) : renderCoupleProfileChallenge(),
+  "challenge-2": () => state.completedChallenges[2] ? navigate("analysis-2", { advance: true }) : renderCoupleProfileIntro(),
   "analysis-2": renderAnalysis,
   "resolution-2": renderCoupleProfileResults,
   "gallery-2": () => renderGalleryInvitation("travel-past-medium"),
