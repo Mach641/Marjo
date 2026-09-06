@@ -526,3 +526,21 @@ noscript { display: block; margin: 30px; text-align: center; }
 @media (prefers-reduced-motion: reduce) {
   .closed-notebook--new-memory, .intro-stage__rainbow { animation: none; }
 }
+
+/* Défi 5 : couches interactives sur la carte fournie. */
+.stockholm-intro { text-align: center; justify-content: center; }
+.stockholm-intro > img { display: block; width: min(100%, 420px); max-height: 340px; object-fit: contain; margin: 16px auto; }
+.stockholm-intro > p:not(.kicker) { font: italic 1.05rem/1.55 Georgia, serif; }
+.stockholm-map { position: relative; width: 100%; margin-bottom: 18px; }
+.stockholm-map > img { display: block; width: 100%; height: auto; }
+.stockholm-map > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.stockholm-map__route { fill: none; stroke: #9a5038; stroke-width: 6; stroke-linecap: round; opacity: .7; }
+.stockholm-map__route--active { stroke-width: 9; opacity: 1; }
+.stockholm-map__option { fill: #193e53; stroke: #193e53; }
+.stockholm-map__option--1 { fill: #955038; stroke: #955038; }
+.stockholm-map__option--2 { fill: #476338; stroke: #476338; }
+.stockholm-map__option path { fill: none; stroke-width: 6; stroke-dasharray: 12 9; }
+.stockholm-map__option text { font: bold 22px Georgia, serif; stroke: #fff8e8; stroke-width: 5; paint-order: stroke; }
+.stockholm-illustration { aspect-ratio: 4 / 3; width: 100%; display: grid; place-items: center; background: #eee5d4; color: var(--muted); margin: 0 0 16px; }
+.stockholm-illustration > img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
+.stockholm-trip > .primary-button { margin-top: 16px; }

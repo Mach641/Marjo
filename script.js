@@ -1,9 +1,9 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.13";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.14";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";
-import { renderRoadTrip } from "./road-trip.js";
+import { renderRoadTrip } from "./road-trip.js?v=1.4.14";
 import { playTimeTravel } from "./time-travel.js?v=1.3.2";
 
 const app = document.querySelector("#app");
@@ -639,7 +639,10 @@ const renderers = {
   "handoff-3": () => renderHandoff(3, "friday-lock"),
   "friday-lock": () => renderDayLock("friday"),
   "saturday-intro": () => { app.innerHTML = page("Bonjour, samedi", `<p>Tu as bien dormi ? Moi, j’ai rêvé d’un camping-car.</p>${button("Prendre la route", "continue")}`); bindAction("continue", () => navigate("challenge-5", { advance: true })); },
-  "challenge-5": () => { app.innerHTML = page("À toi de nous emmener à Stockholm", `<p>Il n’y a pas de bonne route vers le futur.</p><div id="roadTrip"></div>`); renderRoadTrip(app.querySelector("#roadTrip"), CONFIG.chapters[5].routeEvents, () => completeChallenge(5, "resolution-5")); },
+  "challenge-5": () => {
+    const trip = state.answers["chapter-5"] ||= { started: false, choices: [], phase: "choice" };
+    cleanupCurrentScreen = renderRoadTrip(app, trip, saveState, () => completeChallenge(5, "resolution-5"));
+  },
   "resolution-5": () => renderGalleryResolution(5, "Voilà. On y est.", "L’arc-en-ciel prétend qu’il avait tout prévu.", "Continuer", "reveal-5"),
   "reveal-5": () => renderResolution("Une vie possible.", "", "Regarder", "gallery-5"),
   "gallery-5": () => renderGalleryInvitation("travel-future-small-5"),
