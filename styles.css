@@ -544,3 +544,15 @@ noscript { display: block; margin: 30px; text-align: center; }
 .stockholm-illustration { aspect-ratio: 4 / 3; width: 100%; display: grid; place-items: center; background: #eee5d4; color: var(--muted); margin: 0 0 16px; }
 .stockholm-illustration > img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
 .stockholm-trip > .primary-button { margin-top: 16px; }
+
+/* Défi 6 uniquement. */
+.challenge-six__intro { display: block; width: min(100%, 380px); max-height: 350px; object-fit: contain; margin: 16px auto; }
+.challenge-six__dots { display: flex; gap: 8px; margin: 8px 0 18px; }
+.challenge-six__dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+.challenge-six__dots .is-current { background: var(--terracotta); }
+.challenge-six__selected { border-color: var(--terracotta); background: #fff8ef; }
+.challenge-six .choice:disabled { opacity: 1; cursor: default; }
+.challenge-six__feedback { margin: 18px 0; }
+.challenge-six__illustration { aspect-ratio: 4 / 3; display: grid; place-items: center; background: #eee5d4; color: var(--muted); text-align: center; margin: 18px 0; }
+.challenge-six__illustration img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
+@media (hover: none) { .challenge-six .choice:not(.challenge-six__selected):hover { border-color: var(--line); background: #fffdf8; } }

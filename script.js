@@ -1,4 +1,5 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.14";
+import { renderChallengeSix } from "./challenge-six.js?v=1.4.15";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.15";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -648,11 +649,15 @@ const renderers = {
   "gallery-5": () => renderGalleryInvitation("travel-future-small-5"),
   "travel-future-small-5": () => renderTravelGallery(5, "future", "small", "handoff-5"),
   "handoff-5": () => renderHandoff(5, "challenge-6"),
-  "challenge-6": () => state.completedChallenges[6] ? navigate("resolution-6", { advance: true }) : renderChoiceSequence({ chapterId: 6, title: "Magie, histoire… ou les deux ?", items: CONFIG.chapters[6].questions.map((item) => ({ ...item, options: ["Magie", "Histoire", "Les deux"] })), revealCorrect: true, onDone: () => completeChallenge(6, "resolution-6") }),
-  "resolution-6": () => renderGalleryResolution(6, "Finalement…", "Pourquoi choisir ?", "Continuer", "reveal-6"),
-  "reveal-6": () => renderResolution("Une autre vie possible.", "", "Regarder", "gallery-6"),
-  "gallery-6": () => renderGalleryInvitation("travel-future-medium-6"),
-  "travel-future-medium-6": () => renderTravelGallery(6, "future", "medium", "handoff-6"),
+  "challenge-6": () => {
+    if (state.completedChallenges[6]) return navigate("resolution-6", { advance: true });
+    if (!state.answers["chapter-6"] || Array.isArray(state.answers["chapter-6"])) state.answers["chapter-6"] = { answers: [], phase: "intro", revealed: false };
+    renderChallengeSix(app, state.answers["chapter-6"], saveState, () => completeChallenge(6, "resolution-6"));
+  },
+  "resolution-6": () => renderResolution("Finalement…", "Finalement, ils n’ont peut-être pas hérité que de vos yeux ou de votre caractère.<br>Vous leur avez aussi laissé quelques mondes à explorer.", "Continuer", "handoff-6"),
+  "reveal-6": () => navigate("resolution-6", { advance: true }),
+  "gallery-6": () => renderers["resolution-6"](),
+  "travel-future-medium-6": () => navigate("handoff-6", { advance: true }),
   "handoff-6": () => renderHandoff(6, "challenge-7"),
   "challenge-7": () => { app.innerHTML = page("Une minute en famille", `<p>Les règles changeront sûrement encore.</p><div id="familyGame"></div>`); cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7, "resolution-7")); },
   "resolution-7": () => renderGalleryResolution(7, "Bon.", "Pour les règles, on verra plus tard.", "Continuer", "gallery-7"),

@@ -1,14 +1,16 @@
-const CACHE_NAME = "voyage-majorque-v1-4-14-stockholm";
+const CACHE_NAME = "voyage-majorque-v1-4-15-challenge-six";
 const APP_SHELL = [
+  "./challenge-six.js?v=1.4.15",
+  "./assets/challenge-6/v1-4-15/wizards.png",
   "./assets/challenge-5/v1-4-14/camper.png",
   "./assets/challenge-5/v1-4-14/map.png",
   "./",
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.14",
-  "./script.js?v=1.4.14",
-  "./config.js?v=1.4.14",
+  "./styles.css?v=1.4.15",
+  "./script.js?v=1.4.15",
+  "./config.js?v=1.4.15",
   "./challenge-one.js?v=1.4.8",
   "./family-game.js",
   "./gallery-soundtrack.js?v=1.2.1",
