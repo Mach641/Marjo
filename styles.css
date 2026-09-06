@@ -226,9 +226,19 @@ p { margin: 0 0 20px; line-height: 1.68; }
 .blind-test-song__art { display: block; width: min(72%, 240px); max-height: 260px; margin: 18px auto; object-fit: contain; }
 @media (hover: none) {
   .couple-choice:hover { border-color: var(--line); background: #fffdf8; }
+  .challenge-three-choice:hover { border-color: var(--line); background: #fffdf8; }
 }
-.baby-photo { display: block; width: min(100%, 330px); aspect-ratio: 1 / 1; margin: 16px auto; border: 8px solid white; outline: 1px solid var(--line); object-fit: cover; box-shadow: 0 9px 22px rgba(65, 45, 25, 0.14); transform: rotate(-1deg); }
+.challenge-three-intro { justify-content: center; text-align: center; }
+.challenge-three-intro__subtitle, .challenge-three-intro__copy, .challenge-three-question__subtitle { font: italic 1.05rem/1.55 Georgia, serif; }
+.challenge-three-intro__art { display: block; width: min(92%, 390px); max-height: 330px; margin: 14px auto; object-fit: contain; }
+.challenge-three-question .kicker { text-align: left; }
+.challenge-three-question__subtitle { color: var(--muted); }
+.baby-photo { display: block; width: min(84%, 290px); aspect-ratio: 1 / 1; margin: 14px auto 20px; border: 9px solid #fffdf8; outline: 1px solid var(--line); object-fit: cover; box-shadow: 0 6px 14px rgba(65, 45, 25, 0.1); transform: rotate(-0.7deg); }
 .baby-photo--placeholder { display: grid; place-items: center; padding: 22px; color: var(--muted); background: #e8decc; text-align: center; }
+.challenge-three-choice:disabled { opacity: 1; cursor: default; }
+.challenge-three-choice--selected { border-color: var(--terracotta); background: #fff8ef; }
+.challenge-three-feedback { min-height: 0; margin-top: 16px; text-align: center; }
+.challenge-three-feedback p { margin-bottom: 14px; font: 1.02rem/1.5 Georgia, serif; }
 
 blockquote { margin: 18px 0 28px; padding: 18px; border-left: 3px solid var(--terracotta); background: #f8f1e5; font: italic 1.15rem/1.6 Georgia, serif; }
 .field-label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 0.76rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }

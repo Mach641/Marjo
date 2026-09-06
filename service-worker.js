@@ -1,12 +1,12 @@
-const CACHE_NAME = "voyage-majorque-v1-4-12-couple-profile-intro";
+const CACHE_NAME = "voyage-majorque-v1-4-13-challenge-three";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.12",
-  "./script.js?v=1.4.12",
-  "./config.js?v=1.4.12",
+  "./styles.css?v=1.4.13",
+  "./script.js?v=1.4.13",
+  "./config.js?v=1.4.13",
   "./challenge-one.js?v=1.4.8",
   "./family-game.js",
   "./gallery-soundtrack.js?v=1.2.1",
@@ -20,6 +20,7 @@ const APP_SHELL = [
   "./assets/challenge-8/v1-4-10/guitar.png",
   "./assets/challenge-8/v1-4-10/music-note.png",
   "./assets/challenge-2/v1-4-12/couple-profile-notebook.png",
+  "./assets/challenge-3/v1-4-13/baby-polaroids.png",
   "./assets/challenge-1/v1-4-6/intro-door.png",
   "./assets/challenge-1/v1-4-5/closed-door-1.png",
   "./assets/challenge-1/v1-4-5/closed-door-2.png",

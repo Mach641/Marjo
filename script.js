@@ -1,4 +1,4 @@
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.12";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.13";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
 import { renderFamilyGame } from "./family-game.js";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -323,6 +323,38 @@ function renderCoupleProfileResults() {
   bindAction("continue", () => navigate("gallery-2", { advance: true }));
 }
 
+function renderChallengeThreeIntro() {
+  app.innerHTML = page("Qui est qui ?", `<p class="challenge-three-intro__subtitle">Deux petits visages qui se ressemblent beaucoup.</p><img class="challenge-three-intro__art" src="assets/challenge-3/v1-4-13/baby-polaroids.png" alt="" aria-hidden="true" /><p class="challenge-three-intro__copy">Fais confiance à ta mémoire... et à ton cœur.</p>${button("Commencer", "start-challenge-three")}`, { kicker: "Défi 3", className: "challenge-three-intro" });
+  bindAction("start-challenge-three", renderChallengeThreeQuestions);
+}
+
+function renderChallengeThreeQuestions() {
+  const photos = CONFIG.chapters[3].babyPhotos;
+  const answers = [...(state.answers["chapter-3"] || [])];
+  let index = Math.min(answers.length, photos.length - 1);
+  const draw = () => {
+    const photo = photos[index];
+    const photoMarkup = photo.src ? `<img class="baby-photo" src="${photo.src}" alt="${photo.alt}" />` : `<div class="baby-photo baby-photo--placeholder">${photo.alt}</div>`;
+    app.innerHTML = page("Lenny ou Milan ?", `<p class="challenge-three-question__subtitle">À toi de reconnaître qui se cache derrière chaque petit visage.</p>${photoMarkup}<div class="choice-list"><button class="choice challenge-three-choice" type="button" data-baby-choice="Lenny">Lenny</button><button class="choice challenge-three-choice" type="button" data-baby-choice="Milan">Milan</button></div><div class="challenge-three-feedback" role="status"></div>`, { kicker: "Qui est qui ?", className: "challenge-three-question" });
+    app.querySelectorAll("[data-baby-choice]").forEach((choice) => choice.addEventListener("click", () => {
+      const selected = choice.dataset.babyChoice;
+      const correct = selected === photo.answer;
+      app.querySelectorAll("[data-baby-choice]").forEach((node) => { node.disabled = true; });
+      choice.classList.add("challenge-three-choice--selected");
+      answers[index] = selected;
+      state.answers["chapter-3"] = answers;
+      saveState();
+      app.querySelector(".challenge-three-feedback").innerHTML = `<p><strong>${correct ? "Bien vu !" : "Presque !"}</strong><br>C’était ${photo.answer}.</p>${button("Suivant →", "next-baby-photo")}`;
+      bindAction("next-baby-photo", () => {
+        index += 1;
+        if (index >= photos.length) completeChallenge(3, "resolution-3");
+        else draw();
+      });
+    }, { once: true }));
+  };
+  draw();
+}
+
 function renderBlindTest({ chapterId, songs, onDone }) {
   const progressKey = `blind-test-${chapterId}`;
   let index = Math.min(Number(state.answers[progressKey]) || 0, songs.length - 1);
@@ -600,7 +632,7 @@ const renderers = {
   "gallery-2": () => renderGalleryInvitation("travel-past-medium"),
   "travel-past-medium": () => renderTravelGallery(2, "past", "medium", "handoff-2"),
   "handoff-2": () => renderHandoff(2, "challenge-3"),
-  "challenge-3": () => { if (state.completedChallenges[3]) return navigate("resolution-3", { advance: true }); const items = CONFIG.chapters[3].babyPhotos.map((photo) => ({ ...photo, prompt: "Lenny ou Milan ?", options: ["Lenny", "Milan"] })); renderChoiceSequence({ chapterId: 3, title: "Qui est qui ?", items, revealCorrect: true, decorate: (photo) => photo.src ? `<img class="baby-photo" src="${photo.src}" alt="${photo.alt}" />` : `<div class="baby-photo baby-photo--placeholder">${photo.alt}</div>`, onDone: () => completeChallenge(3, "resolution-3") }); },
+  "challenge-3": () => state.completedChallenges[3] ? navigate("resolution-3", { advance: true }) : renderChallengeThreeIntro(),
   "resolution-3": () => renderGalleryResolution(3, "Bon…", "Tu reconnais quand même tes enfants.", "Continuer", "gallery-3"),
   "gallery-3": () => renderGalleryInvitation("travel-future-small"),
   "travel-future-small": () => renderTravelGallery(3, "future", "small", "handoff-3"),
