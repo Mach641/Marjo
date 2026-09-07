@@ -1,5 +1,5 @@
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.15";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.16";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.17";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
 import { renderFamilyGame } from "./family-game.js?v=1.4.16";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -17,7 +17,8 @@ const searchParams = new URLSearchParams(location.search);
 const debugMode = searchParams.get("debug") === "1";
 const displayModeOverride = debugMode ? searchParams.get("display") : null;
 const stateStorageKey = debugMode ? `${CONFIG.storageKey}-debug` : CONFIG.storageKey;
-const SPECIAL_ROUTES = new Set(["install", "book-closed", "book-open"]);
+const OPENING_ROUTES = new Set(["welcome", "prologue", "notebook-intro"]);
+const SPECIAL_ROUTES = new Set(["install", "book-closed", "book-open", "notebook-intro"]);
 const BROWSER_PREVIEW_KEY = "voyage-majorque-browser-preview";
 let cleanupCurrentScreen = null;
 let rendering = false;
@@ -27,6 +28,7 @@ const defaultState = () => ({
   version: CONFIG.stateVersion,
   started: false,
   onboardingCompleted: false,
+  openingStep: "welcome",
   currentStep: "welcome",
   completedChallenges: {},
   challengeOne: {
@@ -107,7 +109,9 @@ function navigate(id, { advance = false, replace = false } = {}) {
 
 function updateChrome(id) {
   const index = Math.max(0, stepIndex(id));
-  header.hidden = ["install", "welcome", "prologue", "book-closed", "book-open", "challenge-1"].includes(id);
+  const opening = OPENING_ROUTES.has(id);
+  document.body.classList.toggle("opening-active", opening);
+  header.hidden = opening || ["install", "book-closed", "book-open", "challenge-1"].includes(id);
   progressLabel.textContent = "Le carnet";
   progressBar.style.width = `${Math.round((index / (STEPS.length - 1)) * 100)}%`;
   illustrationCount.hidden = true;
@@ -139,22 +143,39 @@ function renderInstallGuide() {
   bindAction("browser-preview", () => { allowBrowserPreview(); navigate("welcome", { replace: true }); });
 }
 
+// Artwork is cropped from the approved references; these styles only apply to onboarding.
+const OPENING_ASSETS = "assets/opening/v1-4-17";
+
+function openingPage(id, title, copy, label, { notebook = false, decoration = "flowers" } = {}) {
+  state.openingStep = id;
+  saveState();
+  app.innerHTML = `<section class="opening-screen opening-screen--${id}" aria-labelledby="opening-title">
+    <img class="opening-rainbow" src="${OPENING_ASSETS}/rainbow.png" width="306" height="146" alt="" />
+    <h1 id="opening-title" tabindex="-1">${title}</h1>
+    <div class="opening-copy">${copy.map((line) => `<p>${line}</p>`).join("")}</div>
+    ${notebook ? `<div class="opening-notebook"><img class="opening-notebook__book" src="${OPENING_ASSETS}/notebook.png" width="276" height="284" alt="Un petit carnet en papier brun, noué d’une ficelle et orné de fleurs séchées" /><img class="opening-notebook__heart" src="${OPENING_ASSETS}/heart.png" width="48" height="52" alt="" /></div>` : `<img class="opening-botanical" src="${OPENING_ASSETS}/${decoration}.png" alt="" /><img class="opening-trail" src="${OPENING_ASSETS}/trail.png" width="204" height="127" alt="" />`}
+    <div class="opening-actions">${button(label, "opening-next", "opening-button")}</div>
+  </section>`;
+  app.querySelector("#opening-title").focus({ preventScroll: true });
+}
+
 function renderIntro() {
   state.started = true;
-  saveState();
-  document.body.classList.add("intro-weather--active");
-  app.innerHTML = `<section class="intro-stage screen" aria-label="Le carnet se réveille"><div class="intro-stage__rainbow" aria-hidden="true"><i></i><i></i><i></i><i></i></div></section>`;
-  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const timer = setTimeout(() => navigate("prologue", { advance: true, replace: true }), reducedMotion ? 50 : 2600);
-  cleanupCurrentScreen = () => { clearTimeout(timer); document.body.classList.remove("intro-weather--active"); };
+  openingPage("welcome", "Bonjour Marjolaine.", CONFIG.text.opening.welcome, "Commencer le voyage →");
+  bindAction("opening-next", () => navigate("prologue", { advance: true }));
 }
 
 function renderPrologue() {
-  app.innerHTML = page("L’esprit du carnet", `${CONFIG.text.prologue.map((line) => `<p>${line}</p>`).join("")}${button("Commencer le voyage", "start-journey")}`, { guide: "Bonjour Marjolaine." });
-  bindAction("start-journey", () => {
+  openingPage("prologue", "Pendant quelques jours…", CONFIG.text.opening.prologue, "C’est parti ! →", { decoration: "leaves" });
+  bindAction("opening-next", () => navigate("notebook-intro"));
+}
+
+function renderNotebookIntro() {
+  openingPage("notebook-intro", "Un petit carnet t’attend.", CONFIG.text.opening.notebook, "Ouvrir le carnet →", { notebook: true });
+  bindAction("opening-next", () => {
     state.started = true;
     state.onboardingCompleted = true;
-    state.currentStep = "challenge-1";
+    advanceStateTo("challenge-1");
     saveState();
     navigate("book-closed", { replace: true });
   });
@@ -588,6 +609,7 @@ const renderers = {
   install: renderInstallGuide,
   welcome: renderIntro,
   prologue: renderPrologue,
+  "notebook-intro": renderNotebookIntro,
   "book-closed": renderClosedNotebook,
   "book-open": renderOpenNotebook,
   "challenge-1": () => {
@@ -730,7 +752,7 @@ function setupDebug() {
   });
   debugPanel.querySelector("#debugOnboarding").addEventListener("click", () => {
     stopActiveSoundtrack();
-    Object.assign(state, { started: false, onboardingCompleted: false, currentStep: "welcome" });
+    Object.assign(state, { started: false, onboardingCompleted: false, openingStep: "welcome", currentStep: "welcome" });
     saveState();
     navigate("welcome", { replace: true });
   });
@@ -828,7 +850,7 @@ const initial = location.hash.slice(1);
 let initialRoute;
 if (!isStandaloneApp() && !browserPreviewAllowed()) initialRoute = "install";
 else if (debugMode && initial && routeExists(initial)) initialRoute = initial;
-else if (!state.onboardingCompleted) initialRoute = "welcome";
+else if (!state.onboardingCompleted) initialRoute = OPENING_ROUTES.has(state.openingStep) ? state.openingStep : "welcome";
 else initialRoute = "book-closed";
 navigate(initialRoute, { replace: true });
 

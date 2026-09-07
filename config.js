@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.16";
+export const APP_VERSION = "1.4.17";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -33,13 +33,23 @@ export const CONFIG = {
     saturdayUnlockDate: "2026-09-19",
   },
   text: {
-    prologue: [
-      "Moi, c’est l’arc-en-ciel.",
-      "Je suis l’esprit de ce carnet.",
-      "Dans les prochains jours, je te proposerai quelques défis. Chaque souvenir devra être gagné avant de trouver sa place entre ces pages.",
-      "Nous voyagerons dans votre passé, dans les vies qui auraient pu être les vôtres, dans le présent… et peut-être un peu plus loin.",
-      "Alors… tu veux commencer le voyage ?",
-    ],
+    opening: {
+      welcome: [
+        "Je suis né parce que la pluie et le soleil se sont rencontrés.",
+        "Les paysages changent, les chemins aussi, parfois même la destination.",
+        "Mais certains voyages restent beaux pour une raison beaucoup plus simple.",
+        "Est-ce que tu veux découvrir avec moi pourquoi ?",
+      ],
+      prologue: [
+        "Je t’invite à ouvrir des pages,<br>à relever quelques défis,<br>à te laisser surprendre.",
+        "On ira faire un tour du côté des souvenirs,<br>et imaginer d’autres possibles,<br>et on verra comment tout cela s’assemble.",
+        "Pas besoin d’être parfaite,<br>juste d’être curieuse.",
+      ],
+      notebook: [
+        "C’est lui qui va nous accompagner.<br>Il contiendra les étapes de notre voyage,<br>avec ses défis et ses découvertes.",
+        "Prends-le, quand tu es prête.<br>Et laisse-toi guider…",
+      ],
+    },
     analysis: [
       "Analyse de vos réponses…",
       "Compatibilité des habitudes…",
