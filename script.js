@@ -1,7 +1,7 @@
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.15";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.15";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.16";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
-import { renderFamilyGame } from "./family-game.js";
+import { renderFamilyGame } from "./family-game.js?v=1.4.16";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";
 import { renderRoadTrip } from "./road-trip.js?v=1.4.14";
@@ -659,10 +659,17 @@ const renderers = {
   "gallery-6": () => renderers["resolution-6"](),
   "travel-future-medium-6": () => navigate("handoff-6", { advance: true }),
   "handoff-6": () => renderHandoff(6, "challenge-7"),
-  "challenge-7": () => { app.innerHTML = page("Une minute en famille", `<p>Les règles changeront sûrement encore.</p><div id="familyGame"></div>`); cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7, "resolution-7")); },
-  "resolution-7": () => renderGalleryResolution(7, "Bon.", "Pour les règles, on verra plus tard.", "Continuer", "gallery-7"),
-  "gallery-7": () => renderGalleryInvitation("travel-future-medium-7"),
-  "travel-future-medium-7": () => renderTravelGallery(7, "future", "medium", "handoff-7"),
+  "challenge-7": () => {
+    if (state.completedChallenges[7]) return navigate("resolution-7", { advance: true });
+    app.innerHTML = page("Le serpent", `<p>Un mini défi, comme au temps des vieux téléphones.<br>Fais grandir le serpent en mangeant les pommes.</p><img class="snake-intro" src="assets/challenge-7/v1-4-16/apple-snake.png" alt="Serpent composé de rondelles de pomme" />${button("Jouer", "play-snake")}`, { kicker: "Défi 7" });
+    bindAction("play-snake", () => {
+      app.innerHTML = page("Le serpent", `<div id="familyGame"></div>`, { kicker: "Défi 7" });
+      cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7, "resolution-7"));
+    });
+  },
+  "resolution-7": () => renderResolution("Bien joué !", "Pommes 10 / 10. Le serpent a bien grandi.", "Continuer", "handoff-7"),
+  "gallery-7": () => renderers["resolution-7"](),
+  "travel-future-medium-7": () => navigate("handoff-7", { advance: true }),
   "handoff-7": () => renderHandoff(7, "travel-past-large-return"),
   "travel-past-large-return": () => renderTravel("past", "large", "saturday-evening"),
   "saturday-evening": renderSaturdayEvening,

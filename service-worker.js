@@ -1,5 +1,6 @@
-const CACHE_NAME = "voyage-majorque-v1-4-15-challenge-six";
+const CACHE_NAME = "voyage-majorque-v1-4-16-snake";
 const APP_SHELL = [
+  "./assets/challenge-7/v1-4-16/apple-snake.png",
   "./challenge-six.js?v=1.4.15",
   "./assets/challenge-6/v1-4-15/wizards.png",
   "./assets/challenge-5/v1-4-14/camper.png",
@@ -8,11 +9,11 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.15",
-  "./script.js?v=1.4.15",
-  "./config.js?v=1.4.15",
+  "./styles.css?v=1.4.16",
+  "./script.js?v=1.4.16",
+  "./config.js?v=1.4.16",
   "./challenge-one.js?v=1.4.8",
-  "./family-game.js",
+  "./family-game.js?v=1.4.16",
   "./gallery-soundtrack.js?v=1.2.1",
   "./gallery-viewer.js?v=1.3.2",
   "./road-trip.js?v=1.4.14",

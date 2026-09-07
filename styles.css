@@ -556,3 +556,16 @@ noscript { display: block; margin: 30px; text-align: center; }
 .challenge-six__illustration { aspect-ratio: 4 / 3; display: grid; place-items: center; background: #eee5d4; color: var(--muted); text-align: center; margin: 18px 0; }
 .challenge-six__illustration img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
 @media (hover: none) { .challenge-six .choice:not(.challenge-six__selected):hover { border-color: var(--line); background: #fffdf8; } }
+
+/* Défi 7 : grille et commandes du Snake. */
+.snake-intro { display: block; width: min(100%, 360px); max-height: 340px; object-fit: contain; margin: 16px auto; }
+.snake-board { width: min(100%, 420px); aspect-ratio: 1; margin: 0 auto; display: grid; grid-template: repeat(10,1fr) / repeat(10,1fr); border: 2px solid #786849; background-color: #eee0bd; background-image: linear-gradient(to right, #78684940 1px, transparent 1px), linear-gradient(to bottom, #78684940 1px, transparent 1px); background-size: 10% 10%; }
+.snake-piece { align-self: center; justify-self: center; width: 90%; height: 90%; display: grid; place-items: center; border-radius: 50%; border: 3px solid #aa5140; background: radial-gradient(ellipse, #fff1c5, #ead39c); color: #715538; font-size: clamp(10px, 3vw, 18px); box-shadow: inset 2px -2px #c99865; }
+.snake-piece--head { border-radius: 45%; color: #3e3021; }
+.snake-apple { align-self: center; justify-self: center; width: 66%; height: 68%; background: #ad4938; border: 1px solid #753e2d; border-radius: 42% 45% 48% 48%; position: relative; }
+.snake-apple::before { content: ''; position: absolute; width: 42%; height: 23%; background: #657444; border-radius: 100% 0; top: -18%; left: 48%; transform: rotate(-20deg); }
+.snake-score { text-align: center; font: 1.2rem Georgia, serif; margin: 14px 0; }
+.snake-controls { display: grid; grid-template: repeat(3,60px) / repeat(3,60px); gap: 6px; justify-content: center; }
+.snake-control { width: 60px; height: 60px; min-height: 60px; padding: 0; border-radius: 50%; font-size: 1.8rem; touch-action: manipulation; }
+.snake-control--up { grid-area: 1 / 2; }.snake-control--left { grid-area: 2 / 1; }.snake-control--right { grid-area: 2 / 3; }.snake-control--down { grid-area: 3 / 2; }
+[data-snake-message] { text-align: center; margin-top: 12px; }

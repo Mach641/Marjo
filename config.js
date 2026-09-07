@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.15";
+export const APP_VERSION = "1.4.16";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -238,7 +238,7 @@ export const CONFIG = {
     },
     7: {
       title: "Adolescence",
-      publicChallengeTitle: "Une minute en famille",
+      publicChallengeTitle: "Le serpent",
       galleryTitle: "Regarde.",
       letter: "M",
       gallery: [{ src: null, label: "PLACEHOLDER — ADOLESCENCE" }],
