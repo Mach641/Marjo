@@ -791,12 +791,12 @@ body:has(.challenge-landing) > .weather { display: none; }
 }
 
 /* Targeted opening 2–3 and challenge 1 adjustments. */
-.opening-screen--prologue .opening-rainbow { width: 64%; }
+.opening-screen--prologue .opening-rainbow { width: 45%; }
 .opening-screen--notebook-intro .opening-rainbow { width: 45%; }
 .opening-screen--notebook-intro .opening-notebook { margin-top: 24px; }
 .opening-notebook__tap {
   display: block;
-  width: 70%;
+  width: 61%;
   margin: 0 auto;
   padding: 0;
   border: 0;
@@ -832,3 +832,58 @@ body:has(.challenge-landing) > .weather { display: none; }
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 65%);
   mask-image: linear-gradient(to bottom, transparent, #000 65%);
 }
+
+/* Initial notebook spread and its contextual first-memory page. */
+body:has(.journey-notebook) { background: #fae9ce; }
+body:has(.journey-notebook)::before { background: url("assets/opening/v1-4-18/01_background_papier.png") center / 100% 100% no-repeat; }
+body:has(.journey-notebook) > .site-header,
+body:has(.journey-notebook) > .weather { display: none; }
+.app:has(.journey-notebook) { width: 100%; padding: 28px 24px 24px 16px; }
+.journey-notebook {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 460px);
+  min-height: calc(100svh - 52px);
+  margin: auto;
+  padding: 26px 22px 32px;
+  border: 1px solid #a28761;
+  border-left: 6px solid #a4825a;
+  border-radius: 10px 19px 16px 8px;
+  background: url("assets/opening/v1-4-18/01_background_papier.png") center / 100% 100%;
+  box-shadow: -4px 2px 0 #c7ad86, 4px 5px 0 #ebd8b5, 5px 6px 0 1px #927752, 8px 9px 0 #dec5a0, 0 8px 16px #59452d28, inset 6px 0 12px #88643f20;
+  text-align: center;
+  animation: journey-open .4s ease-out both;
+}
+@keyframes journey-open { from { opacity: 0; transform: scale(.98) rotate(-.6deg); } to { opacity: 1; transform: none; } }
+.journey-notebook h1 { margin: 0 0 30px; color: #514330; font: 400 clamp(27px, 8vw, 38px)/1.2 "Opening Hand", cursive; outline: none; }
+.journey-notebook:not(.journey-notebook--context) h1 { padding-bottom: 12px; border-bottom: 1px solid #a58b66; }
+.journey-notebook__tabs { position: absolute; right: -20px; top: 66px; display: grid; gap: 9px; z-index: -1; }
+.journey-notebook__tabs i { width: 27px; height: 62px; padding-top: 16px; border: 1px solid #b2a183; border-radius: 0 5px 5px 0; background: #c4cbb0; color: #706d54; font-style: normal; }
+.journey-notebook__tabs i:nth-child(2) { background: #dab4a1; }
+.journey-notebook__tabs i:nth-child(3) { background: #b3c5c7; }
+.journey-notebook__grid { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 28px 16px; }
+.journey-polaroid { display: block; position: relative; width: 100%; padding: 0; border: 0; background: transparent; color: #fff4dc; transform: rotate(-3deg); cursor: pointer; }
+.journey-polaroid img { display: block; width: 100%; height: auto; pointer-events: none; }
+.journey-polaroid__question { position: absolute; left: 45%; top: 38%; font: 400 44px/1 "Opening Hand", cursive; }
+.journey-polaroid__accent { position: absolute; left: -12px; top: 8%; color: #c78b45; font-size: 28px; transform: rotate(-60deg); }
+.journey-polaroid:focus-visible, .journey-notebook button:focus-visible { outline: 2px solid #8e6249; outline-offset: 4px; }
+.journey-notebook__guide { margin: 12px -3px 0; color: #69563e; font: italic 14px/1.4 Georgia, serif; text-align: left; }
+.journey-notebook__ghost { position: relative; display: grid; place-items: center; aspect-ratio: .78; margin-top: 18px; border: 1px dashed #b9a17966; background: #c7ab7910; box-shadow: 0 2px 5px #8f725b08; transform: rotate(3deg); color: #95856c; }
+.journey-notebook__ghost::before { content: ""; position: absolute; top: -10px; left: 35%; width: 36%; height: 18px; background: #c9b48a40; transform: rotate(-5deg); }
+.journey-notebook__ghost:last-child { transform: rotate(-3deg); }
+.journey-notebook__soon { margin: 40px 0 0; color: #756148; font: italic 16px/1.5 Georgia, serif; }
+.journey-notebook__flower { position: absolute; width: 15%; height: auto; right: -2px; bottom: 14px; pointer-events: none; opacity: .8; }
+.journey-notebook__back { display: block; min-height: 44px; padding: 0; margin-bottom: 20px; border: 0; background: transparent; color: #65543d; font: 24px "Opening Hand", cursive; cursor: pointer; }
+.journey-polaroid--large { width: 72%; max-width: 230px; margin: 0 auto 28px; cursor: default; }
+.journey-polaroid--large .journey-polaroid__question { font-size: 60px; }
+.journey-notebook--context h1 { margin-bottom: 18px; font-size: 30px; }
+.journey-notebook__copy { margin: 0 0 30px; font: 16px/1.5 Georgia, serif; }
+.journey-notebook__cta, .challenge-landing--1 .challenge-landing__button {
+  position: relative; isolation: isolate; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: #fffaf0;
+}
+.journey-notebook__cta { width: 94%; min-height: 56px; padding: 12px 10px; font: 600 16px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; cursor: pointer; }
+.journey-notebook__cta::before, .challenge-landing--1 .challenge-landing__button::before {
+  content: ""; display: block; position: absolute; z-index: -1; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; transform: none;
+  background: url("assets/notebook/v1-4-21/cta-terracotta.png") center / 100% 100% no-repeat; pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) { .journey-notebook { animation: none; } }

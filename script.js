@@ -1,6 +1,6 @@
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.19";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.20";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.21";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.19";
 import { renderFamilyGame } from "./family-game.js?v=1.4.16";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -178,15 +178,13 @@ function renderNotebookIntro() {
     state.onboardingCompleted = true;
     advanceStateTo("challenge-1");
     saveState();
-    navigate("book-closed", { replace: true });
+    navigate("book-open", { replace: true });
   });
 }
 
 const unlockedMemoryIds = () => CONFIG.routeOrder.filter((id) => Boolean(state.galleryViewed[id] && CONFIG.chapters[id]?.gallery));
 
 function hubCopy() {
-  const firstChallenge = state.currentStep === "challenge-1" && !state.completedChallenges[1];
-  if (firstChallenge) return { message: "Bon… maintenant que les présentations sont faites. Tu es prête pour ton premier défi ?", cta: "Je suis prête" };
   if (state.currentStep === "thursday-lock" && !dayIsOpen(CONFIG.schedule.fridayUnlockDate)) {
     return { message: "C’est tout pour aujourd’hui. Garde le carnet près de toi, une nouvelle page s’ouvrira demain matin.", cta: null };
   }
@@ -205,6 +203,10 @@ function notebookDecorations(count) {
 }
 
 function renderClosedNotebook() {
+  if (isFirstNotebook()) {
+    history.replaceState(null, "", "#book-open");
+    return renderFirstNotebook();
+  }
   const memories = unlockedMemoryIds();
   const status = hubCopy();
   const enriched = Boolean(state.newMemoryChapterId);
@@ -230,7 +232,29 @@ function renderMemoryCard(chapterId) {
   return `<button class="memory-card" type="button" data-memory="${chapterId}" aria-label="Revoir le souvenir ${chapter.title}">${visual}<strong>${chapter.title}</strong><small>Toucher pour se souvenir</small></button>`;
 }
 
+// The initial spread reserves one slot per challenge; later progression stays unchanged.
+const firstNotebookSlots = Array.from({ length: 8 }, (_, index) => ({ challengeId: index + 1 }));
+const isFirstNotebook = () => state.currentStep === "challenge-1" && !state.completedChallenges[1];
+const NOTEBOOK_ASSETS = "assets/notebook/v1-4-21";
+function notebookPolaroid() {
+  return `<img src="${NOTEBOOK_ASSETS}/polaroid-back.png" width="645" height="772" alt="" /><span class="journey-polaroid__question" aria-hidden="true">?</span>`;
+}
+function renderFirstNotebook(selectedId = null) {
+  const selected = firstNotebookSlots.find(slot => slot.challengeId === selectedId);
+  app.innerHTML = `<section class="journey-notebook${selected ? " journey-notebook--context" : ""}" aria-labelledby="journey-title">
+    <div class="journey-notebook__tabs" aria-hidden="true"><i>♧</i><i>✧</i><i>△</i></div>
+    ${selected ? '<button class="journey-notebook__back" type="button" data-action="notebook-back">← Notre voyage</button>' : '<h1 id="journey-title" tabindex="-1">Notre voyage</h1>'}
+    ${selected ? `<div class="journey-polaroid journey-polaroid--large">${notebookPolaroid()}</div><h1 id="journey-title" tabindex="-1">Ce souvenir t’attend…</h1><p class="journey-notebook__copy">Pour le découvrir, il va falloir relever un défi.<br>C’est le premier d’une belle aventure.</p>${button("Commencer le défi 1", "notebook-start", "journey-notebook__cta")}` : `<div class="journey-notebook__grid">${firstNotebookSlots.slice(0, 4).map((slot, index) => index === 0 ? `<div class="journey-notebook__active"><button class="journey-polaroid" type="button" data-challenge="${slot.challengeId}" aria-label="Découvrir le premier souvenir">${notebookPolaroid()}<span class="journey-polaroid__accent" aria-hidden="true">╱</span></button><p class="journey-notebook__guide">Le premier souvenir est là…<br>mais il faudra relever un défi pour le découvrir.</p></div>` : `<div class="journey-notebook__ghost" data-challenge-slot="${slot.challengeId}" aria-hidden="true"><span>…</span></div>`).join("")}</div><p class="journey-notebook__soon">Il y a encore beaucoup<br>de pages à remplir…</p>`}
+    <img class="journey-notebook__flower" src="${OPENING_ASSETS}/03_fleur_bas_gauche.png" alt="" />
+  </section>`;
+  app.querySelector("#journey-title").focus({ preventScroll: true });
+  app.querySelector("[data-challenge]")?.addEventListener("click", event => renderFirstNotebook(Number(event.currentTarget.dataset.challenge)));
+  bindAction("notebook-back", () => renderFirstNotebook());
+  bindAction("notebook-start", () => navigate(`challenge-${selected.challengeId}`));
+}
+
 function renderOpenNotebook() {
+  if (isFirstNotebook()) return renderFirstNotebook();
   const memories = unlockedMemoryIds();
   const spreads = [];
   for (let index = 0; index < memories.length; index += 2) spreads.push(memories.slice(index, index + 2));
