@@ -928,3 +928,17 @@ body:has(.journey-notebook) > .weather { display: none; }
 .gameplay-header--compact .gameplay-header__theme { margin-bottom: 6px; }
 .gameplay-header--compact h1 { font-size: 26px; }
 .gameplay-header--compact .gameplay-header__divider { margin-top: 12px; margin-bottom: 14px; }
+
+/* Notebook support only for the active phases selected by the gameplay header. */
+body:has(.gameplay-header) { background: #fae9ce; }
+body:has(.gameplay-header)::before {
+  opacity: 1;
+  background: url("assets/opening/v1-4-18/01_background_papier.png") center / calc(100% + 8px) calc(100% + 8px) no-repeat;
+}
+.paper-card:has(.gameplay-header) {
+  background: url("assets/opening/v1-4-18/01_background_papier.png") center / calc(100% + 8px) calc(100% + 8px) no-repeat;
+  border-color: #a28761;
+  border-radius: 10px 19px 16px 8px;
+  box-shadow: 3px 2px 0 #ebd8b5, 4px 3px 0 #b8a17d, 6px 5px 0 #dec5a0, 0 5px 10px #59452d18, inset 3px 0 8px #88643f12;
+}
+.paper-card:has(.gameplay-header)::after { display: none; }
