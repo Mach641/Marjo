@@ -1,3 +1,4 @@
+import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 // Les quatre images de thème seront fournies ultérieurement.
 export const THEMES = [
@@ -191,7 +192,7 @@ export function renderChallengeSix(container, progress, save, complete) {
       const question = theme.questions[index % 6];
       const selected = revealed ? progress.answers[index] : null;
       const correct = selected === question.answer;
-      body = `<p class="kicker">${theme.title}</p><div class="challenge-six__dots" aria-label="Question ${index%6+1} sur 6">${Array.from({length:6},(_,i)=>`<span class="${i===index%6?'is-current':''}" aria-hidden="true"></span>`).join('')}</div><h1>${question.prompt}</h1><div class="choice-list">${theme.options.map((o,i)=>`<button class="choice ${selected===o?'challenge-six__selected':''}" type="button" data-six-choice="${i}" ${revealed?'disabled':''}>${o}</button>`).join('')}</div>${revealed?`<div class="challenge-six__feedback" role="status"><p><strong>${correct?'Bien vu !':'Pas tout à fait.'}</strong><br>La réponse : ${question.answer}.</p>${question.reveal?`<p>${esc(question.reveal).replaceAll('\n','<br>')}</p>`:''}</div>${button('Suivant')}`:''}`;
+      body = `${revealed ? `<p class="kicker">${theme.title}</p>` : gameplayHeader({ theme: theme.title, title: question.prompt })}<div class="challenge-six__dots" aria-label="Question ${index%6+1} sur 6">${Array.from({length:6},(_,i)=>`<span class="${i===index%6?'is-current':''}" aria-hidden="true"></span>`).join('')}</div>${revealed ? `<h1>${question.prompt}</h1>` : ""}<div class="choice-list">${theme.options.map((o,i)=>`<button class="choice ${selected===o?'challenge-six__selected':''}" type="button" data-six-choice="${i}" ${revealed?'disabled':''}>${o}</button>`).join('')}</div>${revealed?`<div class="challenge-six__feedback" role="status"><p><strong>${correct?'Bien vu !':'Pas tout à fait.'}</strong><br>La réponse : ${question.answer}.</p>${question.reveal?`<p>${esc(question.reveal).replaceAll('\n','<br>')}</p>`:''}</div>${button('Suivant')}`:''}`;
     }
     container.innerHTML = progress.phase === 'intro' ? body : `<section class="paper-card screen challenge-six">${body}</section>`;
     if (progress.phase === 'intro' || progress.phase === 'theme') next(()=>change('question'));

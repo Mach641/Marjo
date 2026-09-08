@@ -1,11 +1,12 @@
+import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
-import { renderChallengeSix } from "./challenge-six.js?v=1.4.19";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.22";
-import { renderChallengeOne } from "./challenge-one.js?v=1.4.19";
-import { renderFamilyGame } from "./family-game.js?v=1.4.16";
+import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.23";
+import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
+import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";
-import { renderRoadTrip } from "./road-trip.js?v=1.4.19";
+import { renderRoadTrip } from "./road-trip.js?v=1.4.23";
 import { playTimeTravel } from "./time-travel.js?v=1.3.2";
 
 const app = document.querySelector("#app");
@@ -326,7 +327,7 @@ function renderCoupleProfileChallenge() {
   const question = questions[progress.questionIndex];
   const playerName = progress.activePlayer === "marjolaine" ? "Marjolaine" : "Vincent";
   const questionProgress = questions.map((_, index) => `<span class="blind-test-progress__dot${index === progress.questionIndex ? " blind-test-progress__dot--active" : ""}"></span>`).join("");
-  app.innerHTML = page("Notre profil de couple", `<div class="blind-test-progress couple-profile-progress" role="img" aria-label="Question ${progress.questionIndex + 1} sur ${questions.length}">${questionProgress}</div><p class="couple-player" data-couple-player>Réponse de ${playerName}</p><h2>${question.prompt}</h2><div class="choice-list">${question.options.map((choice) => `<button class="choice couple-choice" type="button" data-profile="${choice.profile}"><span class="couple-choice__symbol" aria-hidden="true">${choice.symbol}</span><span>${choice.text}</span></button>`).join("")}</div>`);
+  app.innerHTML = `<section class="paper-card screen">${gameplayHeader({ theme: "Notre profil de couple", title: question.prompt, description: `<span data-couple-player>Réponse de ${playerName}</span>` })}<div class="blind-test-progress couple-profile-progress" role="img" aria-label="Question ${progress.questionIndex + 1} sur ${questions.length}">${questionProgress}</div><div class="choice-list">${question.options.map((choice) => `<button class="choice couple-choice" type="button" data-profile="${choice.profile}"><span class="couple-choice__symbol" aria-hidden="true">${choice.symbol}</span><span>${choice.text}</span></button>`).join("")}</div></section>`;
   app.querySelectorAll("[data-profile]").forEach((choice) => choice.addEventListener("click", () => {
     const activePlayer = progress.activePlayer;
     progress[activePlayer][progress.questionIndex] = choice.dataset.profile;
@@ -382,7 +383,7 @@ function renderChallengeThreeQuestions() {
   const draw = () => {
     const photo = photos[index];
     const photoMarkup = photo.src ? `<img class="baby-photo" src="${photo.src}" alt="${photo.alt}" />` : `<div class="baby-photo baby-photo--placeholder">${photo.alt}</div>`;
-    app.innerHTML = page("Lenny ou Milan ?", `<p class="challenge-three-question__subtitle">À toi de reconnaître qui se cache derrière chaque petit visage.</p>${photoMarkup}<div class="choice-list"><button class="choice challenge-three-choice" type="button" data-baby-choice="Lenny">Lenny</button><button class="choice challenge-three-choice" type="button" data-baby-choice="Milan">Milan</button></div><div class="challenge-three-feedback" role="status"></div>`, { kicker: "Qui est qui ?", className: "challenge-three-question" });
+    app.innerHTML = `<section class="paper-card screen challenge-three-question">${gameplayHeader({ theme: "Qui est qui ?", title: "Lenny ou Milan ?", description: "À toi de reconnaître qui se cache derrière chaque petit visage." })}${photoMarkup}<div class="choice-list"><button class="choice challenge-three-choice" type="button" data-baby-choice="Lenny">Lenny</button><button class="choice challenge-three-choice" type="button" data-baby-choice="Milan">Milan</button></div><div class="challenge-three-feedback" role="status"></div></section>`;
     app.querySelectorAll("[data-baby-choice]").forEach((choice) => choice.addEventListener("click", () => {
       const selected = choice.dataset.babyChoice;
       const correct = selected === photo.answer;
@@ -407,7 +408,7 @@ function renderBlindTest({ chapterId, songs, onDone }) {
   let index = Math.min(Number(state.answers[progressKey]) || 0, songs.length - 1);
   const drawSong = () => {
     const progress = songs.map((_, songIndex) => `<span class="blind-test-progress__dot${songIndex === index ? " blind-test-progress__dot--active" : ""}"></span>`).join("");
-    app.innerHTML = `<section class="paper-card screen blind-test-song"><p class="kicker">Défi 8</p><div class="blind-test-progress" aria-hidden="true">${progress}</div><h1>Chanson ${index + 1}</h1><h2>À toi de jouer !</h2><img class="blind-test-song__art" src="assets/challenge-8/v1-4-10/music-note.png" alt="" aria-hidden="true" /><p class="blind-test-song__copy">Vincent lance la musique sur la playlist<br>Deezer, écoute bien…</p>${button("J’ai trouvé !", "reveal-song")}</section>`;
+    app.innerHTML = `<section class="paper-card screen blind-test-song">${index === songs.length - 1 ? `<p class="kicker">Le blind test</p><div class="blind-test-progress" aria-hidden="true">${progress}</div><h1>Chanson ${index + 1}</h1><h2>À toi de jouer !</h2>` : `${gameplayHeader({ theme: "Le blind test", title: `Chanson ${index + 1}`, description: "À toi de jouer !<br>Vincent lance la musique sur la playlist<br>Deezer, écoute bien…" })}<div class="blind-test-progress" aria-hidden="true">${progress}</div>`}<img class="blind-test-song__art" src="assets/challenge-8/v1-4-10/music-note.png" alt="" aria-hidden="true" />${index === songs.length - 1 ? '<p class="blind-test-song__copy">Vincent lance la musique sur la playlist<br>Deezer, écoute bien…</p>' : ""}${button("J’ai trouvé !", "reveal-song")}</section>`;
     bindAction("reveal-song", () => {
       const song = songs[index];
       app.innerHTML = page("Révélation", `<div class="notice"><p><strong>Titre</strong><br>${song.title}</p><p><strong>Artiste</strong><br>${song.artist}</p></div>${button("Chanson suivante", "next-song")}`);
@@ -710,7 +711,7 @@ const renderers = {
     if (state.completedChallenges[7]) return navigate("resolution-7", { advance: true });
     app.innerHTML = challengeIntro({ id: 7, title: "Le serpent", subtitle: "Comme au temps des vieux téléphones.", image: "assets/challenge-7/v1-4-16/apple-snake.png", alt: "Un serpent composé de rondelles de pomme", copy: "Fais grandir le serpent<br>en mangeant les pommes.", label: "Jouer", action: 'data-action="play-snake"', footer: "path" });
     bindAction("play-snake", () => {
-      app.innerHTML = page("Le serpent", `<div id="familyGame"></div>`, { kicker: "Défi 7" });
+      app.innerHTML = `<section class="paper-card screen"><div id="familyGame"></div></section>`;
       cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7, "resolution-7"));
     });
   },

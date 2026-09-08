@@ -888,3 +888,43 @@ body:has(.journey-notebook) > .weather { display: none; }
   background: url("assets/notebook/v1-4-21/cta-terracotta.png") center / 100% 100% no-repeat; pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) { .journey-notebook { animation: none; } }
+
+/* Shared active-game header. The PNG's transparent canvas is identical everywhere. */
+.gameplay-header { text-align: center; }
+.gameplay-header .gameplay-header__theme {
+  margin: 0 0 12px;
+  color: var(--terracotta);
+  font: 700 11px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.gameplay-header h1 {
+  margin: 0;
+  color: #3d352d;
+  font: 400 clamp(28px, 8vw, 36px)/1.15 Georgia, "Times New Roman", serif;
+  letter-spacing: -.035em;
+}
+.gameplay-header .gameplay-header__description {
+  margin: 10px 0 0;
+  color: #776b5d;
+  font: italic 16px/1.45 Georgia, "Times New Roman", serif;
+}
+.gameplay-header__divider {
+  position: relative;
+  width: 102px;
+  height: 3px;
+  margin: 22px auto 26px;
+  pointer-events: none;
+}
+.gameplay-header__divider img {
+  position: absolute;
+  display: block;
+  width: 102px;
+  max-width: none;
+  height: 34px;
+  left: 0;
+  top: -15px;
+}
+.gameplay-header--compact .gameplay-header__theme { margin-bottom: 6px; }
+.gameplay-header--compact h1 { font-size: 26px; }
+.gameplay-header--compact .gameplay-header__divider { margin-top: 12px; margin-bottom: 14px; }

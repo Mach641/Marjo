@@ -1,3 +1,4 @@
+import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 const ASSETS = 'assets/challenge-5/v1-4-14';
 const START = [350,664];
@@ -276,7 +277,7 @@ export function renderRoadTrip(container,trip,save,onComplete) {
   const final=trip.phase==='final',reveal=trip.phase==='reveal',stage=trip.choices.length-(reveal?1:0),step=ROAD_STEPS[stage];let body;
   if(final)body=`<h1>Voilà notre route.</h1><p>Pas forcément la plus courte.<br>Pas forcément la plus logique.<br>Mais sûrement la nôtre.</p>${map(stage,false,true)}${cta('Continuer le voyage →')}`;
   else if(reveal){const o=step.options[trip.choices[stage]];body=`${map(stage,true,false)}<div class="stockholm-illustration" data-illustration="${stage+1}-${trip.choices[stage]+1}">${o.image?`<img src="${esc(o.image)}" alt="${esc(o.title)}"/>`:'<span>Illustration à venir</span>'}</div><h1>${esc(o.title)}</h1><p>${esc(o.text)}</p>${cta(stage===4?'Voir notre route →':'Suivant →')}`;}
-  else body=`${map(stage,false,false)}<p class="kicker">ÉTAPE ${stage+1}</p><h1>${step.title}</h1><p>${step.subtitle}</p><div class="choice-list">${step.options.map((o,i)=>`<button type="button" class="choice" data-trip-choice="${i}">${o.title}</button>`).join('')}</div>`;
+  else body=`${gameplayHeader({ theme: "À toi de nous emmener à Stockholm", title: step.title, description: step.subtitle })}${map(stage,false,false)}<p class="kicker">ÉTAPE ${stage+1}</p><div class="choice-list">${step.options.map((o,i)=>`<button type="button" class="choice" data-trip-choice="${i}">${o.title}</button>`).join('')}</div>`;
   container.innerHTML=`<section class="paper-card screen stockholm-trip">${body}</section>`;
   if(final)next(onComplete);
   else if(reveal){next(()=>{trip.phase=trip.choices.length===5?'final':'choice';save();draw();});

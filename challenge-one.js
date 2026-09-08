@@ -1,3 +1,4 @@
+import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 const svg = (content, label) => `<svg class="rule-sketch" viewBox="0 0 320 230" role="img" aria-label="${label}">${content}</svg>`;
 const layer = (level, needed, content) => level >= needed ? `<g class="sketch-layer sketch-layer--${needed}">${content}</g>` : "";
@@ -95,7 +96,7 @@ export function renderChallengeOne(root, options) {
   function renderDoors() {
     const noneOpen = current.openedDoors.length === 0;
     const allOpen = current.openedDoors.length === 6;
-    root.innerHTML = `<section class="paper-card screen rules-doors"><p class="kicker">Les règles de notre monde</p><h1>Choisis une porte</h1>${noneOpen ? '<p class="rules-note">On commence toujours par la règle numéro 1.</p>' : '<p class="rules-note">Chaque porte ouverte garde sa couleur.</p>'}<div class="door-grid">${options.rules.map((rule) => {
+    root.innerHTML = `<section class="paper-card screen rules-doors">${allOpen ? `<p class="kicker">Les règles de notre monde</p><h1>Choisis une porte</h1><p class="rules-note">Chaque porte ouverte garde sa couleur.</p>` : gameplayHeader({ theme: "Les règles de notre monde", title: "Choisis une porte", description: noneOpen ? "On commence toujours par la règle numéro 1." : "Chaque porte ouverte garde sa couleur." })}<div class="door-grid">${options.rules.map((rule) => {
       const opened = current.openedDoors.includes(rule.id);
       const locked = opened || (noneOpen && rule.id !== 1);
       const visualState = opened ? "open" : locked ? "locked" : "available";
@@ -106,11 +107,11 @@ export function renderChallengeOne(root, options) {
 
   function renderRule() {
     const lastLevel = current.revealLevel === 3;
-    root.innerHTML = `<section class="paper-card screen rule-page"><p class="kicker">Règle n°${current.selectedRule}</p><h1>Quelle règle se cache derrière ce dessin ?</h1><div class="rule-drawing rule-drawing--transparent">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div>${current.hintVisible ? `<p class="rule-hint">${selected().hint}</p>` : ""}<div class="rule-actions"><button class="primary-button" data-rules-action="know">Je connais la règle</button><button class="secondary-button" data-rules-action="more">${lastLevel ? "Donne-moi un indice" : "Dessine-moi encore un peu"}</button></div></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page">${gameplayHeader({ theme: `Règle n°${current.selectedRule}`, title: "Quelle règle se cache derrière ce dessin ?" })}<div class="rule-drawing rule-drawing--transparent">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div>${current.hintVisible ? `<p class="rule-hint">${selected().hint}</p>` : ""}<div class="rule-actions"><button class="primary-button" data-rules-action="know">Je connais la règle</button><button class="secondary-button" data-rules-action="more">${lastLevel ? "Donne-moi un indice" : "Dessine-moi encore un peu"}</button></div></section>`;
   }
 
   function renderSpeak() {
-    root.innerHTML = `<section class="paper-card screen rule-page rule-page--speak"><p class="kicker">Règle n°${current.selectedRule}</p><div class="rule-drawing rule-drawing--transparent">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div><div class="rules-rainbow rules-rainbow--small" aria-hidden="true">⌒</div><h1>Alors dis-la à Vincent.</h1><button class="primary-button" data-rules-action="found">J’ai trouvé</button></section>`;
+    root.innerHTML = `<section class="paper-card screen rule-page rule-page--speak">${gameplayHeader({ theme: `Règle n°${current.selectedRule}`, title: "Alors dis-la à Vincent." })}<div class="rule-drawing rule-drawing--transparent">${drawings[current.selectedRule - 1](current.revealLevel, false)}</div><div class="rules-rainbow rules-rainbow--small" aria-hidden="true">⌒</div><button class="primary-button" data-rules-action="found">J’ai trouvé</button></section>`;
   }
 
   function renderReward() {
