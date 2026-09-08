@@ -1,3 +1,4 @@
+import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 const ASSETS = 'assets/challenge-5/v1-4-14';
 const START = [350,664];
 // Coordonnées sur la carte originale ; image réserve un asset distinct pour chaque choix.
@@ -271,7 +272,7 @@ export function renderRoadTrip(container,trip,save,onComplete) {
  const draw=(animate=false)=>{
   cancelAnimationFrame(frame);if(disposed)return;
   window.scrollTo(0, 0);
-  if(!trip.started){container.innerHTML=`<section class="paper-card screen stockholm-intro"><p class="kicker">DÉFI 5</p><h1>À toi de nous emmener à Stockholm</h1><p>Il n’y a pas de bonne route vers le futur.</p><img src="${ASSETS}/camper.png" alt="Camping-car devant les montagnes"/><p>Choisis simplement celle qui te ressemble le plus.</p>${cta('Commencer')}</section>`;next(()=>{trip.started=true;save();draw();});return;}
+  if(!trip.started){container.innerHTML=challengeIntro({ id: 5, title: "À toi de nous emmener à Stockholm", subtitle: "Il n’y a pas de bonne route vers le futur.", image: `${ASSETS}/camper.png`, alt: "Camping-car devant les montagnes", copy: "Choisis simplement celle<br>qui te ressemble le plus.", label: "Choisir l’itinéraire", action: "data-trip-next", footer: "path" });next(()=>{trip.started=true;save();draw();});return;}
   const final=trip.phase==='final',reveal=trip.phase==='reveal',stage=trip.choices.length-(reveal?1:0),step=ROAD_STEPS[stage];let body;
   if(final)body=`<h1>Voilà notre route.</h1><p>Pas forcément la plus courte.<br>Pas forcément la plus logique.<br>Mais sûrement la nôtre.</p>${map(stage,false,true)}${cta('Continuer le voyage →')}`;
   else if(reveal){const o=step.options[trip.choices[stage]];body=`${map(stage,true,false)}<div class="stockholm-illustration" data-illustration="${stage+1}-${trip.choices[stage]+1}">${o.image?`<img src="${esc(o.image)}" alt="${esc(o.title)}"/>`:'<span>Illustration à venir</span>'}</div><h1>${esc(o.title)}</h1><p>${esc(o.text)}</p>${cta(stage===4?'Voir notre route →':'Suivant →')}`;}

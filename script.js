@@ -1,10 +1,11 @@
-import { renderChallengeSix } from "./challenge-six.js?v=1.4.15";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.18";
-import { renderChallengeOne } from "./challenge-one.js?v=1.4.8";
+import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
+import { renderChallengeSix } from "./challenge-six.js?v=1.4.19";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.19";
+import { renderChallengeOne } from "./challenge-one.js?v=1.4.19";
 import { renderFamilyGame } from "./family-game.js?v=1.4.16";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";
-import { renderRoadTrip } from "./road-trip.js?v=1.4.14";
+import { renderRoadTrip } from "./road-trip.js?v=1.4.19";
 import { playTimeTravel } from "./time-travel.js?v=1.3.2";
 
 const app = document.querySelector("#app");
@@ -290,7 +291,7 @@ function coupleProfileProgress() {
 }
 
 function renderCoupleProfileIntro() {
-  app.innerHTML = page("Notre profil de couple", `<p class="couple-profile-intro__subtitle">Un test très scientifique. Évidemment.</p><img class="couple-profile-intro__art" src="assets/challenge-2/v1-4-12/couple-profile-notebook.png" alt="" aria-hidden="true" /><p class="couple-profile-intro__copy"><strong>20 questions. Deux réponses à chaque fois.</strong><br><em>D’abord Marjolaine. Puis Vincent.</em></p>${button("Commencer le test", "start-couple-profile")}`, { kicker: "Défi 2", className: "couple-profile-intro" });
+  app.innerHTML = challengeIntro({ id: 2, title: "Notre profil de couple", subtitle: "Un test très scientifique. Évidemment.", image: "assets/challenge-2/v1-4-12/couple-profile-notebook.png", alt: "Un petit carnet ouvert et son crayon", copy: "20 questions. Deux réponses à chaque fois.<br><em>D’abord Marjolaine. Puis Vincent.</em>", label: "Commencer le test", action: 'data-action="start-couple-profile"', footer: "coast" });
   bindAction("start-couple-profile", renderCoupleProfileChallenge);
 }
 
@@ -346,7 +347,7 @@ function renderCoupleProfileResults() {
 }
 
 function renderChallengeThreeIntro() {
-  app.innerHTML = page("Qui est qui ?", `<p class="challenge-three-intro__subtitle">Deux petits visages qui se ressemblent beaucoup.</p><img class="challenge-three-intro__art" src="assets/challenge-3/v1-4-13/baby-polaroids.png" alt="" aria-hidden="true" /><p class="challenge-three-intro__copy">Fais confiance à ta mémoire... et à ton cœur.</p>${button("Commencer", "start-challenge-three")}`, { kicker: "Défi 3", className: "challenge-three-intro" });
+  app.innerHTML = challengeIntro({ id: 3, title: "Qui est qui ?", subtitle: "Deux petits visages qui se ressemblent beaucoup.", image: "assets/challenge-3/v1-4-13/baby-polaroids.png", alt: "Deux portraits de bébés en polaroids", copy: "À toi de reconnaître qui se cache<br>derrière chaque petit visage.", label: "Commencer le défi", action: 'data-action="start-challenge-three"', footer: "balloon" });
   bindAction("start-challenge-three", renderChallengeThreeQuestions);
 }
 
@@ -395,7 +396,7 @@ function renderBlindTest({ chapterId, songs, onDone }) {
       });
     });
   };
-  app.innerHTML = page("Le blind test", `<p class="blind-test-intro__subtitle">Des chansons qui ont accompagné<br>notre histoire.</p><img class="blind-test-intro__art" src="assets/challenge-8/v1-4-10/guitar.png" alt="" aria-hidden="true" /><p class="blind-test-intro__copy">Écoute bien, fais confiance<br>à ta mémoire… et à ton cœur.</p>${button("Commencer le blind test", "start-blind-test")}`, { kicker: "Défi 8", className: "blind-test-intro" });
+  app.innerHTML = challengeIntro({ id: 8, title: "Le blind test", subtitle: "Des chansons qui ont accompagné notre histoire.", image: "assets/challenge-8/v1-4-10/guitar.png", alt: "Une guitare dessinée dans le carnet", copy: "Écoute bien et fais confiance à ta mémoire.<br>À toi de retrouver les chansons.", label: "Commencer le blind test", action: 'data-action="start-blind-test"', footer: "coast" });
   bindAction("start-blind-test", drawSong);
 }
 
@@ -683,7 +684,7 @@ const renderers = {
   "handoff-6": () => renderHandoff(6, "challenge-7"),
   "challenge-7": () => {
     if (state.completedChallenges[7]) return navigate("resolution-7", { advance: true });
-    app.innerHTML = page("Le serpent", `<p>Un mini défi, comme au temps des vieux téléphones.<br>Fais grandir le serpent en mangeant les pommes.</p><img class="snake-intro" src="assets/challenge-7/v1-4-16/apple-snake.png" alt="Serpent composé de rondelles de pomme" />${button("Jouer", "play-snake")}`, { kicker: "Défi 7" });
+    app.innerHTML = challengeIntro({ id: 7, title: "Le serpent", subtitle: "Comme au temps des vieux téléphones.", image: "assets/challenge-7/v1-4-16/apple-snake.png", alt: "Un serpent composé de rondelles de pomme", copy: "Fais grandir le serpent<br>en mangeant les pommes.", label: "Jouer", action: 'data-action="play-snake"', footer: "path" });
     bindAction("play-snake", () => {
       app.innerHTML = page("Le serpent", `<div id="familyGame"></div>`, { kicker: "Défi 7" });
       cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7, "resolution-7"));

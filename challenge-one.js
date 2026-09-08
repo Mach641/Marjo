@@ -1,3 +1,4 @@
+import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 const svg = (content, label) => `<svg class="rule-sketch" viewBox="0 0 320 230" role="img" aria-label="${label}">${content}</svg>`;
 const layer = (level, needed, content) => level >= needed ? `<g class="sketch-layer sketch-layer--${needed}">${content}</g>` : "";
 const wash = (solved, content) => solved ? `<g class="sketch-watercolor" aria-hidden="true">${content}</g>` : "";
@@ -88,7 +89,7 @@ export function renderChallengeOne(root, options) {
   const selected = () => options.rules.find((rule) => rule.id === current.selectedRule);
 
   function renderIntro() {
-    root.innerHTML = `<section class="paper-card screen rules-intro"><p class="kicker">Premier défi</p><h1>Les règles de notre monde</h1><img class="rules-intro__door" src="assets/challenge-1/v1-4-6/intro-door.png" alt="" aria-hidden="true" /><p class="rules-intro__copy">Avant de parcourir notre histoire…<br>voyons si tu connais encore<br>les règles de notre monde à nous.</p><button class="primary-button" data-rules-action="discover">Découvrir les règles</button></section>`;
+    root.innerHTML = challengeIntro({ id: 1, title: "Les règles de notre monde", subtitle: "Avant de parcourir notre histoire…", image: "assets/challenge-1/v1-4-6/intro-door.png", alt: "La grande porte de notre monde", copy: "Voyons si tu connais encore<br>les règles de notre monde à nous.", label: "Découvrir les règles", action: 'data-rules-action="discover"', footer: "path" });
   }
 
   function renderDoors() {
