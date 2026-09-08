@@ -867,16 +867,17 @@ body:has(.journey-notebook) > .weather { display: none; }
 .journey-polaroid__question { position: absolute; left: 45%; top: 38%; font: 400 44px/1 "Opening Hand", cursive; }
 .journey-polaroid__accent { position: absolute; left: -12px; top: 8%; color: #c78b45; font-size: 28px; transform: rotate(-60deg); }
 .journey-polaroid:focus-visible, .journey-notebook button:focus-visible { outline: 2px solid #8e6249; outline-offset: 4px; }
-.journey-notebook__guide { margin: 12px -3px 0; color: #69563e; font: italic 14px/1.4 Georgia, serif; text-align: left; }
+.journey-notebook__guide { position: relative; margin: 4px -3px 0; padding-left: 8px; color: #69563e; font: italic 13px/1.3 Georgia, serif; text-align: left; }
+.journey-notebook__guide::before { content: ""; position: absolute; left: -8px; top: -23px; width: 20px; height: 32px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 32'%3E%3Cpath d='M8 30 Q1 18 13 3 M5 7 Q10 4 13 3 L14 12' fill='none' stroke='%2379654a' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; pointer-events: none; }
 .journey-notebook__ghost { position: relative; display: grid; place-items: center; aspect-ratio: .78; margin-top: 18px; border: 1px dashed #b9a17966; background: #c7ab7910; box-shadow: 0 2px 5px #8f725b08; transform: rotate(3deg); color: #95856c; }
 .journey-notebook__ghost::before { content: ""; position: absolute; top: -10px; left: 35%; width: 36%; height: 18px; background: #c9b48a40; transform: rotate(-5deg); }
 .journey-notebook__ghost:last-child { transform: rotate(-3deg); }
-.journey-notebook__soon { margin: 40px 0 0; color: #756148; font: italic 16px/1.5 Georgia, serif; }
+.journey-notebook__soon { margin: 20px 0 0; padding-bottom: max(24px, env(safe-area-inset-bottom)); color: #756148; font: italic 14px/1.5 Georgia, serif; }
 .journey-notebook__flower { position: absolute; width: 15%; height: auto; right: -2px; bottom: 14px; pointer-events: none; opacity: .8; }
-.journey-notebook__back { display: block; min-height: 44px; padding: 0; margin-bottom: 20px; border: 0; background: transparent; color: #65543d; font: 24px "Opening Hand", cursive; cursor: pointer; }
-.journey-polaroid--large { width: 72%; max-width: 230px; margin: 0 auto 28px; cursor: default; }
+.journey-notebook__back { display: block; min-height: 44px; padding: 0; margin-bottom: 20px; border: 0; background: transparent; color: #514330; font: 400 27px "Opening Hand", cursive; font-synthesis: none; cursor: pointer; }
+.journey-polaroid--large { width: 72%; max-width: 230px; margin: 0 auto 28px; transform: rotate(4deg); cursor: default; }
 .journey-polaroid--large .journey-polaroid__question { font-size: 60px; }
-.journey-notebook--context h1 { margin-bottom: 18px; font-size: 30px; }
+.journey-notebook--context h1 { margin-bottom: 18px; color: #443724; font-size: 32px; font-weight: 400; font-synthesis: none; }
 .journey-notebook__copy { margin: 0 0 30px; font: 16px/1.5 Georgia, serif; }
 .journey-notebook__cta, .challenge-landing--1 .challenge-landing__button {
   position: relative; isolation: isolate; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: #fffaf0;
