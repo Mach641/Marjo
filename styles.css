@@ -789,3 +789,46 @@ body:has(.challenge-landing) > .weather { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .challenge-landing__button:active { transform: none; }
 }
+
+/* Targeted opening 2–3 and challenge 1 adjustments. */
+.opening-screen--prologue .opening-rainbow { width: 64%; }
+.opening-screen--notebook-intro .opening-rainbow { width: 45%; }
+.opening-screen--notebook-intro .opening-notebook { margin-top: 24px; }
+.opening-notebook__tap {
+  display: block;
+  width: 70%;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+.opening-notebook__tap .opening-notebook__book { width: 100%; margin: 0; }
+.opening-notebook__tap:focus-visible { outline: 2px solid #8e6249; outline-offset: 5px; }
+.opening-notebook__hint {
+  margin: 14px 0 0;
+  color: #786b5a;
+  font: italic 400 14px/1.4 Georgia, "Times New Roman", serif;
+}
+.opening-screen--notebook-intro .opening-notebook__heart { width: 9%; right: 9%; top: 4%; }
+.challenge-landing--1 .challenge-landing__button {
+  width: 80%;
+  min-height: 56px;
+  padding: 12px 10px;
+  font-size: 1rem;
+  border-radius: 13px 17px 14px 11px / 12px 14px 11px 15px;
+  background: radial-gradient(ellipse at 24% 25%, #cf846555, transparent 65%),
+    radial-gradient(ellipse at 82% 75%, #954a2f33, transparent 60%),
+    linear-gradient(105deg, #b96449, #bd6a4f 45%, #b65e45);
+  box-shadow: 0 2px 3px #78523b18;
+}
+.challenge-landing--1 .challenge-landing__button::before { display: none; }
+.challenge-landing--1 .challenge-landing__footer {
+  width: 92%;
+  align-self: center;
+  opacity: .72;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 65%);
+  mask-image: linear-gradient(to bottom, transparent, #000 65%);
+}

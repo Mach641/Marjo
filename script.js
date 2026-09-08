@@ -1,6 +1,6 @@
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.19";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.19";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.20";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.19";
 import { renderFamilyGame } from "./family-game.js?v=1.4.16";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -154,8 +154,8 @@ function openingPage(id, title, copy, label, { notebook = false, decoration = "0
     <img class="opening-rainbow" src="${OPENING_ASSETS}/02_arc_en_ciel.png" width="1506" height="616" alt="" />
     <h1 id="opening-title" tabindex="-1">${title}</h1>
     <div class="opening-copy">${copy.map((line) => `<p>${line}</p>`).join("")}</div>
-    ${notebook ? `<div class="opening-notebook"><img class="opening-notebook__book" src="${OPENING_ASSETS}/05_carnet_ferme.png" width="398" height="441" alt="Un petit carnet en papier brun, noué d’une ficelle et orné de fleurs séchées" /><img class="opening-notebook__heart" src="${OPENING_ASSETS}/06_coeur.png" width="157" height="229" alt="" /></div>` : `<img class="opening-botanical" src="${OPENING_ASSETS}/${decoration}.png" alt="" /><img class="opening-trail" src="${OPENING_ASSETS}/07_chemin_pointille.png" width="731" height="115" alt="" />`}
-    <div class="opening-actions">${button(label, "opening-next", "opening-button")}</div>
+    ${notebook ? `<div class="opening-notebook"><button class="opening-notebook__tap" type="button" data-action="opening-next" aria-label="Ouvrir le carnet" aria-describedby="opening-notebook-hint"><img class="opening-notebook__book" src="${OPENING_ASSETS}/05_carnet_ferme.png" width="398" height="441" alt="Un petit carnet en papier brun, noué d’une ficelle et orné de fleurs séchées" /></button><p id="opening-notebook-hint" class="opening-notebook__hint">Tape sur le carnet pour l’ouvrir.</p><img class="opening-notebook__heart" src="${OPENING_ASSETS}/06_coeur.png" width="157" height="229" alt="" /></div>` : `<img class="opening-botanical" src="${OPENING_ASSETS}/${decoration}.png" alt="" /><img class="opening-trail" src="${OPENING_ASSETS}/07_chemin_pointille.png" width="731" height="115" alt="" />`}
+    ${notebook ? "" : `<div class="opening-actions">${button(label, "opening-next", "opening-button")}</div>`}
   </section>`;
   app.querySelector("#opening-title").focus({ preventScroll: true });
 }
