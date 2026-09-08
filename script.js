@@ -1,7 +1,7 @@
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.24";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.25";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -321,32 +321,46 @@ function renderCoupleProfileIntro() {
 }
 
 function renderCoupleProfileChallenge() {
+  cleanupCurrentScreen?.();
+  let feedbackTimer = null;
+  let pending = false;
+  let disposed = false;
+  cleanupCurrentScreen = () => { disposed = true; clearTimeout(feedbackTimer); };
   const questions = CONFIG.chapters[2].questions;
   const progress = coupleProfileProgress();
   if (progress.questionIndex >= questions.length) return completeChallenge(2, "analysis-2");
   const question = questions[progress.questionIndex];
   const playerName = progress.activePlayer === "marjolaine" ? "Marjolaine" : "Vincent";
   const questionProgress = questions.map((_, index) => `<span class="blind-test-progress__dot${index === progress.questionIndex ? " blind-test-progress__dot--active" : ""}"></span>`).join("");
-  app.innerHTML = `<section class="paper-card screen">${gameplayHeader({ theme: "Notre profil de couple", title: question.prompt, description: `<span data-couple-player>Réponse de ${playerName}</span>` })}<div class="blind-test-progress couple-profile-progress" role="img" aria-label="Question ${progress.questionIndex + 1} sur ${questions.length}">${questionProgress}</div><div class="choice-list">${question.options.map((choice) => `<button class="choice couple-choice" type="button" data-profile="${choice.profile}"><span class="couple-choice__symbol" aria-hidden="true">${choice.symbol}</span><span>${choice.text}</span></button>`).join("")}</div></section>`;
+  app.innerHTML = `<section class="paper-card screen">${gameplayHeader({ theme: "Notre profil de couple", title: question.prompt, description: `<span data-couple-player>Réponse de ${playerName}</span>` })}<div class="blind-test-progress couple-profile-progress" role="img" aria-label="Question ${progress.questionIndex + 1} sur ${questions.length}">${questionProgress}</div><div class="choice-list">${question.options.map((choice) => `<button class="choice couple-choice paper-choice" type="button" aria-pressed="false" data-profile="${choice.profile}"><span class="couple-choice__symbol" aria-hidden="true">${choice.symbol}</span><span class="paper-choice__text">${choice.text}</span><span class="paper-choice__circle" aria-hidden="true"></span></button>`).join("")}</div></section>`;
   app.querySelectorAll("[data-profile]").forEach((choice) => choice.addEventListener("click", () => {
-    const activePlayer = progress.activePlayer;
-    progress[activePlayer][progress.questionIndex] = choice.dataset.profile;
-    if (activePlayer === "marjolaine") {
-      progress.activePlayer = "vincent";
+    if (pending || disposed) return;
+    pending = true;
+    choice.setAttribute("aria-pressed", "true");
+    app.querySelectorAll("[data-profile]").forEach(node => { node.disabled = true; });
+    feedbackTimer = setTimeout(() => {
+      if (disposed) return;
+      const activePlayer = progress.activePlayer;
+      progress[activePlayer][progress.questionIndex] = choice.dataset.profile;
+      if (activePlayer === "marjolaine") {
+        progress.activePlayer = "vincent";
+        saveState();
+        app.querySelectorAll("[data-profile]").forEach((node) => {
+          node.classList.remove("choice--selected");
+          node.setAttribute("aria-pressed", "false");
+          node.disabled = false;
+          node.blur();
+        });
+        app.querySelector("[data-couple-player]").textContent = "Réponse de Vincent";
+        pending = false;
+        return;
+      }
+      progress.questionIndex += 1;
+      progress.activePlayer = "marjolaine";
       saveState();
-      app.querySelectorAll("[data-profile]").forEach((node) => {
-        node.classList.remove("choice--selected");
-        node.removeAttribute("aria-pressed");
-        node.blur();
-      });
-      app.querySelector("[data-couple-player]").textContent = "Réponse de Vincent";
-      return;
-    }
-    progress.questionIndex += 1;
-    progress.activePlayer = "marjolaine";
-    saveState();
-    if (progress.questionIndex >= questions.length) completeChallenge(2, "analysis-2");
-    else renderCoupleProfileChallenge();
+      if (progress.questionIndex >= questions.length) completeChallenge(2, "analysis-2");
+      else renderCoupleProfileChallenge();
+    }, 500);
   }));
 }
 
@@ -383,12 +397,13 @@ function renderChallengeThreeQuestions() {
   const draw = () => {
     const photo = photos[index];
     const photoMarkup = photo.src ? `<img class="baby-photo" src="${photo.src}" alt="${photo.alt}" />` : `<div class="baby-photo baby-photo--placeholder">${photo.alt}</div>`;
-    app.innerHTML = `<section class="paper-card screen challenge-three-question">${gameplayHeader({ theme: "Qui est qui ?", title: "Lenny ou Milan ?", description: "À toi de reconnaître qui se cache derrière chaque petit visage." })}${photoMarkup}<div class="choice-list"><button class="choice challenge-three-choice" type="button" data-baby-choice="Lenny">Lenny</button><button class="choice challenge-three-choice" type="button" data-baby-choice="Milan">Milan</button></div><div class="challenge-three-feedback" role="status"></div></section>`;
+    app.innerHTML = `<section class="paper-card screen challenge-three-question">${gameplayHeader({ theme: "Qui est qui ?", title: "Lenny ou Milan ?", description: "À toi de reconnaître qui se cache derrière chaque petit visage." })}${photoMarkup}<div class="choice-list"><button class="choice challenge-three-choice paper-choice" type="button" aria-pressed="false" data-baby-choice="Lenny"><span class="paper-choice__text">Lenny</span><span class="paper-choice__circle" aria-hidden="true"></span></button><button class="choice challenge-three-choice paper-choice" type="button" aria-pressed="false" data-baby-choice="Milan"><span class="paper-choice__text">Milan</span><span class="paper-choice__circle" aria-hidden="true"></span></button></div><div class="challenge-three-feedback" role="status"></div></section>`;
     app.querySelectorAll("[data-baby-choice]").forEach((choice) => choice.addEventListener("click", () => {
       const selected = choice.dataset.babyChoice;
       const correct = selected === photo.answer;
       app.querySelectorAll("[data-baby-choice]").forEach((node) => { node.disabled = true; });
       choice.classList.add("challenge-three-choice--selected");
+      choice.setAttribute("aria-pressed", "true");
       answers[index] = selected;
       state.answers["chapter-3"] = answers;
       saveState();

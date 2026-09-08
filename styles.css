@@ -942,3 +942,47 @@ body:has(.gameplay-header)::before {
   box-shadow: 3px 2px 0 #ebd8b5, 4px 3px 0 #b8a17d, 6px 5px 0 #dec5a0, 0 5px 10px #59452d18, inset 3px 0 8px #88643f12;
 }
 .paper-card:has(.gameplay-header)::after { display: none; }
+
+/* Remove only the legacy global bar while active gameplay is displayed. */
+body:has(.gameplay-header) > .site-header { display: none; }
+
+/* Shared paper choices, currently opted into only by D2 and D3. */
+.choice.paper-choice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 10px;
+  height: auto;
+  min-height: 54px;
+  padding: 14px 16px;
+  border: 1px solid #bca47b66;
+  border-radius: 7px 12px 8px 5px / 6px 7px 11px 8px;
+  background: radial-gradient(ellipse at 18% 12%, #fffaf077, transparent 75%), linear-gradient(108deg, #f7ecd6, #fbf2e1 60%, #f5e9d0);
+  box-shadow: 0 2px 3px #755a3612;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.couple-choice.paper-choice { grid-template-columns: 28px minmax(0, 1fr) 22px; }
+.paper-choice__text { min-width: 0; overflow-wrap: break-word; }
+.paper-choice__circle {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #a27058;
+  border-radius: 49% 46% 51% 47%;
+}
+.paper-choice__circle::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 47% 52% 46% 51%;
+  background: #b46d51;
+  opacity: 0;
+}
+.choice.paper-choice[aria-pressed="true"] {
+  border-color: #b8755a;
+  background: radial-gradient(ellipse at 20% 40%, #cf896744, transparent 80%), linear-gradient(100deg, #f2dccc, #f7e8d6 68%, #efd9c7);
+}
+.paper-choice[aria-pressed="true"] .paper-choice__circle::after { opacity: 1; }
+.choice.paper-choice:disabled { opacity: 1; cursor: default; }

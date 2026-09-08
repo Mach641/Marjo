@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-24-gameplay-paper";
+const CACHE_NAME = "voyage-majorque-v1-4-25-paper-choices";
 const APP_SHELL = [
   "./gameplay-header.js?v=1.4.23",
   "./assets/gameplay/v1-4-23/divider-terracotta.png",
@@ -29,9 +29,9 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.24",
-  "./script.js?v=1.4.24",
-  "./config.js?v=1.4.24",
+  "./styles.css?v=1.4.25",
+  "./script.js?v=1.4.25",
+  "./config.js?v=1.4.25",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",
