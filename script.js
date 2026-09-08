@@ -1,6 +1,6 @@
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.19";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.21";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.22";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.19";
 import { renderFamilyGame } from "./family-game.js?v=1.4.16";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
