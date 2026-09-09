@@ -930,21 +930,21 @@ body:has(.journey-notebook) > .weather { display: none; }
 .gameplay-header--compact .gameplay-header__divider { margin-top: 12px; margin-bottom: 14px; }
 
 /* Notebook support only for the active phases selected by the gameplay header. */
-body:has(.gameplay-header) { background: #fae9ce; }
-body:has(.gameplay-header)::before {
+body:has(.gameplay-header, .blind-test-reveal, .blind-test-finale) { background: #fae9ce; }
+body:has(.gameplay-header, .blind-test-reveal, .blind-test-finale)::before {
   opacity: 1;
   background: url("assets/opening/v1-4-18/01_background_papier.png") center / calc(100% + 8px) calc(100% + 8px) no-repeat;
 }
-.paper-card:has(.gameplay-header) {
+.paper-card:is(:has(.gameplay-header), .blind-test-reveal, .blind-test-finale) {
   background: url("assets/opening/v1-4-18/01_background_papier.png") center / calc(100% + 8px) calc(100% + 8px) no-repeat;
   border-color: #a28761;
   border-radius: 10px 19px 16px 8px;
   box-shadow: 3px 2px 0 #ebd8b5, 4px 3px 0 #b8a17d, 6px 5px 0 #dec5a0, 0 5px 10px #59452d18, inset 3px 0 8px #88643f12;
 }
-.paper-card:has(.gameplay-header)::after { display: none; }
+.paper-card:is(:has(.gameplay-header), .blind-test-reveal, .blind-test-finale)::after { display: none; }
 
 /* Remove only the legacy global bar while active gameplay is displayed. */
-body:has(.gameplay-header) > .site-header { display: none; }
+body:has(.gameplay-header, .blind-test-reveal, .blind-test-finale) > .site-header { display: none; }
 
 /* Shared paper choices, currently opted into only by D2 and D3. */
 .choice.paper-choice {
@@ -986,3 +986,35 @@ body:has(.gameplay-header) > .site-header { display: none; }
 }
 .paper-choice[aria-pressed="true"] .paper-choice__circle::after { opacity: 1; }
 .choice.paper-choice:disabled { opacity: 1; cursor: default; }
+
+/* D8 reuses the existing notebook paper and watercolor CTA. */
+.blind-test-song .journey-notebook__cta { display: block; margin: 24px auto 0; }
+.blind-test-reveal, .blind-test-finale {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.blind-test-reveal h1 { margin: 0 0 20px; font: 400 clamp(28px, 8vw, 36px)/1.2 Georgia, serif; }
+.blind-test-reveal > p { margin: 0 0 40px; font: italic 20px/1.4 Georgia, serif; }
+.blind-test-reveal--leaving { animation: blind-test-fade-out 250ms ease both; }
+@keyframes blind-test-fade-out { to { opacity: 0; } }
+.blind-test-finale__rainbow { display: block; flex: none; width: 140px; height: 70px; margin: 0 auto 36px; }
+.blind-test-finale__rainbow path {
+  transform-origin: 80px 70px;
+  animation: blind-test-painted-arc 1s ease-in-out var(--rainbow-delay) both;
+}
+@keyframes blind-test-painted-arc {
+  from { transform: scaleY(.035); opacity: .12; }
+  to { transform: scaleY(1); opacity: .8; }
+}
+.blind-test-finale__message[hidden] { display: block; visibility: hidden; }
+.blind-test-finale__message { animation: blind-test-message-in .45s ease both; }
+.blind-test-finale__message p { margin: 0 0 24px; font: 400 21px/1.5 Georgia, serif; }
+.blind-test-finale__message .journey-notebook__cta { margin-top: 12px; }
+@keyframes blind-test-message-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .blind-test-finale__rainbow path, .blind-test-finale__message[hidden] { display: block; visibility: hidden; }
+.blind-test-finale__message { animation: none; }
+}

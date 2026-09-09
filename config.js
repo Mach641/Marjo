@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.25";
+export const APP_VERSION = "1.4.26";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -262,9 +262,13 @@ export const CONFIG = {
       gallery: [{ src: null, label: "PLACEHOLDER — FUTUR LOINTAIN" }],
       soundtrack: null,
       songs: [
-        { title: "À définir", artist: "À définir" },
-        { title: "À définir", artist: "À définir" },
-        { title: "À définir", artist: "À définir" },
+        { title: "Lady Marmalade", artist: "Christina Aguilera" },
+        { title: "Set Fire to the Rain", artist: "Adele" },
+        { title: "Bohemian Rhapsody", artist: "Queen" },
+        { title: "Ave Maria", artist: "Andrea Bocelli" },
+        { title: "Your Song", artist: "Elton John" },
+        { title: "Still Loving You", artist: "Scorpions" },
+        { title: "Can’t Help Falling in Love", artist: "Elvis Presley" },
       ],
     },
   },

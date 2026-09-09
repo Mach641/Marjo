@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-25-paper-choices";
+const CACHE_NAME = "voyage-majorque-v1-4-26-blind-test";
 const APP_SHELL = [
   "./gameplay-header.js?v=1.4.23",
   "./assets/gameplay/v1-4-23/divider-terracotta.png",
@@ -29,9 +29,9 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.25",
-  "./script.js?v=1.4.25",
-  "./config.js?v=1.4.25",
+  "./styles.css?v=1.4.26",
+  "./script.js?v=1.4.26",
+  "./config.js?v=1.4.26",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",
@@ -43,7 +43,7 @@ const APP_SHELL = [
   "./assets/icons/icon-512-v1.png",
   "./assets/icons/apple-touch-icon-v1.png",
   "./assets/challenge-8/v1-4-10/guitar.png",
-  "./assets/challenge-8/v1-4-10/music-note.png",
+  "./assets/challenge-8/v1-4-26/music-notes.png",
   "./assets/challenge-2/v1-4-12/couple-profile-notebook.png",
   "./assets/challenge-3/v1-4-13/baby-polaroids.png",
   "./assets/challenge-1/v1-4-6/intro-door.png",

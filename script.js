@@ -1,7 +1,7 @@
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.25";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.26";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -421,22 +421,57 @@ function renderChallengeThreeQuestions() {
 function renderBlindTest({ chapterId, songs, onDone }) {
   const progressKey = `blind-test-${chapterId}`;
   let index = Math.min(Number(state.answers[progressKey]) || 0, songs.length - 1);
+  let transitionTimer = null;
+  let disposed = false;
+  cleanupCurrentScreen = () => { disposed = true; clearTimeout(transitionTimer); };
+  const later = (callback, delay) => {
+    transitionTimer = setTimeout(() => { if (!disposed) callback(); }, delay);
+  };
+  const cta = (label, action) => button(label, action, "journey-notebook__cta");
+  const drawFinale = () => {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const colors = ["#c97865", "#dca575", "#e0c783", "#a6b08b", "#92b4c0", "#b6a1bf"];
+    app.innerHTML = `<section class="paper-card blind-test-finale">
+      <svg class="blind-test-finale__rainbow" viewBox="0 0 160 80" aria-hidden="true">
+        ${colors.map((color, i) => `<path d="M ${14+i*7} 70 A ${66-i*7} ${59-i*7} 0 0 1 ${146-i*7} 70" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" style="--rainbow-delay:${i*75}ms" />`).join("")}
+      </svg>
+      <div class="blind-test-finale__message" ${reduced ? "" : "hidden"}>
+        <p>Il y a des chansons qu’on reconnaît en quelques secondes.</p>
+        <p><em>Et d’autres qu’on n’oublie jamais.</em></p>
+        ${cta("Continuer", "finish-blind-test")}
+      </div>
+    </section>`;
+    const showMessage = () => { app.querySelector(".blind-test-finale__message").hidden = false; };
+    if (!reduced) later(showMessage, 1400);
+    bindAction("finish-blind-test", () => {
+      state.answers[progressKey] = songs.length;
+      saveState();
+      onDone();
+    });
+  };
   const drawSong = () => {
     const progress = songs.map((_, songIndex) => `<span class="blind-test-progress__dot${songIndex === index ? " blind-test-progress__dot--active" : ""}"></span>`).join("");
-    app.innerHTML = `<section class="paper-card screen blind-test-song">${index === songs.length - 1 ? `<p class="kicker">Le blind test</p><div class="blind-test-progress" aria-hidden="true">${progress}</div><h1>Chanson ${index + 1}</h1><h2>À toi de jouer !</h2>` : `${gameplayHeader({ theme: "Le blind test", title: `Chanson ${index + 1}`, description: "À toi de jouer !<br>Vincent lance la musique sur la playlist<br>Deezer, écoute bien…" })}<div class="blind-test-progress" aria-hidden="true">${progress}</div>`}<img class="blind-test-song__art" src="assets/challenge-8/v1-4-10/music-note.png" alt="" aria-hidden="true" />${index === songs.length - 1 ? '<p class="blind-test-song__copy">Vincent lance la musique sur la playlist<br>Deezer, écoute bien…</p>' : ""}${button("J’ai trouvé !", "reveal-song")}</section>`;
+    app.innerHTML = `<section class="paper-card screen blind-test-song">${gameplayHeader({ theme: "Le blind test", title: `Chanson ${index + 1}`, description: "À toi de jouer !<br>Vincent lance la musique sur la playlist<br>Deezer, écoute bien…" })}<div class="blind-test-progress" aria-hidden="true">${progress}</div><img class="blind-test-song__art" src="assets/challenge-8/v1-4-26/music-notes.png" alt="" aria-hidden="true" />${cta("J’ai trouvé !", "reveal-song")}</section>`;
     bindAction("reveal-song", () => {
       const song = songs[index];
-      app.innerHTML = page("Révélation", `<div class="notice"><p><strong>Titre</strong><br>${song.title}</p><p><strong>Artiste</strong><br>${song.artist}</p></div>${button("Chanson suivante", "next-song")}`);
-      bindAction("next-song", () => {
+      const last = index === songs.length - 1;
+      app.innerHTML = `<section class="paper-card screen blind-test-reveal"><h1>${song.title}</h1><p>${song.artist}</p>${last ? "" : cta("Chanson suivante", "next-song")}</section>`;
+      if (last) {
+        later(() => {
+          if (matchMedia("(prefers-reduced-motion: reduce)").matches) return drawFinale();
+          app.querySelector(".blind-test-reveal").classList.add("blind-test-reveal--leaving");
+          later(drawFinale, 250);
+        }, 1000);
+      } else bindAction("next-song", () => {
         index += 1;
         state.answers[progressKey] = index;
         saveState();
-        if (index >= songs.length) onDone();
-        else drawSong();
+        drawSong();
       });
     });
   };
   app.innerHTML = challengeIntro({ id: 8, title: "Le blind test", subtitle: "Des chansons qui ont accompagné notre histoire.", image: "assets/challenge-8/v1-4-10/guitar.png", alt: "Une guitare dessinée dans le carnet", copy: "Écoute bien et fais confiance à ta mémoire.<br>À toi de retrouver les chansons.", label: "Commencer le blind test", action: 'data-action="start-blind-test"', footer: "coast" });
+  app.querySelector(".challenge-landing__label").remove();
   bindAction("start-blind-test", drawSong);
 }
 
