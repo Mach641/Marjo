@@ -1,5 +1,7 @@
-const CACHE_NAME = "voyage-majorque-v1-4-28-d1-portrait-prototype";
+const CACHE_NAME = "voyage-majorque-v1-4-29-scrapbook";
 const APP_SHELL = [
+  "./assets/opening/v1-4-17/tape-rose.png",
+  "./assets/opening/v1-4-17/tape-blue.png",
   "./assets/challenge-1/v1-4-28/d1-01-parc-de-vincennes.webp",
   "./d1-portrait-gallery.js?v=1.4.28",
   "./assets/challenge-1/v1-4-27/parc-de-vincennes.png",
@@ -32,9 +34,9 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.28",
-  "./script.js?v=1.4.28",
-  "./config.js?v=1.4.28",
+  "./styles.css?v=1.4.29",
+  "./script.js?v=1.4.29",
+  "./config.js?v=1.4.29",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",

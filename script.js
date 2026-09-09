@@ -2,7 +2,7 @@ import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.28";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.28";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.29";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -244,19 +244,33 @@ function notebookPolaroid(unlocked = false) {
   const face = unlocked && image?.src;
   return `<img src="${NOTEBOOK_ASSETS}/polaroid-back.png" width="645" height="772" alt="" />${face ? `<img class="journey-polaroid__face" src="${image.src}" alt="" />` : '<span class="journey-polaroid__question" aria-hidden="true">?</span>'}`;
 }
+function scrapbookPolaroid({ chapterId, face, annotation = "", action }) {
+  // Only explicit decor thumbnails belong in the notebook, never gallery images.
+  const decor = CONFIG.chapters[chapterId]?.memoryThumbnail;
+  return `<div class="scrapbook-memory"><button class="scrapbook-polaroid" type="button" data-scrapbook-action="${action}" aria-label="${face ? `Revoir le souvenir ${annotation}` : "Découvrir le prochain souvenir"}">
+    ${face && decor ? `<img class="scrapbook-polaroid__image" src="${decor}" alt="" />` : '<span class="scrapbook-polaroid__back" aria-hidden="true">?</span>'}
+    <span class="scrapbook-polaroid__caption">${face ? annotation : ""}</span>
+    ${face && chapterId === 1 ? '<svg class="scrapbook-polaroid__doodle" viewBox="0 0 12 16" aria-hidden="true"><path d="M6 14C3 10 0 6 2 3C4 1 6 5 6 6C7 2 10 1 11 4C12 7 8 11 6 14Z" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>' : ""}
+  </button></div>`;
+}
+
 function renderFirstNotebook(selectedId = null) {
   const unlocked = Boolean(state.completedChallenges[1]);
-  const animateUnlock = unlocked && firstMemoryJustUnlocked;
   firstMemoryJustUnlocked = false;
   const selected = !unlocked && firstNotebookSlots.find(slot => slot.challengeId === selectedId);
-  app.innerHTML = `<section class="journey-notebook${selected ? " journey-notebook--context" : ""}" aria-labelledby="journey-title">
+  app.innerHTML = `<section class="journey-notebook${selected ? " journey-notebook--context" : " journey-notebook--scrapbook"}" aria-labelledby="journey-title">
     <div class="journey-notebook__tabs" aria-hidden="true"><i>♧</i><i>✧</i><i>△</i></div>
     ${selected ? '<button class="journey-notebook__back" type="button" data-action="notebook-back">← Notre voyage</button>' : '<h1 id="journey-title" tabindex="-1">Notre voyage</h1>'}
-    ${selected ? `<div class="journey-polaroid journey-polaroid--large">${notebookPolaroid()}</div><h1 id="journey-title" tabindex="-1">Ce souvenir t’attend…</h1><p class="journey-notebook__copy">Pour le découvrir, il va falloir relever un défi.<br>C’est le premier d’une belle aventure.</p>${button("Commencer le défi 1", "notebook-start", "journey-notebook__cta")}` : `<div class="journey-notebook__grid">${firstNotebookSlots.slice(0, 4).map((slot, index) => index === 0 ? `<div class="journey-notebook__active"><button class="journey-polaroid${animateUnlock ? " journey-polaroid--new-memory" : ""}" type="button" data-challenge="${slot.challengeId}" aria-label="Découvrir le premier souvenir">${notebookPolaroid(unlocked)}<span class="journey-polaroid__accent" aria-hidden="true">╱</span></button><p class="journey-notebook__guide" ${unlocked ? 'style="visibility: hidden" aria-hidden="true"' : ""}>Le premier souvenir est là…<br>mais il faudra relever un défi pour le découvrir.</p></div>` : `<div class="journey-notebook__ghost" data-challenge-slot="${slot.challengeId}" aria-hidden="true"><span>…</span></div>`).join("")}</div><p class="journey-notebook__soon">Il y a encore beaucoup<br>de pages à remplir…</p>`}
-    <img class="journey-notebook__flower" src="${OPENING_ASSETS}/03_fleur_bas_gauche.png" alt="" />
+    ${selected ? `<div class="journey-polaroid journey-polaroid--large">${notebookPolaroid()}</div><h1 id="journey-title" tabindex="-1">Ce souvenir t’attend…</h1><p class="journey-notebook__copy">Pour le découvrir, il va falloir relever un défi.<br>C’est le premier d’une belle aventure.</p>${button("Commencer le défi 1", "notebook-start", "journey-notebook__cta")}` : `<div class="scrapbook-memories">${scrapbookPolaroid({ chapterId: 1, face: unlocked, annotation: "Vincennes", action: unlocked ? "gallery" : "first-challenge" })}${unlocked ? scrapbookPolaroid({ chapterId: CONFIG.routeOrder[1], face: false, action: "continue" }) : ""}</div><p class="journey-notebook__soon">Il y a encore beaucoup<br>de pages à remplir…</p>`}
+    ${selected ? `<img class="journey-notebook__flower" src="${OPENING_ASSETS}/03_fleur_bas_gauche.png" alt="" />` : ""}
   </section>`;
   app.querySelector("#journey-title").focus({ preventScroll: true });
-  app.querySelector("[data-challenge]")?.addEventListener("click", event => unlocked ? navigate("gallery-1") : renderFirstNotebook(Number(event.currentTarget.dataset.challenge)));
+  app.querySelectorAll("[data-scrapbook-action]").forEach(polaroid => polaroid.addEventListener("click", () => {
+    const action = polaroid.dataset.scrapbookAction;
+    if (action === "gallery") navigate("gallery-1");
+    else if (action === "first-challenge") renderFirstNotebook(1);
+    else navigate(state.currentStep);
+  }));
   bindAction("notebook-back", () => renderFirstNotebook());
   bindAction("notebook-start", () => navigate(`challenge-${selected.challengeId}`));
 }
