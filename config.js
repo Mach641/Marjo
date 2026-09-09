@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.27";
+export const APP_VERSION = "1.4.28";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -63,8 +63,9 @@ export const CONFIG = {
       publicChallengeTitle: "Les règles de notre monde",
       galleryTitle: "Stresa",
       letter: "M",
+      memoryThumbnail: "assets/challenge-1/v1-4-27/parc-de-vincennes.png",
       gallery: [
-        { src: "assets/challenge-1/v1-4-27/parc-de-vincennes.png", alt: "Parc de Vincennes" },
+        { src: "assets/challenge-1/v1-4-28/d1-01-parc-de-vincennes.webp", introSrc: "assets/challenge-1/v1-4-27/parc-de-vincennes.png", alt: "Parc de Vincennes" },
         { src: null, label: "PLACEHOLDER — STRESA 2" },
       ],
       // Option future : { enabled: true, src: "assets/audio/...", startMode: "user", volume: 0.8 }

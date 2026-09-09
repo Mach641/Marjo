@@ -1036,3 +1036,26 @@ body:has(.gameplay-header, .blind-test-reveal, .blind-test-finale) > .site-heade
   to { opacity: 1; transform: translateY(0) rotate(-3deg); }
 }
 @media (prefers-reduced-motion: reduce) { .journey-polaroid--new-memory { animation: none; } }
+
+/* Reversible D1 portrait gallery prototype, isolated from other galleries. */
+body:has(.d1-portrait-gallery) > .site-header,
+body:has(.d1-portrait-gallery) > .weather { display: none; }
+body:has(.d1-portrait-gallery) { background: #fae9ce; }
+body:has(.d1-portrait-gallery)::before { opacity: 1; background: url("assets/opening/v1-4-18/01_background_papier.png") center / calc(100% + 8px) calc(100% + 8px) no-repeat; }
+.app:has(.d1-portrait-gallery) { width: 100%; padding: 0; min-height: 100svh; }
+.d1-portrait-gallery { height: 100svh; height: 100dvh; display: grid; grid-template-rows: minmax(0, 1fr) 76px; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); animation: d1-portrait-fade 450ms ease both; }
+.d1-portrait-gallery__track { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; min-height: 0; min-width: 0; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; outline-offset: -3px; }
+.d1-portrait-gallery__track::-webkit-scrollbar { display: none; }
+.d1-portrait-gallery__slide { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; min-width: 0; margin: 0; padding: 20px 12px; scroll-snap-align: center; scroll-snap-stop: always; }
+.d1-portrait-gallery__slide img { display: block; width: 100%; max-height: calc(100svh - 190px); height: auto; object-fit: contain; }
+.d1-portrait-gallery__slide figcaption { font: 13px/1.4 Georgia, serif; color: #776b5d; }
+.d1-portrait-gallery__slide p { padding: 24px; text-align: center; font: 14px/1.5 Georgia, serif; color: #776b5d; }
+.d1-portrait-gallery__actions { display: flex; align-items: center; justify-content: center; padding: 8px 16px 20px; }
+.d1-portrait-gallery__close { min-height: 44px; padding: 10px 18px; border: 0; background: transparent; color: #65543d; font: 16px Georgia, serif; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+@keyframes d1-portrait-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .d1-portrait-gallery { animation: none; } }
+
+.d1-portrait-gallery__scene { position: relative; width: 100%; }
+.d1-portrait-gallery__scene .d1-portrait-gallery__memory { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 800ms ease; }
+.d1-portrait-gallery__scene .d1-portrait-gallery__memory.is-revealed { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .d1-portrait-gallery__scene .d1-portrait-gallery__memory { transition: none; } }

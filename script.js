@@ -1,7 +1,8 @@
+import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.28";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.27";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.28";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -239,7 +240,7 @@ const isFirstNotebook = () => state.currentStep === "challenge-1" || (state.comp
 let firstMemoryJustUnlocked = false;
 const NOTEBOOK_ASSETS = "assets/notebook/v1-4-21";
 function notebookPolaroid(unlocked = false) {
-  const image = CONFIG.chapters[1].gallery[0];
+  const image = { src: CONFIG.chapters[1].memoryThumbnail };
   const face = unlocked && image?.src;
   return `<img src="${NOTEBOOK_ASSETS}/polaroid-back.png" width="645" height="772" alt="" />${face ? `<img class="journey-polaroid__face" src="${image.src}" alt="" />` : '<span class="journey-polaroid__question" aria-hidden="true">?</span>'}`;
 }
@@ -545,7 +546,7 @@ function openChapterGallery(chapterId, nextStep) {
   const chapter = CONFIG.chapters[chapterId];
   const namedGallery = chapterId === 1 || chapterId === 5;
   const accessibleLabel = namedGallery ? `Images — ${chapter.title}` : "Fenêtre sur votre histoire";
-  cleanupCurrentScreen = openGalleryViewer({
+  cleanupCurrentScreen = (chapterId === 1 ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
     accessibleLabel,
     images: chapter.gallery,
     reveal: true,
@@ -565,7 +566,7 @@ function openChapterGalleryReview(chapterId) {
   const chapter = CONFIG.chapters[chapterId];
   if (!state.galleryViewed[chapterId] || !chapter?.gallery) return navigate("book-open", { replace: true });
   const namedGallery = chapterId === 1 || chapterId === 5;
-  cleanupCurrentScreen = openGalleryViewer({
+  cleanupCurrentScreen = (chapterId === 1 ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
     accessibleLabel: `Souvenir — ${chapter.title}`,
     images: chapter.gallery,
     reveal: false,
@@ -714,8 +715,8 @@ const renderers = {
     });
   },
   "resolution-1": () => renderGalleryResolution(1, "Tu t’en souviens.", "Alors laisse-moi te montrer ce que tu n’avais jamais vu.", "Découvrir le souvenir", "gallery-1"),
-  "gallery-1": () => renderGalleryInvitation("travel-past-medium-1"),
-  "travel-past-medium-1": () => renderTravelGallery(1, "past", "medium", "handoff-1"),
+  "gallery-1": () => openChapterGallery(1, "handoff-1"),
+  "travel-past-medium-1": () => openChapterGallery(1, "handoff-1"),
   "handoff-1": () => renderHandoff(1, "challenge-8"),
   "challenge-8": () => state.completedChallenges[8] ? navigate("resolution-8", { advance: true }) : renderBlindTest({ chapterId: 8, songs: CONFIG.chapters[8].songs, onDone: () => completeChallenge(8, "resolution-8") }),
   "resolution-8": () => renderGalleryResolution(8, "Celle-là, garde-la quelque part.", "Certaines chansons savent attendre longtemps.", "Continuer", "gallery-8"),
