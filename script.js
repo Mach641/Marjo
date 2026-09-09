@@ -1,7 +1,7 @@
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.26";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.27";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -235,21 +235,27 @@ function renderMemoryCard(chapterId) {
 
 // The initial spread reserves one slot per challenge; later progression stays unchanged.
 const firstNotebookSlots = Array.from({ length: 8 }, (_, index) => ({ challengeId: index + 1 }));
-const isFirstNotebook = () => state.currentStep === "challenge-1" && !state.completedChallenges[1];
+const isFirstNotebook = () => state.currentStep === "challenge-1" || (state.completedChallenges[1] && ["resolution-1", "gallery-1", "travel-past-medium-1", "handoff-1"].includes(state.currentStep));
+let firstMemoryJustUnlocked = false;
 const NOTEBOOK_ASSETS = "assets/notebook/v1-4-21";
-function notebookPolaroid() {
-  return `<img src="${NOTEBOOK_ASSETS}/polaroid-back.png" width="645" height="772" alt="" /><span class="journey-polaroid__question" aria-hidden="true">?</span>`;
+function notebookPolaroid(unlocked = false) {
+  const image = CONFIG.chapters[1].gallery[0];
+  const face = unlocked && image?.src;
+  return `<img src="${NOTEBOOK_ASSETS}/polaroid-back.png" width="645" height="772" alt="" />${face ? `<img class="journey-polaroid__face" src="${image.src}" alt="" />` : '<span class="journey-polaroid__question" aria-hidden="true">?</span>'}`;
 }
 function renderFirstNotebook(selectedId = null) {
-  const selected = firstNotebookSlots.find(slot => slot.challengeId === selectedId);
+  const unlocked = Boolean(state.completedChallenges[1]);
+  const animateUnlock = unlocked && firstMemoryJustUnlocked;
+  firstMemoryJustUnlocked = false;
+  const selected = !unlocked && firstNotebookSlots.find(slot => slot.challengeId === selectedId);
   app.innerHTML = `<section class="journey-notebook${selected ? " journey-notebook--context" : ""}" aria-labelledby="journey-title">
     <div class="journey-notebook__tabs" aria-hidden="true"><i>♧</i><i>✧</i><i>△</i></div>
     ${selected ? '<button class="journey-notebook__back" type="button" data-action="notebook-back">← Notre voyage</button>' : '<h1 id="journey-title" tabindex="-1">Notre voyage</h1>'}
-    ${selected ? `<div class="journey-polaroid journey-polaroid--large">${notebookPolaroid()}</div><h1 id="journey-title" tabindex="-1">Ce souvenir t’attend…</h1><p class="journey-notebook__copy">Pour le découvrir, il va falloir relever un défi.<br>C’est le premier d’une belle aventure.</p>${button("Commencer le défi 1", "notebook-start", "journey-notebook__cta")}` : `<div class="journey-notebook__grid">${firstNotebookSlots.slice(0, 4).map((slot, index) => index === 0 ? `<div class="journey-notebook__active"><button class="journey-polaroid" type="button" data-challenge="${slot.challengeId}" aria-label="Découvrir le premier souvenir">${notebookPolaroid()}<span class="journey-polaroid__accent" aria-hidden="true">╱</span></button><p class="journey-notebook__guide">Le premier souvenir est là…<br>mais il faudra relever un défi pour le découvrir.</p></div>` : `<div class="journey-notebook__ghost" data-challenge-slot="${slot.challengeId}" aria-hidden="true"><span>…</span></div>`).join("")}</div><p class="journey-notebook__soon">Il y a encore beaucoup<br>de pages à remplir…</p>`}
+    ${selected ? `<div class="journey-polaroid journey-polaroid--large">${notebookPolaroid()}</div><h1 id="journey-title" tabindex="-1">Ce souvenir t’attend…</h1><p class="journey-notebook__copy">Pour le découvrir, il va falloir relever un défi.<br>C’est le premier d’une belle aventure.</p>${button("Commencer le défi 1", "notebook-start", "journey-notebook__cta")}` : `<div class="journey-notebook__grid">${firstNotebookSlots.slice(0, 4).map((slot, index) => index === 0 ? `<div class="journey-notebook__active"><button class="journey-polaroid${animateUnlock ? " journey-polaroid--new-memory" : ""}" type="button" data-challenge="${slot.challengeId}" aria-label="Découvrir le premier souvenir">${notebookPolaroid(unlocked)}<span class="journey-polaroid__accent" aria-hidden="true">╱</span></button><p class="journey-notebook__guide" ${unlocked ? 'style="visibility: hidden" aria-hidden="true"' : ""}>Le premier souvenir est là…<br>mais il faudra relever un défi pour le découvrir.</p></div>` : `<div class="journey-notebook__ghost" data-challenge-slot="${slot.challengeId}" aria-hidden="true"><span>…</span></div>`).join("")}</div><p class="journey-notebook__soon">Il y a encore beaucoup<br>de pages à remplir…</p>`}
     <img class="journey-notebook__flower" src="${OPENING_ASSETS}/03_fleur_bas_gauche.png" alt="" />
   </section>`;
   app.querySelector("#journey-title").focus({ preventScroll: true });
-  app.querySelector("[data-challenge]")?.addEventListener("click", event => renderFirstNotebook(Number(event.currentTarget.dataset.challenge)));
+  app.querySelector("[data-challenge]")?.addEventListener("click", event => unlocked ? navigate("gallery-1") : renderFirstNotebook(Number(event.currentTarget.dataset.challenge)));
   bindAction("notebook-back", () => renderFirstNotebook());
   bindAction("notebook-start", () => navigate(`challenge-${selected.challengeId}`));
 }
@@ -689,7 +695,10 @@ const renderers = {
   "book-closed": renderClosedNotebook,
   "book-open": renderOpenNotebook,
   "challenge-1": () => {
-    if (state.completedChallenges[1]) return navigate("gallery-1", { advance: true });
+    if (state.completedChallenges[1]) {
+      history.replaceState(null, "", "#book-open");
+      return renderFirstNotebook();
+    }
     cleanupCurrentScreen = renderChallengeOne(app, {
       progress: state.challengeOne,
       rules: CONFIG.challengeOne.rules,
@@ -699,7 +708,8 @@ const renderers = {
         state.completedChallenges[1] = true;
         state.currentStep = "gallery-1";
         saveState();
-        navigate("gallery-1", { advance: true });
+        firstMemoryJustUnlocked = true;
+        navigate("book-open", { replace: true });
       },
     });
   },

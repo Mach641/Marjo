@@ -1018,3 +1018,21 @@ body:has(.gameplay-header, .blind-test-reveal, .blind-test-finale) > .site-heade
   .blind-test-finale__rainbow path, .blind-test-finale__message[hidden] { display: block; visibility: hidden; }
 .blind-test-finale__message { animation: none; }
 }
+
+/* D1 only: gallery thumbnail inside the existing taped polaroid. */
+.journey-polaroid img.journey-polaroid__face {
+  position: absolute;
+  left: 13.6%;
+  top: 17.1%;
+  width: 73.3%;
+  height: 59.6%;
+  object-fit: cover;
+  object-position: center;
+  transform: rotate(-7deg);
+}
+.journey-polaroid--new-memory { animation: first-memory-placed 450ms ease-out both; }
+@keyframes first-memory-placed {
+  from { opacity: 0; transform: translateY(6px) rotate(-3deg); }
+  to { opacity: 1; transform: translateY(0) rotate(-3deg); }
+}
+@media (prefers-reduced-motion: reduce) { .journey-polaroid--new-memory { animation: none; } }

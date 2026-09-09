@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.26";
+export const APP_VERSION = "1.4.27";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -64,7 +64,7 @@ export const CONFIG = {
       galleryTitle: "Stresa",
       letter: "M",
       gallery: [
-        { src: null, label: "PLACEHOLDER — STRESA 1" },
+        { src: "assets/challenge-1/v1-4-27/parc-de-vincennes.png", alt: "Parc de Vincennes" },
         { src: null, label: "PLACEHOLDER — STRESA 2" },
       ],
       // Option future : { enabled: true, src: "assets/audio/...", startMode: "user", volume: 0.8 }

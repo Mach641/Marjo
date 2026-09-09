@@ -1,5 +1,6 @@
-const CACHE_NAME = "voyage-majorque-v1-4-26-blind-test";
+const CACHE_NAME = "voyage-majorque-v1-4-27-first-memory";
 const APP_SHELL = [
+  "./assets/challenge-1/v1-4-27/parc-de-vincennes.png",
   "./gameplay-header.js?v=1.4.23",
   "./assets/gameplay/v1-4-23/divider-terracotta.png",
   "./assets/notebook/v1-4-21/cta-terracotta.png",
@@ -29,9 +30,9 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.26",
-  "./script.js?v=1.4.26",
-  "./config.js?v=1.4.26",
+  "./styles.css?v=1.4.27",
+  "./script.js?v=1.4.27",
+  "./config.js?v=1.4.27",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",
