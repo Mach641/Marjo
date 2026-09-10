@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-32-notebook-polish";
+const CACHE_NAME = "voyage-majorque-v1-4-33-larger-polaroids";
 const APP_SHELL = [
   "./assets/notebook/v1-4-32/Kalam-Regular.ttf",
   "./assets/challenge-1/v1-4-30/d1-vincennes-portrait-decor.png",
@@ -37,9 +37,9 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.32",
-  "./script.js?v=1.4.32",
-  "./config.js?v=1.4.32",
+  "./styles.css?v=1.4.33",
+  "./script.js?v=1.4.33",
+  "./config.js?v=1.4.33",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",

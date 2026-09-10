@@ -1086,7 +1086,7 @@ body:has(.d1-portrait-gallery)::before { opacity: 1; background: url("assets/ope
 }
 .journey-notebook--scrapbook .journey-notebook__tabs i:nth-child(2) { background-color: #e1c8b9; transform: translateX(2px) rotate(2deg); }
 .journey-notebook--scrapbook .journey-notebook__tabs i:nth-child(3) { background-color: #cbd6d5; transform: rotate(-2deg); }
-.scrapbook-memories { display: grid; grid-template-columns: 42% 42%; justify-content: center; align-items: start; gap: 26px 6%; padding-top: 4px; }
+.scrapbook-memories { display: grid; width: calc(100% + 12px); margin-inline: -6px; grid-template-columns: 46.5% 46.5%; justify-content: center; align-items: start; gap: 26px 4%; padding-top: 4px; }
 .scrapbook-memory { min-width: 0; position: relative; }
 .scrapbook-memory:nth-child(even) { margin-top: 13px; }
 .scrapbook-polaroid {
