@@ -1122,9 +1122,11 @@ body:has(.d1-portrait-gallery)::before { opacity: 1; background: url("assets/ope
 
 /* D1 first-scene portrait experiment; later slides keep their existing layout. */
 .d1-portrait-gallery:has(.d1-portrait-gallery__slide--immersive) { animation: none; }
-.d1-portrait-gallery--immersive { grid-template-rows: minmax(0, 1fr); }
-.d1-portrait-gallery--immersive .d1-portrait-gallery__actions { display: none; }
-.d1-portrait-gallery__slide--immersive { padding: 0; gap: 0; }
+.d1-portrait-gallery--immersive { position: relative; grid-template-rows: minmax(0, 1fr); }
+.d1-portrait-gallery--immersive .d1-portrait-gallery__actions { position: absolute; left: 0; right: 0; bottom: env(safe-area-inset-bottom); height: 76px; pointer-events: none; }
+.d1-portrait-gallery--immersive .d1-portrait-gallery__close { pointer-events: auto; }
+.d1-portrait-gallery__slide--immersive { position: relative; padding: 0; gap: 0; }
+.d1-portrait-gallery__slide--immersive figcaption { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; }
 .d1-portrait-gallery__slide--immersive .d1-portrait-gallery__scene { width: 100%; height: 100%; }
 .d1-portrait-gallery__slide--immersive .d1-portrait-gallery__scene img { position: absolute; inset: 0; width: 100%; height: 100%; max-height: none; object-fit: contain; object-position: center; }
 
