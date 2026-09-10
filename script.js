@@ -2,7 +2,7 @@ import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.30";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.33";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.34";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -236,7 +236,7 @@ function renderMemoryCard(chapterId) {
 
 // The initial spread reserves one slot per challenge; later progression stays unchanged.
 const firstNotebookSlots = Array.from({ length: 8 }, (_, index) => ({ challengeId: index + 1 }));
-const isFirstNotebook = () => state.currentStep === "challenge-1" || (state.completedChallenges[1] && ["resolution-1", "gallery-1", "travel-past-medium-1", "handoff-1"].includes(state.currentStep));
+const isFirstNotebook = () => state.currentStep === "challenge-1" || (state.completedChallenges[1] && (["resolution-1", "gallery-1", "travel-past-medium-1", "handoff-1"].includes(state.currentStep) || (state.currentStep === "challenge-8" && !state.completedChallenges[8])));
 let firstMemoryJustUnlocked = false;
 const NOTEBOOK_ASSETS = "assets/notebook/v1-4-21";
 function notebookPolaroid(unlocked = false) {
@@ -286,6 +286,23 @@ function renderOpenNotebook() {
   </section>`;
   bindAction("close-notebook", () => navigate("book-closed"));
   app.querySelectorAll("[data-memory]").forEach((memory) => memory.addEventListener("click", () => openChapterGalleryReview(Number(memory.dataset.memory))));
+}
+
+// Shared by real D1 completion and its legacy resolution/debug entry.
+function completeFirstChallenge() {
+  state.started = true;
+  state.onboardingCompleted = true;
+  state.completedChallenges[1] = true;
+  state.challengeOne = { ...state.challengeOne, started: true, phase: "doors", openedDoors: CONFIG.challengeOne.rules.map(rule => rule.id), revealLevel: 3, hintVisible: false };
+  advanceStateTo("gallery-1");
+  saveState();
+  firstMemoryJustUnlocked = true;
+  if (rendering) {
+    // Legacy route aliases are already inside render's re-entry guard.
+    history.replaceState(null, "", "#book-open");
+    updateChrome("book-open");
+    renderFirstNotebook();
+  } else navigate("book-open", { replace: true });
 }
 
 function completeChallenge(id, resolutionStep) {
@@ -599,7 +616,7 @@ function renderHandoff(chapterId, nextStep, message = "Vincent a quelque chose �
     advanceStateTo(nextStep);
     state.newMemoryChapterId = chapterId;
     saveState();
-    navigate("book-closed", { replace: true });
+    navigate(chapterId === 1 ? "book-open" : "book-closed", { replace: true });
   });
 }
 
@@ -718,16 +735,10 @@ const renderers = {
       rules: CONFIG.challengeOne.rules,
       debug: debugMode,
       onChange: (progress) => { state.challengeOne = progress; saveState(); },
-      onComplete: () => {
-        state.completedChallenges[1] = true;
-        state.currentStep = "gallery-1";
-        saveState();
-        firstMemoryJustUnlocked = true;
-        navigate("book-open", { replace: true });
-      },
+      onComplete: completeFirstChallenge,
     });
   },
-  "resolution-1": () => renderGalleryResolution(1, "Tu t’en souviens.", "Alors laisse-moi te montrer ce que tu n’avais jamais vu.", "Découvrir le souvenir", "gallery-1"),
+  "resolution-1": completeFirstChallenge,
   "gallery-1": () => openChapterGallery(1, "handoff-1"),
   "travel-past-medium-1": () => openChapterGallery(1, "handoff-1"),
   "handoff-1": () => renderHandoff(1, "challenge-8"),
