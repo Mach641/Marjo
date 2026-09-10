@@ -1,12 +1,12 @@
-import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.30";
+import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.35";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.34";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.35";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
-import { openGalleryViewer } from "./gallery-viewer.js?v=1.3.2";
+import { openGalleryViewer } from "./gallery-viewer.js?v=1.4.35";
 import { renderRoadTrip } from "./road-trip.js?v=1.4.23";
 import { playTimeTravel } from "./time-travel.js?v=1.3.2";
 
@@ -43,6 +43,7 @@ const defaultState = () => ({
     hintVisible: false,
   },
   galleryViewed: {},
+  revealedScenes: {},
   illustrations: {},
   answers: {},
   geoRiddleSolved: false,
@@ -61,6 +62,7 @@ function loadState() {
     const stored = JSON.parse(localStorage.getItem(stateStorageKey));
     if (stored?.version !== CONFIG.stateVersion) return defaultState();
     const migrated = { ...defaultState(), ...stored };
+    migrated.revealedScenes = stored.revealedScenes && typeof stored.revealedScenes === "object" && !Array.isArray(stored.revealedScenes) ? stored.revealedScenes : {};
     migrated.challengeOne = { ...defaultState().challengeOne, ...(stored.challengeOne || {}) };
     migrated.challengeOne.openedDoors = [...new Set((migrated.challengeOne.openedDoors || []).map(Number).filter((id) => id >= 1 && id <= 6))];
     // Les personnes ayant déjà commencé en V1.3 ne doivent pas revoir l'onboarding.
@@ -229,8 +231,8 @@ function renderClosedNotebook() {
 
 function renderMemoryCard(chapterId) {
   const chapter = CONFIG.chapters[chapterId];
-  const image = chapter.gallery.find((item) => item.src);
-  const visual = image ? `<img src="${image.src}" alt="" />` : '<span class="memory-card__landscape" aria-hidden="true"><i></i></span>';
+  const image = chapter.gallery.find((item) => item.src || item.full);
+  const visual = image ? `<img src="${image.src || image.full}" alt="" />` : '<span class="memory-card__landscape" aria-hidden="true"><i></i></span>';
   return `<button class="memory-card" type="button" data-memory="${chapterId}" aria-label="Revoir le souvenir ${chapter.title}">${visual}<strong>${chapter.title}</strong><small>Toucher pour se souvenir</small></button>`;
 }
 
@@ -579,6 +581,9 @@ function openChapterGallery(chapterId, nextStep) {
   cleanupCurrentScreen = (chapterId === 1 ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
     accessibleLabel,
     images: chapter.gallery,
+    revealedScenes: state.revealedScenes,
+    sceneKeyPrefix: String(chapterId),
+    onRevealScene: () => saveState(),
     reveal: true,
     soundtrack: activeSoundtrack,
     placeholderLabel: namedGallery ? `PLACEHOLDER — ${chapter.title.toUpperCase()}` : "PLACEHOLDER — IMAGE À REMPLACER",
@@ -599,6 +604,9 @@ function openChapterGalleryReview(chapterId) {
   cleanupCurrentScreen = (chapterId === 1 ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
     accessibleLabel: `Souvenir — ${chapter.title}`,
     images: chapter.gallery,
+    revealedScenes: state.revealedScenes,
+    sceneKeyPrefix: String(chapterId),
+    onRevealScene: () => saveState(),
     reveal: false,
     placeholderLabel: namedGallery ? `PLACEHOLDER — ${chapter.title.toUpperCase()}` : "PLACEHOLDER — IMAGE À REMPLACER",
     onClose: () => {

@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.34";
+export const APP_VERSION = "1.4.35";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -65,7 +65,7 @@ export const CONFIG = {
       letter: "M",
       memoryThumbnail: "assets/challenge-1/v1-4-27/parc-de-vincennes.png",
       gallery: [
-        { src: "assets/challenge-1/v1-4-30/d1-vincennes-portrait-characters.png", introSrc: "assets/challenge-1/v1-4-30/d1-vincennes-portrait-decor.png", immersive: true, alt: "Vincent et Marjolaine sur le banc du parc de Vincennes" },
+        { id: "vincennes-01", full: "assets/challenge-1/v1-4-30/d1-vincennes-portrait-characters.png", decor: "assets/challenge-1/v1-4-30/d1-vincennes-portrait-decor.png", immersive: true, alt: "Vincent et Marjolaine sur le banc du parc de Vincennes" },
         { src: null, label: "PLACEHOLDER — STRESA 2" },
       ],
       // Option future : { enabled: true, src: "assets/audio/...", startMode: "user", volume: 0.8 }

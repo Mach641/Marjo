@@ -1056,9 +1056,7 @@ body:has(.d1-portrait-gallery)::before { opacity: 1; background: url("assets/ope
 @media (prefers-reduced-motion: reduce) { .d1-portrait-gallery { animation: none; } }
 
 .d1-portrait-gallery__scene { position: relative; width: 100%; }
-.d1-portrait-gallery__scene .d1-portrait-gallery__memory { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 3000ms ease; }
-.d1-portrait-gallery__scene .d1-portrait-gallery__memory.is-revealed { opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .d1-portrait-gallery__scene .d1-portrait-gallery__memory { transition: none; } }
+.d1-portrait-gallery__scene .d1-portrait-gallery__memory { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
 
 /* Scrapbook composition: open hub only, never the contextual challenge screen. */
 .journey-notebook--scrapbook {
@@ -1138,3 +1136,9 @@ body:has(.d1-portrait-gallery)::before { opacity: 1; background: url("assets/ope
   font-style: normal;
   font-display: swap;
 }
+
+/* Paired layers share geometry; the reveal controller changes only full opacity. */
+.scene-reveal { position: relative; object-fit: contain; object-position: center; }
+.scene-reveal > [data-reveal-full] { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: inherit; object-position: inherit; border-radius: inherit; }
+.landscape-viewer__slide > .scene-reveal { width: 100%; height: 100%; object-fit: contain; object-position: center; }
+.landscape-viewer--reveal .landscape-viewer__slide--paired:first-child { animation: none; }

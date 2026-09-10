@@ -1,4 +1,5 @@
-export function openGalleryViewer({ accessibleLabel = "Fenêtre sur votre histoire", images, onClose, placeholderLabel = "PLACEHOLDER — IMAGE À REMPLACER", reveal = false, soundtrack = null }) {
+import { hasScenePair, sceneMarkup, createSceneReveals } from "./scene-reveal.js?v=1.4.35";
+export function openGalleryViewer({ accessibleLabel = "Fenêtre sur votre histoire", images, onClose, placeholderLabel = "PLACEHOLDER — IMAGE À REMPLACER", reveal = false, soundtrack = null, ...revealOptions }) {
   const viewer = document.createElement("div");
   viewer.className = `landscape-viewer${reveal ? " landscape-viewer--reveal" : ""}`;
   viewer.setAttribute("role", "dialog");
@@ -6,8 +7,8 @@ export function openGalleryViewer({ accessibleLabel = "Fenêtre sur votre histoi
   viewer.innerHTML = `
     <div class="landscape-viewer__orientation" aria-hidden="true">↻ Tourne-moi</div>
     <div class="landscape-viewer__track">
-      ${images.map((image, index) => image.src
-        ? `<figure class="landscape-viewer__slide"><img src="${image.src}" alt="${image.alt || accessibleLabel}" /><figcaption>${index + 1} / ${images.length}</figcaption></figure>`
+      ${images.map((image, index) => image.src || hasScenePair(image)
+        ? `<figure class="landscape-viewer__slide${hasScenePair(image) ? " landscape-viewer__slide--paired" : ""}">${sceneMarkup(image, accessibleLabel)}<figcaption>${index + 1} / ${images.length}</figcaption></figure>`
         : `<figure class="landscape-viewer__slide landscape-viewer__placeholder"><span>${placeholderLabel}</span><figcaption>${index + 1} / ${images.length}</figcaption></figure>`).join("")}
     </div>
     ${soundtrack ? '<button class="landscape-viewer__mute" type="button" aria-label="Couper le son">Son activé</button>' : ""}
@@ -16,6 +17,7 @@ export function openGalleryViewer({ accessibleLabel = "Fenêtre sur votre histoi
   document.body.append(viewer);
   document.body.classList.add("viewer-open");
   const track = viewer.querySelector(".landscape-viewer__track");
+  const reveals = createSceneReveals(track, { images, ...revealOptions });
   const close = viewer.querySelector(".landscape-viewer__close");
   const mute = viewer.querySelector(".landscape-viewer__mute");
   let current = 0;
@@ -39,6 +41,7 @@ export function openGalleryViewer({ accessibleLabel = "Fenêtre sur votre histoi
 
   const update = () => {
     current = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+    reveals.activate(current);
     if (current === images.length - 1) scheduleClose();
     else hideClose();
   };
@@ -48,6 +51,7 @@ export function openGalleryViewer({ accessibleLabel = "Fenêtre sur votre histoi
   const finish = () => {
     if (finished) return;
     finished = true;
+    reveals.dispose();
     clearTimeout(closeTimer);
     viewer.remove();
     document.body.classList.remove("viewer-open");

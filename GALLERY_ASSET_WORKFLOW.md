@@ -56,3 +56,20 @@ Exemple :
 Ne pas remplir `masters/` avec toutes les variantes de travail.
 
 Y stocker uniquement les versions validées comme masters définitifs.
+
+## Paires de révélation (decor / full)
+
+Valider et conserver le décor seul avant d’ajouter les personnages. Le full doit
+reprendre ce décor sans le réinterpréter : mêmes dimensions, ratio et cadrage.
+Aucun repositionnement différent des deux images n’est effectué par la galerie.
+
+Une scène peut déclarer `{ id: "nom-stable", decor: "assets/...", full: "assets/..." }`.
+Les scènes à image unique conservent `{ src: "assets/..." }`. Ajouter explicitement
+les deux chemins au précache de `service-worker.js` lors de chaque intégration.
+
+Le mécanisme partagé `scene-reveal.js` attend le décodage des deux images, puis
+joue 1000 ms de décor seul et 4000 ms de fondu linéaire. `revealedScenes`, dans la
+sauvegarde existante, utilise la clé `chapitre:id` (index si aucun id n’est fourni).
+Garder les ids stables lorsque les scènes sont réordonnées. Une scène visitée,
+même quittée rapidement, affiche ensuite le full immédiatement. Le reset de
+progression efface cette mémoire. La réduction des animations affiche le full.
