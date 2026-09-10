@@ -1069,12 +1069,12 @@ body:has(.d1-portrait-gallery)::before { opacity: 1; background: url("assets/ope
   box-shadow: -4px 2px 0 #c7ad86, 4px 5px 0 #ebd8b5, 5px 6px 0 1px #92775280, 8px 9px 0 #dec5a0, 0 8px 16px #59452d20, inset 5px 0 12px #88643f12;
 }
 .journey-notebook.journey-notebook--scrapbook h1 {
-  flex: none; margin: 0 0 28px; padding: 0; border: 0;
-  font-size: clamp(28px, 7.2vw, 33px);
+  flex: none; margin: 0 0 18px; padding: 0; border: 0;
+  color: #443724; font: 400 clamp(25px, 7vw, 30px)/1.2 "Notebook Title", cursive;
 }
 .journey-notebook--scrapbook h1::after {
-  content: ""; display: block; width: 76px; height: 1px;
-  margin: 10px auto 0; background: #967e5860; transform: rotate(-1deg);
+  content: ""; display: block; width: 144px; height: 16px; margin: 5px auto 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 144 16'%3E%3Cpath d='M3 8L60 8M84 8L141 8M72 14C69 10 65 6 68 3C70 1 72 5 72 6C73 2 76 1 77 4C79 7 74 11 72 14Z' fill='none' stroke='%23896745' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 .journey-notebook--scrapbook .journey-notebook__tabs { right: -17px; top: 76px; gap: 12px; }
 .journey-notebook--scrapbook .journey-notebook__tabs i {
@@ -1086,7 +1086,7 @@ body:has(.d1-portrait-gallery)::before { opacity: 1; background: url("assets/ope
 }
 .journey-notebook--scrapbook .journey-notebook__tabs i:nth-child(2) { background-color: #e1c8b9; transform: translateX(2px) rotate(2deg); }
 .journey-notebook--scrapbook .journey-notebook__tabs i:nth-child(3) { background-color: #cbd6d5; transform: rotate(-2deg); }
-.scrapbook-memories { display: grid; grid-template-columns: 38% 38%; justify-content: space-around; align-items: start; gap: 26px 0; padding-top: 10px; }
+.scrapbook-memories { display: grid; grid-template-columns: 42% 42%; justify-content: center; align-items: start; gap: 26px 6%; padding-top: 4px; }
 .scrapbook-memory { min-width: 0; position: relative; }
 .scrapbook-memory:nth-child(even) { margin-top: 13px; }
 .scrapbook-polaroid {
@@ -1129,3 +1129,12 @@ body:has(.d1-portrait-gallery)::before { opacity: 1; background: url("assets/ope
 .d1-portrait-gallery__slide--immersive { padding: 0; gap: 0; }
 .d1-portrait-gallery__slide--immersive .d1-portrait-gallery__scene { width: 100%; height: 100%; }
 .d1-portrait-gallery__slide--immersive .d1-portrait-gallery__scene img { position: absolute; inset: 0; width: 100%; height: 100%; max-height: none; object-fit: contain; object-position: center; }
+
+/* Dedicated real regular weight for the open notebook title only. */
+@font-face {
+  font-family: "Notebook Title";
+  src: url("assets/notebook/v1-4-32/Kalam-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
