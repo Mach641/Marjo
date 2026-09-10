@@ -1,5 +1,7 @@
-const CACHE_NAME = "voyage-majorque-v1-4-35-scene-reveals";
+const CACHE_NAME = "voyage-majorque-v1-4-36-duomo";
 const APP_SHELL = [
+  "./assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png",
+  "./assets/challenge-1/v1-4-36/d1-duomo-portrait-full.png",
   "./scene-reveal.js?v=1.4.35",
   "./assets/notebook/v1-4-32/Kalam-Regular.ttf",
   "./assets/challenge-1/v1-4-30/d1-vincennes-portrait-decor.png",
@@ -39,8 +41,8 @@ const APP_SHELL = [
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
   "./styles.css?v=1.4.35",
-  "./script.js?v=1.4.35",
-  "./config.js?v=1.4.35",
+  "./script.js?v=1.4.36",
+  "./config.js?v=1.4.36",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",
