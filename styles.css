@@ -1056,7 +1056,7 @@ body:has(.d1-portrait-gallery)::before { opacity: 1; background: url("assets/ope
 @media (prefers-reduced-motion: reduce) { .d1-portrait-gallery { animation: none; } }
 
 .d1-portrait-gallery__scene { position: relative; width: 100%; }
-.d1-portrait-gallery__scene .d1-portrait-gallery__memory { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 800ms ease; }
+.d1-portrait-gallery__scene .d1-portrait-gallery__memory { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 3000ms ease; }
 .d1-portrait-gallery__scene .d1-portrait-gallery__memory.is-revealed { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .d1-portrait-gallery__scene .d1-portrait-gallery__memory { transition: none; } }
 
