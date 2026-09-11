@@ -2,7 +2,7 @@ import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.37";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.39";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.40";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -290,12 +290,16 @@ function renderOpenNotebook() {
   app.querySelectorAll("[data-memory]").forEach((memory) => memory.addEventListener("click", () => openChapterGalleryReview(Number(memory.dataset.memory))));
 }
 
-// Shared by real D1 completion and its legacy resolution/debug entry.
-function completeFirstChallenge() {
+// Canonical completion state shared by D1, its debug entry and its handover.
+function markFirstChallengeCompleted() {
   state.started = true;
   state.onboardingCompleted = true;
   state.completedChallenges[1] = true;
   state.challengeOne = { ...state.challengeOne, started: true, phase: "doors", openedDoors: CONFIG.challengeOne.rules.map(rule => rule.id), revealLevel: 3, hintVisible: false };
+}
+
+function completeFirstChallenge() {
+  markFirstChallengeCompleted();
   advanceStateTo("gallery-1");
   saveState();
   firstMemoryJustUnlocked = true;
@@ -626,6 +630,10 @@ function renderHandoff(chapterId, nextStep, message = "Vincent a quelque chose �
     <button class="d1-handover__cta" type="button" data-action="have-it">Je l’ai</button>
   </section>` : `<section class="paper-card screen">${rainbowGuide("Il en reste une.")}<p>${message}</p>${button("Je l’ai", "have-it")}</section>`;
   bindAction("have-it", () => {
+    if (chapterId === 1) {
+      markFirstChallengeCompleted();
+      state.galleryViewed[1] = true;
+    }
     state.illustrations[chapterId] = true;
     advanceStateTo(nextStep);
     state.newMemoryChapterId = chapterId;

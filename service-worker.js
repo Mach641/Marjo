@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-39-d1-hub-return";
+const CACHE_NAME = "voyage-majorque-v1-4-40-d1-complete-state";
 const APP_SHELL = [
   "./assets/challenge-1/v1-4-38/d1-handover.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png",
@@ -42,8 +42,8 @@ const APP_SHELL = [
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
   "./styles.css?v=1.4.38",
-  "./script.js?v=1.4.39",
-  "./config.js?v=1.4.39",
+  "./script.js?v=1.4.40",
+  "./config.js?v=1.4.40",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",
