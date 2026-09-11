@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.41";
+export const APP_VERSION = "1.4.42";
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -285,5 +285,5 @@ export const STEPS = [
   "reveal-5", "gallery-5", "travel-future-small-5", "handoff-5", "challenge-6", "resolution-6",
   "reveal-6", "gallery-6", "travel-future-medium-6", "handoff-6", "challenge-7", "resolution-7",
   "gallery-7", "travel-future-medium-7", "handoff-7", "travel-past-large-return", "saturday-evening",
-  "majorca", "order", "letters-clue", "password", "final",
+  "challenge-4", "resolution-4", "gallery-4", "handoff-4", "majorca", "order", "letters-clue", "password", "final",
 ].map((id) => ({ id, label: id.replaceAll("-", " ") }));

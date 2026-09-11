@@ -2,7 +2,7 @@ import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.37";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.41";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.42";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -70,6 +70,9 @@ function loadState() {
       migrated.onboardingCompleted = Boolean(stored.started || stored.currentStep !== "welcome");
       if (migrated.onboardingCompleted && ["welcome", "prologue"].includes(migrated.currentStep)) migrated.currentStep = "challenge-1";
     }
+    CONFIG.routeOrder.forEach(id => {
+      if (migrated.illustrations[id]) migrated.completedChallenges[id] = true;
+    });
     return migrated;
   } catch { return defaultState(); }
 }
@@ -206,40 +209,28 @@ function notebookDecorations(count) {
   return `${tabs}${papers}${count ? '<span class="closed-notebook__photo" aria-hidden="true"></span>' : ""}${count >= 4 ? '<span class="closed-notebook__flower" aria-hidden="true">✿</span>' : ""}`;
 }
 
-function renderClosedNotebook() {
-  if (isFirstNotebook()) {
+// Legacy book URLs converge on the single canonical hub.
+function renderClosedNotebook() { return showNotebook(); }
+function renderOpenNotebook() { return renderFirstNotebook(); }
+
+const firstNotebookSlots = CONFIG.routeOrder.map(challengeId => ({ challengeId }));
+let pendingNotebookReveal = null;
+// Entry routes retain the existing date, departure and Saturday narrative gates.
+const challengeEntry = { 1: "challenge-1", 8: "challenge-8", 2: "thursday-lock", 3: "challenge-3", 5: "friday-lock", 6: "challenge-6", 7: "challenge-7", 4: "travel-past-large-return" };
+const souvenirRoute = id => `gallery-${id}`;
+const nextChapter = id => CONFIG.routeOrder[CONFIG.routeOrder.indexOf(id) + 1];
+function notebookChapterIds() {
+  return CONFIG.routeOrder.filter((id, index) => state.completedChallenges[id] ||
+    CONFIG.routeOrder.slice(0, index).every(previous => state.illustrations[previous]));
+}
+function showNotebook() {
+  if (rendering) {
     history.replaceState(null, "", "#book-open");
+    updateChrome("book-open");
     return renderFirstNotebook();
   }
-  const memories = unlockedMemoryIds();
-  const status = hubCopy();
-  const enriched = Boolean(state.newMemoryChapterId);
-  const book = `<span class="closed-notebook closed-notebook--level-${Math.min(4, memories.length)}${enriched ? " closed-notebook--new-memory" : ""}">
-    ${notebookDecorations(memories.length)}
-    <span class="closed-notebook__pages"></span>
-    <span class="closed-notebook__cover"><span class="closed-notebook__rainbow" aria-hidden="true">⌒</span><strong>Notre carnet</strong><small>Marjo &amp; Vincent</small><span class="closed-notebook__strap"></span></span>
-  </span>`;
-  app.innerHTML = `<section class="notebook-hub screen">
-    <div class="notebook-hub__guide">${rainbowGuide(status.message)}</div>
-    ${memories.length ? `<button class="notebook-touch" type="button" data-action="open-notebook" aria-label="Ouvrir le carnet et revoir mes souvenirs">${book}<span>Toucher le carnet pour le feuilleter</span></button>` : `<div class="notebook-touch notebook-touch--still">${book}</div>`}
-    ${status.cta ? button(status.cta, "continue-journey") : '<p class="notebook-hub__waiting">Le carnet se souviendra de l’endroit où vous vous êtes arrêtés.</p>'}
-  </section>`;
-  bindAction("open-notebook", () => navigate("book-open"));
-  bindAction("continue-journey", () => navigate(state.currentStep));
-  if (enriched) { state.newMemoryChapterId = null; saveState(); }
+  navigate("book-open", { replace: true });
 }
-
-function renderMemoryCard(chapterId) {
-  const chapter = CONFIG.chapters[chapterId];
-  const image = chapter.gallery.find((item) => item.src || item.full);
-  const visual = image ? `<img src="${image.src || image.full}" alt="" />` : '<span class="memory-card__landscape" aria-hidden="true"><i></i></span>';
-  return `<button class="memory-card" type="button" data-memory="${chapterId}" aria-label="Revoir le souvenir ${chapter.title}">${visual}<strong>${chapter.title}</strong><small>Toucher pour se souvenir</small></button>`;
-}
-
-// The initial spread reserves one slot per challenge; later progression stays unchanged.
-const firstNotebookSlots = Array.from({ length: 8 }, (_, index) => ({ challengeId: index + 1 }));
-const isFirstNotebook = () => state.newMemoryChapterId === 1 || state.currentStep === "challenge-1" || (state.completedChallenges[1] && (["resolution-1", "gallery-1", "travel-past-medium-1", "handoff-1"].includes(state.currentStep) || (state.currentStep === "challenge-8" && !state.completedChallenges[8])));
-let firstMemoryJustUnlocked = false;
 const NOTEBOOK_ASSETS = "assets/notebook/v1-4-21";
 function notebookPolaroid(unlocked = false) {
   const image = { src: CONFIG.chapters[1].memoryThumbnail };
@@ -249,8 +240,8 @@ function notebookPolaroid(unlocked = false) {
 function scrapbookPolaroid({ chapterId, face, annotation = "", action, flip = false }) {
   // Only explicit decor thumbnails belong in the notebook, never gallery images.
   const decor = CONFIG.chapters[chapterId]?.memoryThumbnail;
-  return `<div class="scrapbook-memory"><button class="scrapbook-polaroid${flip ? " scrapbook-polaroid--reveal" : ""}" type="button" data-scrapbook-action="${action}" aria-label="${face ? `Revoir le souvenir ${annotation}` : "Découvrir le prochain souvenir"}">
-    ${face && decor ? `<img class="scrapbook-polaroid__image" src="${decor}" alt="" />` : '<span class="scrapbook-polaroid__back" aria-hidden="true">?</span>'}
+  return `<div class="scrapbook-memory"><button class="scrapbook-polaroid${flip ? " scrapbook-polaroid--reveal" : ""}" type="button" data-chapter="${chapterId}" data-scrapbook-action="${action}" aria-label="${face ? `Revoir le souvenir ${annotation}` : "Découvrir le prochain souvenir"}">
+    ${face ? (decor ? `<img class="scrapbook-polaroid__image" src="${decor}" alt="" />` : '<span class="scrapbook-polaroid__image" aria-hidden="true"></span>') : '<span class="scrapbook-polaroid__back" aria-hidden="true">?</span>'}
     <span class="scrapbook-polaroid__caption">${face ? annotation : ""}</span>
     ${flip ? '<span class="scrapbook-polaroid__reverse" aria-hidden="true"><span class="scrapbook-polaroid__back">?</span></span>' : ""}
   </button></div>`;
@@ -258,38 +249,36 @@ function scrapbookPolaroid({ chapterId, face, annotation = "", action, flip = fa
 
 function renderFirstNotebook(selectedId = null) {
   const unlocked = Boolean(state.completedChallenges[1]);
-  const flip = unlocked && firstMemoryJustUnlocked && !state.illustrations[1];
-  firstMemoryJustUnlocked = false;
+  const revealId = pendingNotebookReveal;
+  pendingNotebookReveal = null;
   const selected = !unlocked && firstNotebookSlots.find(slot => slot.challengeId === selectedId);
   app.innerHTML = `<section class="journey-notebook${selected ? " journey-notebook--context" : " journey-notebook--scrapbook"}" aria-labelledby="journey-title">
     <div class="journey-notebook__tabs" aria-hidden="true"><i>♧</i><i>✧</i><i>△</i></div>
     ${selected ? '<button class="journey-notebook__back" type="button" data-action="notebook-back">← Notre voyage</button>' : '<h1 id="journey-title" tabindex="-1">NOTRE VOYAGE</h1>'}
-    ${selected ? `<div class="journey-polaroid journey-polaroid--large">${notebookPolaroid()}</div><h1 id="journey-title" tabindex="-1">Ce souvenir t’attend…</h1><p class="journey-notebook__copy">Pour le découvrir, il va falloir relever un défi.<br>C’est le premier d’une belle aventure.</p>${button("Commencer le défi 1", "notebook-start", "journey-notebook__cta")}` : `<div class="scrapbook-memories">${scrapbookPolaroid({ chapterId: 1, face: unlocked, annotation: "Etre un couple", flip, action: unlocked ? "gallery" : "first-challenge" })}${unlocked && state.illustrations[1] ? scrapbookPolaroid({ chapterId: CONFIG.routeOrder[1], face: false, action: "continue" }) : ""}</div><p class="journey-notebook__soon">Il y a encore beaucoup<br>de pages à remplir…</p>`}
+    ${selected ? `<div class="journey-polaroid journey-polaroid--large">${notebookPolaroid()}</div><h1 id="journey-title" tabindex="-1">Ce souvenir t’attend…</h1><p class="journey-notebook__copy">Pour le découvrir, il va falloir relever un défi.<br>C’est le premier d’une belle aventure.</p>${button("Commencer le défi 1", "notebook-start", "journey-notebook__cta")}` : `<div class="scrapbook-memories">${notebookChapterIds().map(chapterId => scrapbookPolaroid({ chapterId, face: Boolean(state.completedChallenges[chapterId]), annotation: chapterId === 1 ? "Etre un couple" : CONFIG.chapters[chapterId].title, flip: chapterId === revealId && !state.illustrations[chapterId], action: state.completedChallenges[chapterId] ? "gallery" : chapterId === 1 ? "first-challenge" : "continue" })).join("")}</div><p class="journey-notebook__soon">Il y a encore beaucoup<br>de pages à remplir…</p>${state.illustrations[4] ? button("Continuer le voyage", "notebook-finale", "quiet-button") : ""}`}
     ${selected ? `<img class="journey-notebook__flower" src="${OPENING_ASSETS}/03_fleur_bas_gauche.png" alt="" />` : ""}
   </section>`;
   app.querySelector("#journey-title").focus({ preventScroll: true });
+  // Later rewards must remain visible when the existing two-column grid grows.
+  const activeCard = app.querySelector(".scrapbook-polaroid--reveal") || app.querySelector('[data-scrapbook-action="continue"]');
+  if (activeCard && activeCard.getBoundingClientRect().bottom > innerHeight - 76) {
+    activeCard.scrollIntoView({ block: "center", behavior: "instant" });
+  }
   app.querySelectorAll("[data-scrapbook-action]").forEach(polaroid => polaroid.addEventListener("click", () => {
     const action = polaroid.dataset.scrapbookAction;
-    if (action === "gallery") navigate("gallery-1");
+    const chapterId = Number(polaroid.dataset.chapter);
+    if (action === "gallery") navigate(souvenirRoute(chapterId), { advance: true });
     else if (action === "first-challenge") renderFirstNotebook(1);
-    else navigate(state.currentStep);
+    else {
+      const entry = challengeEntry[chapterId];
+      const challenge = chapterId === 4 ? "saturday-evening" : `challenge-${chapterId}`;
+      const resumedEntry = stepIndex(state.currentStep) >= stepIndex(entry) && stepIndex(state.currentStep) <= stepIndex(challenge) ? state.currentStep : entry;
+      navigate(resumedEntry, { advance: true });
+    }
   }));
+  bindAction("notebook-finale", () => navigate("order", { advance: true }));
   bindAction("notebook-back", () => renderFirstNotebook());
   bindAction("notebook-start", () => navigate(`challenge-${selected.challengeId}`));
-}
-
-function renderOpenNotebook() {
-  if (isFirstNotebook()) return renderFirstNotebook();
-  const memories = unlockedMemoryIds();
-  const spreads = [];
-  for (let index = 0; index < memories.length; index += 2) spreads.push(memories.slice(index, index + 2));
-  const pages = spreads.map((spread) => `<section class="open-notebook__spread"><div class="open-notebook__page">${renderMemoryCard(spread[0])}<span class="paper-doodle" aria-hidden="true">⌒</span></div><div class="open-notebook__page">${spread[1] ? renderMemoryCard(spread[1]) : '<p class="notebook-soon">D’autres souvenirs arriveront bientôt…</p>'}</div></section>`).join("");
-  app.innerHTML = `<section class="open-notebook screen">
-    <header class="open-notebook__header"><div><p class="kicker">Carnet ouvert</p><h1>Mes souvenirs</h1></div><button class="open-notebook__close" type="button" data-action="close-notebook" aria-label="Refermer le carnet">Fermer <span aria-hidden="true">×</span></button></header>
-    ${memories.length ? `<div class="open-notebook__track">${pages}</div><p class="open-notebook__hint">Fais glisser pour feuilleter les pages.</p>` : '<div class="open-notebook__empty"><p>Les premières pages attendent encore leur histoire.</p></div>'}
-  </section>`;
-  bindAction("close-notebook", () => navigate("book-closed"));
-  app.querySelectorAll("[data-memory]").forEach((memory) => memory.addEventListener("click", () => openChapterGalleryReview(Number(memory.dataset.memory))));
 }
 
 // Canonical completion state shared by D1, its debug entry and its handover.
@@ -300,24 +289,36 @@ function markFirstChallengeCompleted() {
   state.challengeOne = { ...state.challengeOne, started: true, phase: "doors", openedDoors: CONFIG.challengeOne.rules.map(rule => rule.id), revealLevel: 3, hintVisible: false };
 }
 
-function completeFirstChallenge() {
-  const newlyCompleted = !state.completedChallenges[1];
-  markFirstChallengeCompleted();
-  advanceStateTo("gallery-1");
+function completeFirstChallenge() { completeChallenge(1); }
+
+// completedChallenges = reward revealed; illustrations = physical souvenir finished.
+// The transient event animates once. Persisted completion prevents replay on reload.
+function completeChallenge(id) {
+  const newlyCompleted = !state.completedChallenges[id];
+  if (id === 1) markFirstChallengeCompleted();
+  else {
+    state.started = true;
+    state.onboardingCompleted = true;
+    state.completedChallenges[id] = true;
+  }
+  advanceStateTo(souvenirRoute(id));
   saveState();
-  firstMemoryJustUnlocked = newlyCompleted;
-  if (rendering) {
-    // Legacy route aliases are already inside render's re-entry guard.
-    history.replaceState(null, "", "#book-open");
-    updateChrome("book-open");
-    renderFirstNotebook();
-  } else navigate("book-open", { replace: true });
+  pendingNotebookReveal = newlyCompleted ? id : null;
+  showNotebook();
 }
 
-function completeChallenge(id, resolutionStep) {
+function finishSouvenir(id) {
+  state.started = true;
+  state.onboardingCompleted = true;
+  if (id === 1) markFirstChallengeCompleted();
   state.completedChallenges[id] = true;
+  state.galleryViewed[id] = true;
+  state.illustrations[id] = true;
+  const next = nextChapter(id);
+  advanceStateTo(next ? challengeEntry[next] : "order");
+  state.newMemoryChapterId = id;
   saveState();
-  navigate(resolutionStep, { advance: true });
+  showNotebook();
 }
 
 function renderChoiceSequence({ chapterId, title, items, enforceCorrect = false, revealCorrect = false, onDone, decorate }) {
@@ -374,7 +375,7 @@ function renderCoupleProfileChallenge() {
   cleanupCurrentScreen = () => { disposed = true; clearTimeout(feedbackTimer); };
   const questions = CONFIG.chapters[2].questions;
   const progress = coupleProfileProgress();
-  if (progress.questionIndex >= questions.length) return completeChallenge(2, "analysis-2");
+  if (progress.questionIndex >= questions.length) return completeChallenge(2);
   const question = questions[progress.questionIndex];
   const playerName = progress.activePlayer === "marjolaine" ? "Marjolaine" : "Vincent";
   const questionProgress = questions.map((_, index) => `<span class="blind-test-progress__dot${index === progress.questionIndex ? " blind-test-progress__dot--active" : ""}"></span>`).join("");
@@ -404,7 +405,7 @@ function renderCoupleProfileChallenge() {
       progress.questionIndex += 1;
       progress.activePlayer = "marjolaine";
       saveState();
-      if (progress.questionIndex >= questions.length) completeChallenge(2, "analysis-2");
+      if (progress.questionIndex >= questions.length) completeChallenge(2);
       else renderCoupleProfileChallenge();
     }, 500);
   }));
@@ -428,7 +429,7 @@ function renderCoupleProfileResults() {
   const result = (name, key) => `<article class="couple-result"><h2>${name}</h2><div class="couple-result__symbol" aria-hidden="true">${profiles[key].symbol}</div><h3>${profiles[key].name}</h3><p>${profiles[key].description}</p></article>`;
   const crossedComment = marjolaineKey === vincentKey ? "Même profil.<br>Ça explique probablement beaucoup de choses." : "Pas tout à fait le même profil…<br>mais visiblement la même équipe.";
   app.innerHTML = page("Votre profil de couple", `<div class="couple-results">${result("Marjolaine", marjolaineKey)}${result("Vincent", vincentKey)}</div><p class="couple-results__comment">${crossedComment}</p><p class="couple-results__diagnostic">${CONFIG.text.diagnostic}</p>${button("Continuer", "continue")}`);
-  bindAction("continue", () => navigate("gallery-2", { advance: true }));
+  bindAction("continue", () => renderGalleryInvitation("travel-past-medium"));
 }
 
 function renderChallengeThreeIntro() {
@@ -456,7 +457,7 @@ function renderChallengeThreeQuestions() {
       app.querySelector(".challenge-three-feedback").innerHTML = `<p><strong>${correct ? "Bien vu !" : "Presque !"}</strong><br>C’était ${photo.answer}.</p>${button("Suivant →", "next-baby-photo")}`;
       bindAction("next-baby-photo", () => {
         index += 1;
-        if (index >= photos.length) completeChallenge(3, "resolution-3");
+        if (index >= photos.length) completeChallenge(3);
         else draw();
       });
     }, { once: true }));
@@ -624,25 +625,15 @@ function openChapterGalleryReview(chapterId) {
   });
 }
 
-function renderHandoff(chapterId, nextStep, message = "Vincent a quelque chose à te remettre.") {
-  app.innerHTML = chapterId === 1 ? `<section class="d1-handover" aria-labelledby="d1-handover-title">
+function renderHandoff(chapterId) {
+  app.innerHTML = `<section class="d1-handover" aria-labelledby="d1-handover-title">
     <h1 id="d1-handover-title">Ce souvenir n’est pas tout à fait terminé.</h1>
     <div class="d1-handover__divider" aria-hidden="true"><img src="assets/gameplay/v1-4-23/divider-terracotta.png" alt="" /></div>
     <p>Vincent a encore quelque chose pour toi.</p>
     <img class="d1-handover__illustration" src="assets/challenge-1/v1-4-38/d1-handover.png" alt="Une enveloppe contenant un souvenir passe des mains de Vincent à celles de Marjolaine." />
     <button class="d1-handover__cta" type="button" data-action="have-it">Je l’ai</button>
-  </section>` : `<section class="paper-card screen">${rainbowGuide("Il en reste une.")}<p>${message}</p>${button("Je l’ai", "have-it")}</section>`;
-  bindAction("have-it", () => {
-    if (chapterId === 1) {
-      markFirstChallengeCompleted();
-      state.galleryViewed[1] = true;
-    }
-    state.illustrations[chapterId] = true;
-    advanceStateTo(nextStep);
-    state.newMemoryChapterId = chapterId;
-    saveState();
-    navigate(chapterId === 1 ? "book-open" : "book-closed", { replace: true });
-  });
+  </section>`;
+  bindAction("have-it", () => finishSouvenir(chapterId));
 }
 
 function renderTravel(direction, intensity, next) {
@@ -731,16 +722,15 @@ function renderAnalysis() {
 
 function renderMajorca() {
   app.innerHTML = page("Le présent vous attendait exactement ici.", `${button("Je l’ai", "have-it")}`, { className: "majorca-screen" });
-  bindAction("have-it", () => { state.illustrations[4] = true; saveState(); navigate("order", { advance: true }); });
+  bindAction("have-it", () => finishSouvenir(4));
 }
 
 function renderSaturdayEvening() {
-  if (state.majorcaMomentSeen) return navigate("majorca", { advance: true, replace: true });
+  if (state.completedChallenges[4]) return showNotebook();
   state.majorcaMomentSeen = true;
-  if (stepIndex("majorca") > currentStepIndex()) state.currentStep = "majorca";
   saveState();
-  history.replaceState(null, "", "#majorca");
-  app.innerHTML = page("Samedi soir", `<p><strong>Marche jusqu’au banc.</strong></p>`, { guide: "Pour une fois, ne cherche pas le futur. Il suffit de regarder devant toi.", className: "majorca-screen" });
+  app.innerHTML = page("Samedi soir", `<p><strong>Marche jusqu’au banc.</strong></p>${button("Continuer", "complete-majorca")}`, { guide: "Pour une fois, ne cherche pas le futur. Il suffit de regarder devant toi.", className: "majorca-screen" });
+  bindAction("complete-majorca", () => completeChallenge(4));
 }
 
 const renderers = {
@@ -766,12 +756,12 @@ const renderers = {
   "resolution-1": completeFirstChallenge,
   "gallery-1": () => openChapterGallery(1, "handoff-1"),
   "travel-past-medium-1": () => openChapterGallery(1, "handoff-1"),
-  "handoff-1": () => renderHandoff(1, "challenge-8"),
-  "challenge-8": () => state.completedChallenges[8] ? navigate("resolution-8", { advance: true }) : renderBlindTest({ chapterId: 8, songs: CONFIG.chapters[8].songs, onDone: () => completeChallenge(8, "resolution-8") }),
-  "resolution-8": () => renderGalleryResolution(8, "Celle-là, garde-la quelque part.", "Certaines chansons savent attendre longtemps.", "Continuer", "gallery-8"),
+  "handoff-1": () => renderHandoff(1),
+  "challenge-8": () => state.completedChallenges[8] ? navigate("resolution-8", { advance: true }) : renderBlindTest({ chapterId: 8, songs: CONFIG.chapters[8].songs, onDone: () => completeChallenge(8) }),
+  "resolution-8": () => completeChallenge(8),
   "gallery-8": () => renderGalleryInvitation("travel-future-large"),
   "travel-future-large": () => renderTravelGallery(8, "future", "large", "handoff-8"),
-  "handoff-8": () => renderHandoff(8, "thursday-lock"),
+  "handoff-8": () => renderHandoff(8),
   "thursday-lock": () => renderDayLock("thursday"),
   "travel-past-large": () => renderTravel("past", "large", "friday-returned"),
   "friday-returned": () => { app.innerHTML = `<section class="paper-card screen">${rainbowGuide("Bon. Revenons à aujourd’hui.")}${button("Continuer", "continue")}</section>`; bindAction("continue", () => navigate("geo", { advance: true })); },
@@ -786,51 +776,56 @@ const renderers = {
   },
   flight: () => { app.innerHTML = page("Quelque part au-dessus des nuages", `<div class="plane" aria-hidden="true">✈</div>${button("Poursuivre le voyage", "continue")}`, { guide: "Tu vois ? Même les nuages ont des pages." }); bindAction("continue", () => navigate("challenge-2", { advance: true })); },
   "challenge-2": () => state.completedChallenges[2] ? navigate("analysis-2", { advance: true }) : renderCoupleProfileIntro(),
-  "analysis-2": renderAnalysis,
-  "resolution-2": renderCoupleProfileResults,
-  "gallery-2": () => renderGalleryInvitation("travel-past-medium"),
+  "analysis-2": () => completeChallenge(2),
+  "resolution-2": () => completeChallenge(2),
+  "gallery-2": renderCoupleProfileResults,
   "travel-past-medium": () => renderTravelGallery(2, "past", "medium", "handoff-2"),
-  "handoff-2": () => renderHandoff(2, "challenge-3"),
+  "handoff-2": () => renderHandoff(2),
   "challenge-3": () => state.completedChallenges[3] ? navigate("resolution-3", { advance: true }) : renderChallengeThreeIntro(),
-  "resolution-3": () => renderGalleryResolution(3, "Bon…", "Tu reconnais quand même tes enfants.", "Continuer", "gallery-3"),
+  "resolution-3": () => completeChallenge(3),
   "gallery-3": () => renderGalleryInvitation("travel-future-small"),
   "travel-future-small": () => renderTravelGallery(3, "future", "small", "handoff-3"),
-  "handoff-3": () => renderHandoff(3, "friday-lock"),
+  "handoff-3": () => renderHandoff(3),
   "friday-lock": () => renderDayLock("friday"),
   "saturday-intro": () => { app.innerHTML = page("Bonjour, samedi", `<p>Tu as bien dormi ? Moi, j’ai rêvé d’un camping-car.</p>${button("Prendre la route", "continue")}`); bindAction("continue", () => navigate("challenge-5", { advance: true })); },
   "challenge-5": () => {
+    if (state.completedChallenges[5]) return showNotebook();
     const trip = state.answers["chapter-5"] ||= { started: false, choices: [], phase: "choice" };
-    cleanupCurrentScreen = renderRoadTrip(app, trip, saveState, () => completeChallenge(5, "resolution-5"));
+    cleanupCurrentScreen = renderRoadTrip(app, trip, saveState, () => completeChallenge(5));
   },
-  "resolution-5": () => renderGalleryResolution(5, "Voilà. On y est.", "L’arc-en-ciel prétend qu’il avait tout prévu.", "Continuer", "reveal-5"),
-  "reveal-5": () => renderResolution("Une vie possible.", "", "Regarder", "gallery-5"),
+  "resolution-5": () => completeChallenge(5),
+  "reveal-5": () => completeChallenge(5),
   "gallery-5": () => renderGalleryInvitation("travel-future-small-5"),
   "travel-future-small-5": () => renderTravelGallery(5, "future", "small", "handoff-5"),
-  "handoff-5": () => renderHandoff(5, "challenge-6"),
+  "handoff-5": () => renderHandoff(5),
   "challenge-6": () => {
     if (state.completedChallenges[6]) return navigate("resolution-6", { advance: true });
     if (!state.answers["chapter-6"] || Array.isArray(state.answers["chapter-6"])) state.answers["chapter-6"] = { answers: [], phase: "intro", revealed: false };
-    renderChallengeSix(app, state.answers["chapter-6"], saveState, () => completeChallenge(6, "resolution-6"));
+    renderChallengeSix(app, state.answers["chapter-6"], saveState, () => completeChallenge(6));
   },
-  "resolution-6": () => renderResolution("Finalement…", "Finalement, ils n’ont peut-être pas hérité que de vos yeux ou de votre caractère.<br>Vous leur avez aussi laissé quelques mondes à explorer.", "Continuer", "handoff-6"),
-  "reveal-6": () => navigate("resolution-6", { advance: true }),
-  "gallery-6": () => renderers["resolution-6"](),
+  "resolution-6": () => completeChallenge(6),
+  "reveal-6": () => completeChallenge(6),
+  "gallery-6": () => renderResolution("Finalement…", "Finalement, ils n’ont peut-être pas hérité que de vos yeux ou de votre caractère.<br>Vous leur avez aussi laissé quelques mondes à explorer.", "Continuer", "handoff-6"),
   "travel-future-medium-6": () => navigate("handoff-6", { advance: true }),
-  "handoff-6": () => renderHandoff(6, "challenge-7"),
+  "handoff-6": () => renderHandoff(6),
   "challenge-7": () => {
     if (state.completedChallenges[7]) return navigate("resolution-7", { advance: true });
     app.innerHTML = challengeIntro({ id: 7, title: "Le serpent", subtitle: "Comme au temps des vieux téléphones.", image: "assets/challenge-7/v1-4-16/apple-snake.png", alt: "Un serpent composé de rondelles de pomme", copy: "Fais grandir le serpent<br>en mangeant les pommes.", label: "Jouer", action: 'data-action="play-snake"', footer: "path" });
     bindAction("play-snake", () => {
       app.innerHTML = `<section class="paper-card screen"><div id="familyGame"></div></section>`;
-      cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7, "resolution-7"));
+      cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7));
     });
   },
-  "resolution-7": () => renderResolution("Bien joué !", "Pommes 10 / 10. Le serpent a bien grandi.", "Continuer", "handoff-7"),
-  "gallery-7": () => renderers["resolution-7"](),
+  "resolution-7": () => completeChallenge(7),
+  "gallery-7": () => renderResolution("Bien joué !", "Pommes 10 / 10. Le serpent a bien grandi.", "Continuer", "handoff-7"),
   "travel-future-medium-7": () => navigate("handoff-7", { advance: true }),
-  "handoff-7": () => renderHandoff(7, "travel-past-large-return"),
+  "handoff-7": () => renderHandoff(7),
   "travel-past-large-return": () => renderTravel("past", "large", "saturday-evening"),
   "saturday-evening": renderSaturdayEvening,
+  "challenge-4": renderSaturdayEvening,
+  "resolution-4": () => completeChallenge(4),
+  "gallery-4": renderMajorca,
+  "handoff-4": renderMajorca,
   majorca: renderMajorca,
   order: () => { app.innerHTML = page("Huit images, un seul fil", `<p>Tu as maintenant huit images entre les mains. Elles racontent la même histoire. Mais pas dans le bon ordre.</p><p><strong>Remets notre voyage dans le temps.</strong></p>${button("Je pense avoir trouvé l’ordre", "continue")}`, { guide: "Pas d’écran à déplacer. Cette fois, l’histoire se tient vraiment entre tes mains." }); bindAction("continue", () => { state.orderAnnounced = true; saveState(); navigate("letters-clue", { advance: true }); }); },
   "letters-clue": () => { app.innerHTML = page("Bien.", `<p>Maintenant, regarde-les encore une fois.</p><p>Elles ont quelque chose à te dire.</p>${button("Je les ai", "continue")}`); bindAction("continue", () => { state.lettersFound = true; saveState(); navigate("password", { advance: true }); }); },
@@ -871,6 +866,16 @@ function setupDebug() {
   debugPanel.querySelector("#debugGo").addEventListener("click", () => {
     stopActiveSoundtrack();
     state.debugDateLocked = false;
+    const resolution = /^resolution-([1-8])$/.exec(select.value);
+    if (resolution) {
+      // A test entry simulates reaching this reward in narrative order.
+      const previous = CONFIG.routeOrder.slice(0, CONFIG.routeOrder.indexOf(Number(resolution[1])));
+      previous.forEach(id => {
+        state.completedChallenges[id] = true;
+        state.galleryViewed[id] = true;
+        state.illustrations[id] = true;
+      });
+    }
     if (stepIndex(select.value) >= 0) state.currentStep = select.value;
     saveState();
     navigate(select.value);
