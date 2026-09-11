@@ -1,5 +1,6 @@
-const CACHE_NAME = "voyage-majorque-v1-4-37-stable-swipe";
+const CACHE_NAME = "voyage-majorque-v1-4-38-d1-handover";
 const APP_SHELL = [
+  "./assets/challenge-1/v1-4-38/d1-handover.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-full.png",
   "./scene-reveal.js?v=1.4.35",
@@ -40,9 +41,9 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.37",
-  "./script.js?v=1.4.37",
-  "./config.js?v=1.4.37",
+  "./styles.css?v=1.4.38",
+  "./script.js?v=1.4.38",
+  "./config.js?v=1.4.38",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",

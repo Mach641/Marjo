@@ -1144,3 +1144,17 @@ body:has(.d1-portrait-gallery)::before { opacity: 1; background: url("assets/ope
 .scene-reveal > [data-reveal-full] { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: inherit; object-position: inherit; border-radius: inherit; }
 .landscape-viewer__slide > .scene-reveal { width: 100%; height: 100%; object-fit: contain; object-position: center; }
 .landscape-viewer--reveal .landscape-viewer__slide--paired:first-child { animation: none; }
+
+/* Narrative handover after D1 only; shared handoffs retain their existing DA. */
+body:has(.d1-handover) > .site-header,
+body:has(.d1-handover) > .weather { display: none; }
+body:has(.d1-handover) { background: #fae9ce; }
+body:has(.d1-handover)::before { opacity: 1; background: url("assets/opening/v1-4-18/01_background_papier.png") center / calc(100% + 8px) calc(100% + 8px) no-repeat; }
+.app:has(.d1-handover) { width: 100%; padding: 0; }
+.d1-handover { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(10px, 1.9svh, 18px); min-height: 100svh; padding: max(26px, env(safe-area-inset-top)) 20px max(76px, env(safe-area-inset-bottom)); color: #443326; text-align: center; }
+.d1-handover h1 { max-width: 320px; margin: 0; font: 400 clamp(30px, 9.8vw, 42px)/1.16 Georgia, serif; }
+.d1-handover p { width: 90%; max-width: 340px; margin: 0; font: 400 clamp(17px, 4.8vw, 21px)/1.4 Georgia, serif; }
+.d1-handover__divider { position: relative; width: 120px; height: 8px; flex: none; }
+.d1-handover__divider img { position: absolute; width: 120px; height: 40px; max-width: none; left: 0; top: -16px; }
+.d1-handover__illustration { display: block; width: min(82vw, 36svh, 360px); height: auto; flex: none; }
+.d1-handover__cta { flex: none; width: min(78vw, 290px); min-height: 62px; padding: 12px 20px; border: 0; border-radius: 0; box-shadow: none; background: url("assets/notebook/v1-4-21/cta-terracotta.png") center / 100% 100% no-repeat; color: #fff8e9; font: 400 27px/1.2 Georgia, serif; cursor: pointer; }

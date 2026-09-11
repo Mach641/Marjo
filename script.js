@@ -2,7 +2,7 @@ import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.37";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.37";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.38";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -618,7 +618,13 @@ function openChapterGalleryReview(chapterId) {
 }
 
 function renderHandoff(chapterId, nextStep, message = "Vincent a quelque chose à te remettre.") {
-  app.innerHTML = `<section class="paper-card screen">${rainbowGuide("Il en reste une.")}<p>${message}</p>${button("Je l’ai", "have-it")}</section>`;
+  app.innerHTML = chapterId === 1 ? `<section class="d1-handover" aria-labelledby="d1-handover-title">
+    <h1 id="d1-handover-title">Ce souvenir n’est pas tout à fait terminé.</h1>
+    <div class="d1-handover__divider" aria-hidden="true"><img src="assets/gameplay/v1-4-23/divider-terracotta.png" alt="" /></div>
+    <p>Vincent a encore quelque chose pour toi.</p>
+    <img class="d1-handover__illustration" src="assets/challenge-1/v1-4-38/d1-handover.png" alt="Une enveloppe contenant un souvenir passe des mains de Vincent à celles de Marjolaine." />
+    <button class="d1-handover__cta" type="button" data-action="have-it">Je l’ai</button>
+  </section>` : `<section class="paper-card screen">${rainbowGuide("Il en reste une.")}<p>${message}</p>${button("Je l’ai", "have-it")}</section>`;
   bindAction("have-it", () => {
     state.illustrations[chapterId] = true;
     advanceStateTo(nextStep);
