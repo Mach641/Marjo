@@ -1158,3 +1158,18 @@ body:has(.d1-handover)::before { opacity: 1; background: url("assets/opening/v1-
 .d1-handover__divider img { position: absolute; width: 120px; height: 40px; max-width: none; left: 0; top: -16px; }
 .d1-handover__illustration { display: block; width: min(82vw, 36svh, 360px); height: auto; flex: none; }
 .d1-handover__cta { flex: none; width: min(78vw, 290px); min-height: 62px; padding: 12px 20px; border: 0; border-radius: 0; box-shadow: none; background: url("assets/notebook/v1-4-21/cta-terracotta.png") center / 100% 100% no-repeat; color: #fff8e9; font: 400 27px/1.2 Georgia, serif; cursor: pointer; }
+
+/* One-time D1 reward, preserving the polaroid's resting size and rotation. */
+.journey-notebook:has(.scrapbook-polaroid--reveal) { animation: none; }
+.scrapbook-polaroid--reveal { transform-style: preserve-3d; animation: d1-polaroid-turn 1600ms ease-in-out both; }
+.scrapbook-polaroid--reveal > .scrapbook-polaroid__image,
+.scrapbook-polaroid--reveal > .scrapbook-polaroid__caption { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.scrapbook-polaroid__reverse { position: absolute; inset: 0; padding: 7px 7px 31px; background: #fff8e9 url("assets/opening/v1-4-18/01_background_papier.png") center / 600px; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; pointer-events: none; }
+@keyframes d1-polaroid-turn {
+  0%, 25% { transform: perspective(800px) rotate(-3deg) rotateY(180deg); }
+  100% { transform: perspective(800px) rotate(-3deg) rotateY(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scrapbook-polaroid--reveal { animation: none; }
+  .scrapbook-polaroid__reverse { display: none; }
+}
