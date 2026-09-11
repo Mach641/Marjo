@@ -2,7 +2,7 @@ import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.37";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.38";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.39";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -238,7 +238,7 @@ function renderMemoryCard(chapterId) {
 
 // The initial spread reserves one slot per challenge; later progression stays unchanged.
 const firstNotebookSlots = Array.from({ length: 8 }, (_, index) => ({ challengeId: index + 1 }));
-const isFirstNotebook = () => state.currentStep === "challenge-1" || (state.completedChallenges[1] && (["resolution-1", "gallery-1", "travel-past-medium-1", "handoff-1"].includes(state.currentStep) || (state.currentStep === "challenge-8" && !state.completedChallenges[8])));
+const isFirstNotebook = () => state.newMemoryChapterId === 1 || state.currentStep === "challenge-1" || (state.completedChallenges[1] && (["resolution-1", "gallery-1", "travel-past-medium-1", "handoff-1"].includes(state.currentStep) || (state.currentStep === "challenge-8" && !state.completedChallenges[8])));
 let firstMemoryJustUnlocked = false;
 const NOTEBOOK_ASSETS = "assets/notebook/v1-4-21";
 function notebookPolaroid(unlocked = false) {
