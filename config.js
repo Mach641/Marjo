@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.43";
+export const APP_VERSION = "1.4.44";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [

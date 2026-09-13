@@ -8,7 +8,8 @@ import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
 import { openGalleryViewer } from "./gallery-viewer.js?v=1.4.35";
-import { renderRoadTrip } from "./road-trip.js?v=1.4.23";
+import { renderRoadTrip, ROAD_PREVIEWS } from "./road-trip.js?v=1.4.44";
+let roadPreviewAt = null;
 import { playTimeTravel } from "./time-travel.js?v=1.3.2";
 
 const app = document.querySelector("#app");
@@ -713,7 +714,8 @@ const renderers = {
   "challenge-5": () => {
     if (state.completedChallenges[5]) return showNotebook();
     const trip = state.answers["chapter-5"] ||= { started: false, choices: [], phase: "choice" };
-    cleanupCurrentScreen = renderRoadTrip(app, trip, saveState, () => completeChallenge(5));
+    cleanupCurrentScreen = renderRoadTrip(app, trip, saveState, () => completeChallenge(5), { previewAt: roadPreviewAt });
+    roadPreviewAt = null;
   },
   "gallery-5": () => renderGalleryInvitation("travel-future-small-5"),
   "travel-future-small-5": () => renderTravelGallery(5, "future", "small", "handoff-5"),
@@ -777,6 +779,7 @@ function setupDebug() {
   const select = debugPanel.querySelector("#debugStep");
   const debugPresets = [
     ["welcome", "Prologue"],
+    ...ROAD_PREVIEWS.map(([phase, label]) => [`road-${phase}:5`, `D5 — ${label}`]),
     ...CONFIG.routeOrder.flatMap(id => [
       [`available:${id}`, `D${id} — disponible dans le carnet`],
       [`gameplay:${id}`, `D${id} — gameplay`],
@@ -793,6 +796,7 @@ function setupDebug() {
     stopActiveSoundtrack();
     cleanupCurrentScreen?.(); cleanupCurrentScreen = null;
     state = defaultState();
+    roadPreviewAt = null;
     if (value === "welcome") { saveState(); return navigate("welcome", { replace: true }); }
     state.started = state.onboardingCompleted = true;
     const [phase, rawId] = value.split(":");
@@ -811,6 +815,12 @@ function setupDebug() {
     }
     let route = "book-open";
     if (phase === "gameplay") route = challengeEntry(id);
+    const roadPreview = id === 5 && ROAD_PREVIEWS.find(([name]) => phase === `road-${name}`);
+    if (roadPreview) {
+      roadPreviewAt = roadPreview[2];
+      state.answers["chapter-5"] = { started: true, choices: roadPreviewAt === null ? [] : [0], phase: roadPreviewAt === null ? "choice" : "reveal" };
+      route = "challenge-5";
+    }
     if (["conclusion", "reveal", "memory", "handoff", "finished", "before", "ready", "resumed"].includes(phase)) {
       winChallenge(state, id);
       if (phase !== "conclusion") continueConclusion(state, id);

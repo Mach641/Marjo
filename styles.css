@@ -531,19 +531,41 @@ noscript { display: block; margin: 30px; text-align: center; }
 .stockholm-intro { text-align: center; justify-content: center; }
 .stockholm-intro > img { display: block; width: min(100%, 420px); max-height: 340px; object-fit: contain; margin: 16px auto; }
 .stockholm-intro > p:not(.kicker) { font: italic 1.05rem/1.55 Georgia, serif; }
-.stockholm-map { position: relative; width: 100%; margin-bottom: 18px; }
-.stockholm-map > img { display: block; width: 100%; height: auto; }
-.stockholm-map > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.stockholm-map__route { fill: none; stroke: #9a5038; stroke-width: 6; stroke-linecap: round; opacity: .7; }
-.stockholm-map__route--active { stroke-width: 9; opacity: 1; }
+/* D5 only: a single map/illustration stage, with one shared coordinate system. */
+.stockholm-trip { padding: 22px 16px 32px; text-align: center; background: url("assets/opening/v1-4-18/01_background_papier.png") center / cover; }
+.stockholm-trip::after { display: none; }
+.stockholm-overview { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: 14px; margin: 12px 0 18px; }
+.stockholm-map { position: relative; width: 100%; aspect-ratio: 530 / 735; transform-origin: top left; }
+.stockholm-map > svg { display: block; width: 100%; height: 100%; border-radius: 6px; overflow: hidden; }
+.stockholm-destinations { padding-left: 22px; margin: 0; text-align: left; font: 15px/1.45 Georgia, serif; }
+.stockholm-destinations li + li { margin-top: 14px; }
+.stockholm-destination--0 { color: #193e53; }
+.stockholm-destination--1 { color: #955038; }
+.stockholm-destination--2 { color: #476338; }
+.stockholm-map__route { fill: none; stroke: #9a5038; stroke-width: 5; stroke-linecap: round; opacity: .65; }
 .stockholm-map__option { fill: #193e53; stroke: #193e53; }
 .stockholm-map__option--1 { fill: #955038; stroke: #955038; }
 .stockholm-map__option--2 { fill: #476338; stroke: #476338; }
-.stockholm-map__option path { fill: none; stroke-width: 6; stroke-dasharray: 12 9; }
-.stockholm-map__option text { font: bold 22px Georgia, serif; stroke: #fff8e8; stroke-width: 5; paint-order: stroke; }
-.stockholm-illustration { aspect-ratio: 4 / 3; width: 100%; display: grid; place-items: center; background: #eee5d4; color: var(--muted); margin: 0 0 16px; }
+.stockholm-map__option--muted { opacity: .25; }
+.stockholm-map__option path { fill: none; stroke-width: 5; stroke-dasharray: 10 8; }
+.stockholm-map__badge { fill: #fff8e8; stroke-width: 2; }
+.stockholm-map__option text { font: bold 24px Georgia, serif; stroke: none; }
+.stockholm-trip--reveal { overflow: visible; min-height: 0; padding-inline: 8px; }
+.stockholm-stage { position: relative; width: 100%; aspect-ratio: 530 / 735; }
+.stockholm-stage > .stockholm-map, .stockholm-illustration { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stockholm-illustration { display: grid; place-items: center; background: #eee5d4; color: var(--muted); opacity: 0; border-radius: 6px; overflow: hidden; }
 .stockholm-illustration > img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
-.stockholm-trip > .primary-button { margin-top: 16px; }
+.stockholm-illustration > div { padding: 24px; border-block: 1px dashed #b8a17d; }
+.stockholm-illustration small { display: block; margin-top: 12px; font: italic 16px/1.4 Georgia, serif; }
+.stockholm-result { margin-top: 22px; }
+.stockholm-result .primary-button, .stockholm-trip > .primary-button { margin-top: 16px; }
+.stockholm-preview { margin-top: 20px; }
+.stockholm-trip > .stockholm-map { max-width: 420px; margin: 20px auto; }
+@media (min-width: 600px) {
+ .stockholm-stage { max-width: 470px; margin: auto; }
+ .stockholm-overview { max-width: 400px; margin-inline: auto; }
+}
+
 
 /* Défi 6 uniquement. */
 .challenge-six__intro { display: block; width: min(100%, 380px); max-height: 350px; object-fit: contain; margin: 16px auto; }
@@ -1196,3 +1218,9 @@ body:has(.journey-pause)::before { opacity: 1; background: url("assets/opening/v
 @media (prefers-reduced-motion: reduce) {
   [data-conclusion] .blind-test-finale__rainbow path { visibility: visible; animation: none; opacity: .8; }
 }
+
+/* Keep the same notebook support throughout D5, including its map-only phase. */
+body:has(.stockholm-trip) { background: #fae9ce; }
+body:has(.stockholm-trip)::before { opacity: 1; background: url("assets/opening/v1-4-18/01_background_papier.png") center / calc(100% + 8px) calc(100% + 8px) no-repeat; }
+body:has(.stockholm-trip) > .site-header { display: none; }
+.paper-card.stockholm-trip { border-color: #a28761; border-radius: 10px 19px 16px 8px; box-shadow: 3px 2px 0 #ebd8b5, 4px 3px 0 #b8a17d, 6px 5px 0 #dec5a0, 0 5px 10px #59452d18, inset 3px 0 8px #88643f12; }

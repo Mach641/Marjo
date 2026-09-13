@@ -250,39 +250,128 @@ export function routeSegments(choices) {
  return choices.map((choice,i)=>{const o=ROAD_STEPS[i].options[choice];const s={...o,start,d:`M ${start.join(' ')} Q ${o.via.join(' ')} ${o.end.join(' ')}`};start=o.end;return s;});
 }
 const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export function renderRoadTrip(container,trip,save,onComplete) {
- let frame=0, disposed=false;
- const choices=[];
- for(const value of Array.isArray(trip.choices)?trip.choices.slice(0,5):[]) {if(!Number.isInteger(value)||value<0||value>2)break;choices.push(value);}
- trip.choices=choices;
- if(!['choice','reveal','final'].includes(trip.phase))trip.phase='choice';
- if(trip.phase==='reveal'&&!choices.length)trip.phase='choice';
- if(choices.length===5&&trip.phase==='choice')trip.phase='final';
- if(trip.phase==='final'&&choices.length<5)trip.phase='choice';
- const cta=label=>`<button type="button" class="primary-button" data-trip-next>${label}</button>`;
- const next=fn=>container.querySelector('[data-trip-next]').addEventListener('click',fn,{once:true});
- const map=(stage,reveal,final)=>{
-  const segments=routeSegments(trip.choices),position=segments.at(-1)?.end||START;
-  const paths=segments.map((s,i)=>`<path d="${s.d}" class="stockholm-map__route ${reveal&&i===segments.length-1?'stockholm-map__route--active':''}" ${reveal&&i===segments.length-1?'data-trip-segment':''}/>`).join('');
-  const candidates=!reveal&&!final?ROAD_STEPS[stage].options.map((o,i)=>{
-   const s=routeSegments([...trip.choices,i]).at(-1),x=.25*position[0]+.5*o.via[0]+.25*o.end[0],y=.25*position[1]+.5*o.via[1]+.25*o.end[1];
-   return `<g class="stockholm-map__option stockholm-map__option--${i}"><title>${esc(o.title)}</title><path d="${s.d}"/><text x="${x}" y="${y-12}" text-anchor="middle">${esc(o.label)}</text></g>`;
-  }).join(''):'';
-  return `<div class="stockholm-map"><img src="${ASSETS}/map.png" alt="Carte illustrée d’Annecy à Stockholm"/><svg viewBox="0 0 1000 833" role="img" aria-label="${final?'Notre route jusqu’à Stockholm':reveal?'Segment choisi : '+esc(segments.at(-1).title):'Trois routes possibles'}">${paths}${candidates}<g data-trip-van transform="translate(${position.join(' ')})" aria-hidden="true"><rect x="-18" y="-15" width="30" height="20" rx="3" fill="#fff8e8" stroke="#473a2e" stroke-width="3"/><path d="M 12 -8 H 21 L 27 0 V 5 H 12 Z" fill="#e9cf9d" stroke="#473a2e" stroke-width="3"/><path d="M -12 -10 H 5 V -3 H -12 Z" fill="#94b7bf"/><circle cx="-10" cy="7" r="5" fill="#473a2e"/><circle cx="18" cy="7" r="5" fill="#473a2e"/></g></svg></div>`;
+// One presentation timeline, shared by the real journey and the debug snapshots.
+export const ROAD_TIMING = { expand: 550, drive: 2800, arrive: 500, fadeOut: 400, fadeIn: 550 };
+const T = ROAD_TIMING;
+const ARRIVAL = T.expand + T.drive;
+const FADE_OUT = ARRIVAL + T.arrive;
+const FADE_IN = FADE_OUT + T.fadeOut;
+const END = FADE_IN + T.fadeIn;
+export const ROAD_PREVIEWS = [
+ ['question', 'Question + mini-carte', null],
+ ['selected', 'Juste après sélection', 0],
+ ['large', 'Grande carte', T.expand],
+ ['moving', 'Camping-car en mouvement', T.expand + T.drive / 2],
+ ['arrived', 'Arrivée', ARRIVAL],
+ ['transition', 'Carte → illustration', FADE_OUT + T.fadeOut / 2],
+ ['illustration', 'Illustration affichée', END],
+];
+// Same original coordinates for the bitmap, routes, destinations and pawn.
+// The crop contains every quadratic route, with room around Annecy and Stockholm.
+const MAP_VIEW = '250 0 530 735';
+const clamp = value => Math.max(0, Math.min(1, value));
+const ease = value => value * value * (3 - 2 * value);
+export function renderRoadTrip(container, trip, save, onComplete, { previewAt = null } = {}) {
+ let frame = 0, disposed = false;
+ const choices = [];
+ for (const value of Array.isArray(trip.choices) ? trip.choices.slice(0,5) : []) {
+  if (!Number.isInteger(value) || value < 0 || value > 2) break;
+  choices.push(value);
+ }
+ trip.choices = choices;
+ if (!['choice','reveal','final'].includes(trip.phase)) trip.phase = 'choice';
+ if (trip.phase === 'reveal' && !choices.length) trip.phase = 'choice';
+ if (choices.length === 5 && trip.phase === 'choice') trip.phase = 'final';
+ if (trip.phase === 'final' && choices.length < 5) trip.phase = 'choice';
+ const cta = label => `<button type="button" class="primary-button" data-trip-next>${label}</button>`;
+ const next = fn => container.querySelector('[data-trip-next]').addEventListener('click', fn, {once:true});
+ const map = (stage, reveal, final) => {
+  const previous = reveal ? trip.choices.slice(0,-1) : trip.choices;
+  const segments = routeSegments(previous), position = segments.at(-1)?.end || START;
+  const paths = segments.map(s => `<path d="${s.d}" class="stockholm-map__route"/>`).join('');
+  const candidates = final ? '' : ROAD_STEPS[stage].options.map((o,i) => {
+   const s = routeSegments([...previous,i]).at(-1);
+   const selected = reveal && i === trip.choices[stage];
+   const x = .25*position[0] + .5*o.via[0] + .25*o.end[0];
+   const y = .25*position[1] + .5*o.via[1] + .25*o.end[1];
+   return `<g class="stockholm-map__option stockholm-map__option--${i} ${reveal && !selected ? 'stockholm-map__option--muted' : ''}"><title>${esc(o.title)}</title><path d="${s.d}" ${selected ? 'data-trip-segment' : ''}/><circle cx="${o.end[0]}" cy="${o.end[1]}" r="7"/><g transform="translate(${x} ${y-20})"><circle r="17" class="stockholm-map__badge"/><text text-anchor="middle" dy="7">${i+1}</text></g></g>`;
+  }).join('');
+  return `<div class="stockholm-map"><svg viewBox="${MAP_VIEW}" role="img" aria-label="${final ? 'Notre route jusqu’à Stockholm' : reveal ? 'Segment choisi : '+esc(ROAD_STEPS[stage].options[trip.choices[stage]].title) : 'Trois routes possibles'}"><image href="${ASSETS}/map.png" width="1000" height="833"/>${paths}${candidates}<g data-trip-van transform="translate(${position.join(' ')})" aria-hidden="true"><image href="${ASSETS}/camper.png" x="-70" y="-92" width="140" height="105"/></g></svg></div>`;
  };
- const draw=(animate=false)=>{
-  cancelAnimationFrame(frame);if(disposed)return;
-  window.scrollTo(0, 0);
-  if(!trip.started){container.innerHTML=challengeIntro({ id: 5, title: "À toi de nous emmener à Stockholm", subtitle: "Il n’y a pas de bonne route vers le futur.", image: `${ASSETS}/camper.png`, alt: "Camping-car devant les montagnes", copy: "Choisis simplement celle<br>qui te ressemble le plus.", label: "Choisir l’itinéraire", action: "data-trip-next", footer: "path" });next(()=>{trip.started=true;save();draw();});return;}
-  const final=trip.phase==='final',reveal=trip.phase==='reveal',stage=trip.choices.length-(reveal?1:0),step=ROAD_STEPS[stage];let body;
-  if(final)body=`<h1>Voilà notre route.</h1><p>Pas forcément la plus courte.<br>Pas forcément la plus logique.<br>Mais sûrement la nôtre.</p>${map(stage,false,true)}${cta('Continuer le voyage →')}`;
-  else if(reveal){const o=step.options[trip.choices[stage]];body=`${map(stage,true,false)}<div class="stockholm-illustration" data-illustration="${stage+1}-${trip.choices[stage]+1}">${o.image?`<img src="${esc(o.image)}" alt="${esc(o.title)}"/>`:'<span>Illustration à venir</span>'}</div><h1>${esc(o.title)}</h1><p>${esc(o.text)}</p>${cta(stage===4?'Voir notre route →':'Suivant →')}`;}
-  else body=`${gameplayHeader({ theme: "À toi de nous emmener à Stockholm", title: step.title, description: step.subtitle })}${map(stage,false,false)}<p class="kicker">ÉTAPE ${stage+1}</p><div class="choice-list">${step.options.map((o,i)=>`<button type="button" class="choice" data-trip-choice="${i}">${o.title}</button>`).join('')}</div>`;
-  container.innerHTML=`<section class="paper-card screen stockholm-trip">${body}</section>`;
-  if(final)next(onComplete);
-  else if(reveal){next(()=>{trip.phase=trip.choices.length===5?'final':'choice';save();draw();});
-   if(animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches){const path=container.querySelector('[data-trip-segment]'),van=container.querySelector('[data-trip-van]'),length=path.getTotalLength(),startTime=performance.now();const move=now=>{if(disposed)return;const progress=Math.min(1,(now-startTime)/1000),point=path.getPointAtLength(length*progress);van.setAttribute('transform',`translate(${point.x} ${point.y})`);if(progress<1)frame=requestAnimationFrame(move);};move(startTime);}
-  } else container.querySelectorAll('[data-trip-choice]').forEach(button=>button.addEventListener('click',()=>{if(trip.phase!=='choice'||trip.choices.length!==stage)return;trip.choices.push(Number(button.dataset.tripChoice));trip.phase='reveal';save();draw(true);},{once:true}));
+ const draw = (fromRect = null) => {
+  cancelAnimationFrame(frame);
+  if (disposed) return;
+  if (!trip.started) {
+   container.innerHTML = challengeIntro({ id:5, title:"À toi de nous emmener à Stockholm", subtitle:"Il n’y a pas de bonne route vers le futur.", image:`${ASSETS}/camper.png`, alt:"Camping-car devant les montagnes", copy:"Choisis simplement celle<br>qui te ressemble le plus.", label:"Choisir l’itinéraire", action:"data-trip-next", footer:"path" });
+   next(() => { trip.started = true; save(); draw(); }); return;
+  }
+  const final = trip.phase === 'final', reveal = trip.phase === 'reveal';
+  const stage = trip.choices.length - (reveal ? 1 : 0), step = ROAD_STEPS[stage];
+  let body;
+  if (final) body = `<h1>Voilà notre route.</h1><p>Pas forcément la plus courte.<br>Pas forcément la plus logique.<br>Mais sûrement la nôtre.</p>${map(stage,false,true)}${cta('Continuer le voyage →')}`;
+  else if (reveal) {
+   const o = step.options[trip.choices[stage]];
+   body = `<div class="stockholm-stage">${map(stage,true,false)}<div class="stockholm-illustration" data-illustration="${stage+1}-${trip.choices[stage]+1}" aria-hidden="true">${o.image ? `<img src="${esc(o.image)}" alt="${esc(o.title)}"/>` : `<div><span>Illustration à venir</span><small>${esc(o.title)}</small></div>`}</div></div><div class="stockholm-result" hidden><h1>${esc(o.title)}</h1><p>${esc(o.text)}</p>${cta(stage===4 ? 'Voir notre route →' : 'Suivant →')}</div>${previewAt !== null ? '<button type="button" class="quiet-button stockholm-preview" data-trip-play>Lire la suite de l’animation</button>' : ''}`;
+  } else {
+   body = `${gameplayHeader({theme:"À toi de nous emmener à Stockholm",title:step.title,description:step.subtitle})}<div class="stockholm-overview">${map(stage,false,false)}<ol class="stockholm-destinations">${step.options.map((o,i) => `<li class="stockholm-destination--${i}">${esc(o.label)}</li>`).join('')}</ol></div><p class="kicker">ÉTAPE ${stage+1}</p><div class="choice-list">${step.options.map((o,i) => `<button type="button" class="choice" data-trip-choice="${i}">${o.title}</button>`).join('')}</div>`;
+  }
+  container.innerHTML = `<section class="paper-card stockholm-trip ${reveal ? 'stockholm-trip--reveal' : ''}">${body}</section>`;
+  if (!fromRect) window.scrollTo(0,0);
+  if (final) { next(onComplete); return; }
+  if (!reveal) {
+   container.querySelectorAll('[data-trip-choice]').forEach(button => button.addEventListener('click', () => {
+    if (trip.phase !== 'choice' || trip.choices.length !== stage) return;
+    const rect = container.querySelector('.stockholm-map').getBoundingClientRect();
+    trip.choices.push(Number(button.dataset.tripChoice)); trip.phase = 'reveal'; save(); draw(rect);
+   }, {once:true}));
+   return;
+  }
+  next(() => { previewAt = null; trip.phase = trip.choices.length === 5 ? 'final' : 'choice'; save(); draw(); });
+  const section = container.querySelector('.stockholm-trip');
+  const mapNode = container.querySelector('.stockholm-map');
+  const art = container.querySelector('.stockholm-illustration');
+  const result = container.querySelector('.stockholm-result');
+  const path = container.querySelector('[data-trip-segment]');
+  const van = container.querySelector('[data-trip-van]');
+  const length = path.getTotalLength();
+  // FLIP uses measured rectangles; no device-specific coordinates or separate map.
+  window.scrollTo(0,0);
+  const target = mapNode.getBoundingClientRect();
+  const origin = fromRect || {left:target.left,top:target.top,width:target.width*.55,height:target.height*.55};
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const paint = elapsed => {
+   const expanding = ease(clamp(elapsed/T.expand));
+   mapNode.style.transform = `translate(${(origin.left-target.left)*(1-expanding)}px, ${(origin.top-target.top)*(1-expanding)}px) scale(${1+(origin.width/target.width-1)*(1-expanding)}, ${1+(origin.height/target.height-1)*(1-expanding)})`;
+   const progress = ease(clamp((elapsed-T.expand)/T.drive));
+   const point = path.getPointAtLength(length*progress);
+   van.setAttribute('transform', `translate(${point.x} ${point.y})`);
+   mapNode.style.opacity = 1-clamp((elapsed-FADE_OUT)/T.fadeOut);
+   mapNode.style.visibility = elapsed >= FADE_IN ? 'hidden' : 'visible';
+   art.style.opacity = clamp((elapsed-FADE_IN)/T.fadeIn);
+   art.setAttribute('aria-hidden', String(elapsed < FADE_IN));
+   result.hidden = elapsed < END;
+   section.dataset.tripPresentation = elapsed < T.expand ? 'expanding' : elapsed < ARRIVAL ? 'moving' : elapsed < FADE_OUT ? 'arrived' : elapsed < FADE_IN ? 'map-out' : elapsed < END ? 'illustration-in' : 'illustration';
+  };
+  const play = (offset=0) => {
+   cancelAnimationFrame(frame);
+   const start = performance.now();
+   const tick = now => {
+    if (disposed) return;
+    const elapsed = reduced ? END : Math.min(END,offset+now-start);
+    paint(elapsed);
+    if (elapsed < END) frame = requestAnimationFrame(tick);
+   };
+   tick(start);
+  };
+  // A reload of an already selected answer keeps the result, never appends a choice.
+  if (previewAt !== null) {
+   paint(previewAt);
+   container.querySelector('[data-trip-play]').addEventListener('click', event => {
+    event.currentTarget.hidden = true; play(previewAt);
+   }, {once:true});
+  } else if (fromRect) play();
+  else paint(END);
  };
- draw();return()=>{disposed=true;cancelAnimationFrame(frame);};
+ draw();
+ return () => { disposed = true; cancelAnimationFrame(frame); };
 }
