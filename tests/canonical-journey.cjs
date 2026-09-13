@@ -5,7 +5,8 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = process.env.APP_ROOT || path.resolve(__dirname, '..');
-const order = [1, 8, 2, 3, 5, 6, 7, 4];
+const order = [1, 2, 3, 5, 6, 7, 8, 4];
+const targets = {2:"2026-09-18T12:00:00",5:"2026-09-19T08:00:00",7:"2026-09-19T18:00:00"};
 const key = 'voyage-majorque-v1-debug';
 const server = http.createServer((req, res) => {
   const file = path.join(root, decodeURIComponent(new URL(req.url, 'http://localhost').pathname).replace(/^\//, '') || 'index.html');
@@ -28,7 +29,7 @@ let browser;
   const hideDebug = () => page.addStyleTag({ content: '#debugPanel{display:none!important}' });
   const seed = async (route, value = {}) => {
     await go('welcome');
-    await page.evaluate(({key, route, value}) => localStorage.setItem(key, JSON.stringify({ version: 3, started: true, onboardingCompleted: true, currentStep: route, ...value })), {key, route, value});
+    await page.evaluate(({key, route, value}) => localStorage.setItem(key, JSON.stringify({ version: 4, started: true, onboardingCompleted: true, currentStep: route, ...value })), {key, route, value});
     await go(route); await page.reload(); await hideDebug();
   };
   const cards = () => page.locator('.scrapbook-polaroid').evaluateAll(nodes => nodes.map(node => ({id: +node.dataset.chapter, face: node.dataset.scrapbookAction === 'gallery', flip: node.classList.contains('scrapbook-polaroid--reveal')})));
@@ -54,21 +55,47 @@ let browser;
     }
     await page.locator('[data-action="have-it"]').click();
   };
-  // Every Resolution shortcut, including D4, creates reward A, never handover B.
+  const setTime = async localTime => {
+    await page.locator('#debugNow').evaluate((e,v)=>e.value=v,localTime);
+    await page.locator('#debugApplyTime').evaluate(e=>e.click());
+  };
+  const finishPause = async (id, faces, next) => {
+    if (!targets[id]) return assertHub(faces,next);
+    await page.locator('[data-pause-status="PAUSED"]').waitFor();
+    assert.equal(await page.locator('[data-chapter]').count(),0);
+    const before=await read();
+    await page.reload(); await hideDebug();
+    await page.locator('[data-pause-status="PAUSED"]').waitFor();
+    await setTime(targets[id]);
+    await page.locator('[data-pause-status="READY_TO_RESUME"]').waitFor();
+    await page.reload(); await hideDebug();
+    await page.locator('[data-pause-status="READY_TO_RESUME"]').waitFor();
+    assert.deepEqual((await read()).illustrations,before.illustrations);
+    await page.locator('[data-action="resume-chapter"]').click();
+    await assertHub(faces,next);
+    await page.reload(); await hideDebug(); await assertHub(faces,next);
+  };
+  // Conclusion presets persist; reveal presets never simulate handover completion.
   for (let i=0;i<order.length;i++) {
     const id=order[i];
     await seed('welcome');
     await page.locator('#debugPanel').evaluate(e=>e.style.setProperty('display','block','important'));
     await page.locator('#debugPanel details').evaluate(e=>e.open=true);
-    await page.locator('#debugStep').selectOption(`resolution-${id}`);
+    await page.locator('#debugStep').selectOption(`${id===4?'reveal':'conclusion'}:${id}`);
     await page.locator('#debugGo').click(); await hideDebug();
+    if(id!==4) {
+      await page.locator(`[data-conclusion="${id}"]`).waitFor();
+      assert.equal((await read()).revealedMemories[id],undefined);
+      await page.reload(); await hideDebug();
+      await page.locator(`[data-conclusion="${id}"]`).waitFor();
+      await page.locator('[data-action="finish-conclusion"]').click();
+    }
     await assertHub(order.slice(0,i+1), null, id);
     await page.reload(); await hideDebug(); await assertHub(order.slice(0,i+1),null);
     await consume(id);
-    await assertHub(order.slice(0,i+1),order[i+1]);
+    await finishPause(id,order.slice(0,i+1),order[i+1]);
     await page.reload(); await hideDebug(); await assertHub(order.slice(0,i+1),order[i+1]);
-    await go('book-closed'); await assertHub(order.slice(0,i+1),order[i+1]);
-    console.log(`Resolution ${id}: reward alone, handover, next ${order[i+1]||'none'}, persistence OK`);
+    console.log(`D${id} preset: persisted conclusion, one flip, handover, pause/resume, next ${order[i+1]||'none'} OK`);
   }
   // One uninterrupted progression: actual gameplay callbacks, not resolution aliases.
   await seed('book-open'); await assertHub([],1);
@@ -87,25 +114,14 @@ let browser;
       await page.locator('[data-action="start-blind-test"]').click();
       for(let song=0;song<7;song++) { await page.locator('[data-action="reveal-song"]').click(); if(song<6) await page.locator('[data-action="next-song"]').click(); }
       await page.getByText('Il y a des chansons qu’on reconnaît en quelques secondes.').waitFor();
-      await page.locator('[data-action="finish-blind-test"]').click();
+
     } else if (id===2) {
-      await page.locator('.time-travel').click();
-      await page.locator('[data-action="continue"]').click();
-      await page.locator('#destination').fill('Saint Exupery');
-      await page.locator('[data-action="solve"]').click();
-      await page.locator('[data-action="continue"]').click();
-      await page.locator('[data-action="locate"]').click();
-      await page.locator('[data-action="close-book"]').click();
-      await page.locator('[data-action="reopen-book"]').click();
-      await page.locator('[data-action="continue"]').click();
       await page.locator('[data-action="start-couple-profile"]').click();
       for(let answer=0;answer<40;answer++) { await page.locator('[data-profile]').first().click(); await page.waitForTimeout(400); }
     } else if (id===3) {
       await page.locator('[data-action="start-challenge-three"]').click();
       for(let photo=0;photo<3;photo++) { await page.locator('[data-baby-choice]').first().click(); await page.locator('[data-action="next-baby-photo"]').click(); }
     } else if (id===5) {
-      await page.locator('[data-action="continue"]').click();
-      await page.locator('[data-action="continue"]').click();
       await page.locator('[data-trip-next]').click();
       for(let step=0;step<5;step++) { await page.locator('[data-trip-choice]').first().click(); await page.locator('[data-trip-next]').click(); }
       await page.locator('[data-trip-next]').click();
@@ -142,17 +158,26 @@ let browser;
       await page.getByText('Marche jusqu’au banc.',{exact:true}).waitFor();
       await page.locator('[data-action="complete-majorca"]').click();
     }
+    if(id!==4) {
+      await page.locator(`[data-conclusion="${id}"]`).waitFor();
+      await page.locator('[data-action="finish-conclusion"]').click();
+    }
     await assertHub(order.slice(0,i+1), null, id);
     // Finish the existing animation before interactions; inspect a single flip.
     await page.locator('.scrapbook-polaroid--reveal').evaluate(e=>e.getAnimations().forEach(a=>a.finish()));
     await consume(id);
-    await assertHub(order.slice(0,i+1), order[i+1]);
+    await finishPause(id,order.slice(0,i+1), order[i+1]);
     const state=await read();
     assert.deepEqual(Object.keys(state.illustrations).map(Number).sort(),order.slice(0,i+1).sort((a,b)=>a-b));
     console.log(`Real D${id}: complete → reward → souvenir → handover → hub OK`);
   }
   await page.locator('[data-action="notebook-finale"]').click();
   await page.getByRole('heading',{name:'Huit images, un seul fil'}).waitFor();
+  await page.locator('[data-action="continue"]').click();
+  await page.locator('[data-action="continue"]').click();
+  await page.locator('#password').fill('MYMPVTME');
+  await page.locator('[data-action="unlock"]').click();
+  await page.getByRole('heading',{name:'La boîte',exact:true}).waitFor();
   assert.deepEqual(errors,[]);
   console.log('All eight real flows and shortcuts passed; final sequence retained.');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{await browser?.close();server.close();});

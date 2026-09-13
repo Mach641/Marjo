@@ -18,7 +18,7 @@
   </script>
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192-v1.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-v1.png" />
-  <link rel="stylesheet" href="styles.css?v=1.4.42" />
+  <link rel="stylesheet" href="styles.css?v=1.4.43" />
 </head>
 <body>
   <div class="weather" aria-hidden="true">
@@ -50,8 +50,7 @@
         <button id="debugGo" type="button">Ouvrir</button>
         <button id="debugUnlock" type="button">Tout débloquer</button>
         <button id="debugOnboarding" type="button">Rejouer l’intro</button>
-        <button id="debugBook" type="button">Carnet fermé</button>
-        <button id="debugWait" class="button-wide" type="button">Simuler une attente</button>
+        <button id="debugBook" type="button">Notre voyage</button>
       </div>
       <label for="debugChallengeOneRule">Défi 1 — règle et écran</label>
       <div class="debug-challenge-one">
@@ -67,11 +66,9 @@
         </select>
         <button id="debugChallengeOneApply" type="button">Tester</button>
       </div>
-      <label for="debugMemories">Souvenirs débloqués</label>
-      <div class="debug-inline">
-        <select id="debugMemories"></select>
-        <button id="debugApplyMemories" type="button">Simuler</button>
-      </div>
+      <label for="debugNow">Horloge de test — heure de Paris</label>
+      <input id="debugNow" type="datetime-local" step="1" />
+      <div class="debug-actions"><button id="debugApplyTime" type="button">Appliquer l’heure</button><button id="debugRealTime" type="button">Heure réelle</button></div>
       <label for="debugDisplayMode">Contexte d’affichage</label>
       <div class="debug-inline">
         <select id="debugDisplayMode">
@@ -85,11 +82,11 @@
         <button id="debugRefresh" class="button-refresh" type="button">Actualiser la webapp</button>
         <button id="debugReset" class="button-danger" type="button">Reset complet</button>
       </div>
-      <p>Horaires, GPS et timers longs sont automatiquement ignorés.</p>
+      <p>Progression de test séparée. Les horaires restent actifs ; les scénarios de pause et l’horloge permettent de les tester.</p>
     </details>
   </aside>
 
   <noscript>Ce carnet a besoin de JavaScript pour raconter son histoire.</noscript>
-  <script type="module" src="script.js?v=1.4.42"></script>
+  <script type="module" src="script.js?v=1.4.43"></script>
 </body>
 </html>

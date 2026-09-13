@@ -1,11 +1,23 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.42";
+export const APP_VERSION = "1.4.43";
+
+// D8 is deliberately late: the distant future precedes the return to Majorca.
+const JOURNEY_CHAPTERS = [
+  { id: "thursday", challenges: [1, 2], pause: { id: "pause-1", after: 2, next: 3, target: "2026-09-18T12:00:00+02:00", label: "Vendredi 18 septembre à 12 h", text: ["Deux souvenirs retrouvés.", "On s’arrête ici pour ce soir. On reprend demain, dans l’avion."], extra: "En attendant, quel souvenir aimerais-tu emporter partout avec toi ?" } },
+  { id: "friday", challenges: [3, 5], pause: { id: "pause-2", after: 5, next: 6, target: "2026-09-19T08:00:00+02:00", label: "Samedi 19 septembre à 8 h", text: ["Deux souvenirs de plus.", "On s’arrête à nouveau pour aujourd’hui. On reprend demain matin."] } },
+  { id: "saturday-morning", challenges: [6, 7], pause: { id: "pause-3", after: 7, next: 8, target: "2026-09-19T18:00:00+02:00", label: "Samedi 19 septembre à 18 h", text: ["Deux souvenirs de plus.", "Le carnet peut se reposer un peu. On reprend ce soir."] } },
+  { id: "saturday-evening", challenges: [8, 4] },
+];
+
+// Existing gallery transitions remain separate from chapter pauses.
+export const GALLERY_TRAVEL = { 2: "travel-past-medium", 3: "travel-future-small", 5: "travel-future-small-5", 8: "travel-future-large" };
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
-  stateVersion: 3,
+  stateVersion: 4,
   password: "MYMPVTME",
-  routeOrder: [1, 8, 2, 3, 5, 6, 7, 4],
+  journeyChapters: JOURNEY_CHAPTERS,
+  routeOrder: JOURNEY_CHAPTERS.flatMap(chapter => chapter.challenges),
   chronologicalOrder: [1, 2, 3, 4, 5, 6, 7, 8],
   timeTravel: {
     // Inverser ces deux valeurs suffit à retourner le langage visuel passé/futur.
@@ -20,17 +32,6 @@ export const CONFIG = {
       { id: 5, text: "On ne doit jamais se coucher<br>en étant fâchés.", hint: "Notre lit est tout petit<br>pour notre amour.<br>Pas question d’y ajouter<br>notre fierté." },
       { id: 6, text: "À la maison, on porte toujours<br>ses chaussons.", hint: "À la maison, il y a<br>une seule façon de circuler...<br>Vincent le sait bien !" },
     ],
-  },
-  geo: {
-    name: "Aéroport Lyon Saint-Exupéry",
-    latitude: 45.7256,
-    longitude: 5.0811,
-    radiusKm: 10,
-  },
-  schedule: {
-    // Dates locales du voyage, modifiables sans toucher au moteur.
-    fridayUnlockDate: "2026-09-18",
-    saturdayUnlockDate: "2026-09-19",
   },
   text: {
     opening: {
@@ -50,11 +51,16 @@ export const CONFIG = {
         "Prends-le, quand tu es prête.<br>Et laisse-toi guider…",
       ],
     },
-    analysis: [
-      "Analyse de vos réponses…",
-      "Compatibilité des habitudes…",
-      "Prise en compte du retard moyen de Vincent…",
-    ],
+    // Provisional copy except D8, whose validated conclusion is unchanged.
+    conclusions: {
+      1: ["Tu connais les règles de notre monde.", "Un souvenir de nous t’attend maintenant."],
+      2: ["Notre couple ne tient pas dans une case.", "Un souvenir en raconte un peu plus."],
+      3: ["Ces petits visages ont déjà toute une histoire.", "Une page de cette histoire t’attend."],
+      5: ["Chaque chemin dessine une suite possible.", "Découvrons celle qui se cache dans le carnet."],
+      6: ["Il y a des mondes que l’on aime partager.", "Et des souvenirs que l’on transmet."],
+      7: ["Le chemin s’est allongé, pomme après pomme.", "Un souvenir t’attend au bout."],
+      8: ["Il y a des chansons qu’on reconnaît en quelques secondes.", "Et d’autres qu’on n’oublie jamais."],
+    },
     diagnostic: "Votre histoire ne tient dans aucune case.",
   },
   chapters: {
@@ -277,13 +283,12 @@ export const CONFIG = {
 };
 
 export const STEPS = [
-  "welcome", "prologue", "challenge-1", "resolution-1", "gallery-1", "travel-past-medium-1", "handoff-1",
-  "challenge-8", "resolution-8", "gallery-8", "travel-future-large", "handoff-8", "thursday-lock",
-  "travel-past-large", "friday-returned", "geo", "departure", "flight", "challenge-2", "analysis-2", "resolution-2",
-  "gallery-2", "travel-past-medium", "handoff-2", "challenge-3", "resolution-3", "gallery-3",
-  "travel-future-small", "handoff-3", "friday-lock", "saturday-intro", "challenge-5", "resolution-5",
-  "reveal-5", "gallery-5", "travel-future-small-5", "handoff-5", "challenge-6", "resolution-6",
-  "reveal-6", "gallery-6", "travel-future-medium-6", "handoff-6", "challenge-7", "resolution-7",
-  "gallery-7", "travel-future-medium-7", "handoff-7", "travel-past-large-return", "saturday-evening",
-  "challenge-4", "resolution-4", "gallery-4", "handoff-4", "majorca", "order", "letters-clue", "password", "final",
-].map((id) => ({ id, label: id.replaceAll("-", " ") }));
+  "welcome", "prologue", "notebook-intro",
+  ...CONFIG.routeOrder.flatMap(id => [
+    ...(id === 4 ? ["travel-past-large-return", "saturday-evening"] : []),
+    `challenge-${id}`, ...(id === 4 ? [] : [`conclusion-${id}`]),
+    `gallery-${id}`, ...(GALLERY_TRAVEL[id] ? [GALLERY_TRAVEL[id]] : []), `handoff-${id}`,
+    ...JOURNEY_CHAPTERS.filter(chapter => chapter.pause?.after === id).map(chapter => chapter.pause.id),
+  ]),
+  "order", "letters-clue", "password", "final",
+].map(id => ({ id, label: id.replaceAll("-", " ") }));

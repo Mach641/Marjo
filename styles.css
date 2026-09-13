@@ -1175,3 +1175,24 @@ body:has(.d1-handover)::before { opacity: 1; background: url("assets/opening/v1-
 }
 
 .scrapbook-memory:nth-child(even) { --reward-rotation: 2deg; }
+
+/* Chapter pauses: existing paper/rainbow/front artwork, a plain back cover. */
+body:has(.journey-pause) > .site-header,
+body:has(.journey-pause) > .weather { display: none; }
+body:has(.journey-pause) { background: #fae9ce; }
+body:has(.journey-pause)::before { opacity: 1; background: url("assets/opening/v1-4-18/01_background_papier.png") center / cover; }
+.app:has(.journey-pause) { width: 100%; padding: 0; }
+.journey-pause { min-height: 100svh; padding: max(30px, env(safe-area-inset-top)) 24px max(90px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; text-align: center; color: #443326; }
+.journey-pause__rainbow { width: 135px; height: auto; }
+.journey-pause__copy { max-width: 335px; font: 19px/1.5 Georgia, serif; }
+.journey-pause__copy p { margin: 0 0 12px; }
+.journey-pause__front { width: min(46vw, 24svh, 195px); height: auto; }
+.journey-pause__back { position: relative; width: min(40vw, 21svh, 172px); aspect-ratio: 398 / 441; margin: 10px; border: 2px solid #92724e; border-right: 9px solid #765637; border-radius: 6px 13px 13px 6px; background: #bb9369 url("assets/opening/v1-4-18/01_background_papier.png") center / cover; background-blend-mode: multiply; transform: rotate(6deg); box-shadow: -3px 3px 0 #e0c7a2, -5px 5px 0 #96734f, 0 6px 9px #523a2526; }
+.journey-pause__back span { position: absolute; inset: 8px; border: 1px solid #72533640; border-radius: 3px; }
+.journey-pause__extra { max-width: 315px; margin: 0; font: italic 15px/1.5 Georgia, serif; }
+.journey-pause__target { margin: 0; font: 14px/1.4 Georgia, serif; }
+.journey-pause__countdown { font: 18px/1.4 Georgia, serif; font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-conclusion] .blind-test-finale__rainbow path { visibility: visible; animation: none; opacity: .8; }
+}

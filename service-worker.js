@@ -1,5 +1,6 @@
-const CACHE_NAME = "voyage-majorque-v1-4-42-canonical-journey";
+const CACHE_NAME = "voyage-majorque-v1-4-43-chapter-pauses";
 const APP_SHELL = [
+  "./journey-state.js?v=1.4.43",
   "./assets/challenge-1/v1-4-38/d1-handover.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-full.png",
@@ -41,9 +42,9 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.42",
-  "./script.js?v=1.4.42",
-  "./config.js?v=1.4.42",
+  "./styles.css?v=1.4.43",
+  "./script.js?v=1.4.43",
+  "./config.js?v=1.4.43",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",

@@ -1,8 +1,9 @@
+import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.43";
 import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.37";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.42";
+import { APP_VERSION, CONFIG, STEPS, GALLERY_TRAVEL } from "./config.js?v=1.4.43";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -21,7 +22,7 @@ const debugMode = searchParams.get("debug") === "1";
 const displayModeOverride = debugMode ? searchParams.get("display") : null;
 const stateStorageKey = debugMode ? `${CONFIG.storageKey}-debug` : CONFIG.storageKey;
 const OPENING_ROUTES = new Set(["welcome", "prologue", "notebook-intro"]);
-const SPECIAL_ROUTES = new Set(["install", "book-closed", "book-open", "notebook-intro"]);
+const SPECIAL_ROUTES = new Set(["install", "book-open"]);
 const BROWSER_PREVIEW_KEY = "voyage-majorque-browser-preview";
 let cleanupCurrentScreen = null;
 let rendering = false;
@@ -33,7 +34,7 @@ const defaultState = () => ({
   onboardingCompleted: false,
   openingStep: "welcome",
   currentStep: "welcome",
-  completedChallenges: {},
+  ...createJourneyProgress(),
   challengeOne: {
     started: false,
     phase: "intro",
@@ -42,19 +43,12 @@ const defaultState = () => ({
     revealLevel: 1,
     hintVisible: false,
   },
-  galleryViewed: {},
-  revealedScenes: {},
-  illustrations: {},
   answers: {},
-  geoRiddleSolved: false,
-  geoValidated: false,
-  awaitingFlightReopen: false,
   orderAnnounced: false,
   lettersFound: false,
   finalUnlocked: false,
   majorcaMomentSeen: false,
-  newMemoryChapterId: null,
-  debugDateLocked: false,
+  debugTimeOffsetMs: 0,
 });
 
 function loadState() {
@@ -65,14 +59,6 @@ function loadState() {
     migrated.revealedScenes = stored.revealedScenes && typeof stored.revealedScenes === "object" && !Array.isArray(stored.revealedScenes) ? stored.revealedScenes : {};
     migrated.challengeOne = { ...defaultState().challengeOne, ...(stored.challengeOne || {}) };
     migrated.challengeOne.openedDoors = [...new Set((migrated.challengeOne.openedDoors || []).map(Number).filter((id) => id >= 1 && id <= 6))];
-    // Les personnes ayant déjà commencé en V1.3 ne doivent pas revoir l'onboarding.
-    if (typeof stored.onboardingCompleted !== "boolean") {
-      migrated.onboardingCompleted = Boolean(stored.started || stored.currentStep !== "welcome");
-      if (migrated.onboardingCompleted && ["welcome", "prologue"].includes(migrated.currentStep)) migrated.currentStep = "challenge-1";
-    }
-    CONFIG.routeOrder.forEach(id => {
-      if (migrated.illustrations[id]) migrated.completedChallenges[id] = true;
-    });
     return migrated;
   } catch { return defaultState(); }
 }
@@ -105,9 +91,9 @@ function advanceStateTo(id) {
 }
 
 function navigate(id, { advance = false, replace = false } = {}) {
-  if (!routeExists(id)) id = state.currentStep;
+  id = canonicalRoute(id);
   if (advance && stepIndex(id) >= 0) { advanceStateTo(id); saveState(); }
-  if (!debugMode && stepIndex(id) >= 0 && stepIndex(id) > currentStepIndex()) id = state.currentStep;
+  id = canonicalRoute(id);
   const hash = `#${id}`;
   if (replace) history.replaceState(null, "", hash);
   else if (location.hash !== hash) location.hash = id;
@@ -119,7 +105,7 @@ function updateChrome(id) {
   const index = Math.max(0, stepIndex(id));
   const opening = OPENING_ROUTES.has(id);
   document.body.classList.toggle("opening-active", opening);
-  header.hidden = opening || ["install", "book-closed", "book-open", "challenge-1"].includes(id);
+  header.hidden = opening || ["install", "book-open", "challenge-1"].includes(id);
   progressLabel.textContent = "Le carnet";
   progressBar.style.width = `${Math.round((index / (STEPS.length - 1)) * 100)}%`;
   illustrationCount.hidden = true;
@@ -189,48 +175,41 @@ function renderNotebookIntro() {
   });
 }
 
-const unlockedMemoryIds = () => CONFIG.routeOrder.filter((id) => Boolean(state.galleryViewed[id] && CONFIG.chapters[id]?.gallery));
-
-function hubCopy() {
-  if (state.currentStep === "thursday-lock" && !dayIsOpen(CONFIG.schedule.fridayUnlockDate)) {
-    return { message: "C’est tout pour aujourd’hui. Garde le carnet près de toi, une nouvelle page s’ouvrira demain matin.", cta: null };
-  }
-  if (state.currentStep === "friday-lock" && !dayIsOpen(CONFIG.schedule.saturdayUnlockDate)) {
-    return { message: "Le carnet a encore quelque chose à te raconter, mais pas aujourd’hui. Profite du vrai voyage ; on reprend demain.", cta: null };
-  }
-  if (state.finalUnlocked || state.currentStep === "final") return { message: "La dernière page est ouverte.", cta: "La relire" };
-  if (state.awaitingFlightReopen && state.currentStep === "departure") return { message: "Je t’avais dit que le carnet t’attendrait là-haut.", cta: "Rouvrir le carnet" };
-  return { message: "Une nouvelle page t’attend quand tu seras prête.", cta: "Continuer le voyage" };
-}
-
-function notebookDecorations(count) {
-  const tabs = Array.from({ length: Math.min(4, count) }, (_, index) => `<i class="closed-notebook__tab closed-notebook__tab--${index + 1}"></i>`).join("");
-  const papers = Array.from({ length: Math.min(3, Math.max(0, count - 1)) }, (_, index) => `<i class="closed-notebook__paper closed-notebook__paper--${index + 1}"></i>`).join("");
-  return `${tabs}${papers}${count ? '<span class="closed-notebook__photo" aria-hidden="true"></span>' : ""}${count >= 4 ? '<span class="closed-notebook__flower" aria-hidden="true">✿</span>' : ""}`;
-}
-
-// Legacy book URLs converge on the single canonical hub.
-function renderClosedNotebook() { return showNotebook(); }
-function renderOpenNotebook() { return renderFirstNotebook(); }
-
-const firstNotebookSlots = CONFIG.routeOrder.map(challengeId => ({ challengeId }));
-let pendingNotebookReveal = null;
-// Entry routes retain the existing date, departure and Saturday narrative gates.
-const challengeEntry = { 1: "challenge-1", 8: "challenge-8", 2: "thursday-lock", 3: "challenge-3", 5: "friday-lock", 6: "challenge-6", 7: "challenge-7", 4: "travel-past-large-return" };
+const challengeEntry = id => id === 4 ? "travel-past-large-return" : `challenge-${id}`;
 const souvenirRoute = id => `gallery-${id}`;
-const nextChapter = id => CONFIG.routeOrder[CONFIG.routeOrder.indexOf(id) + 1];
-function notebookChapterIds() {
-  return CONFIG.routeOrder.filter((id, index) => state.completedChallenges[id] ||
-    CONFIG.routeOrder.slice(0, index).every(previous => state.illustrations[previous]));
+const journeyNow = () => Date.now() + (debugMode ? Number(state.debugTimeOffsetMs) || 0 : 0);
+function canonicalRoute(id) {
+  if (id === "install") return id;
+  if (!state.onboardingCompleted) return OPENING_ROUTES.has(id) ? id : state.openingStep;
+  const home = journeyHome(state);
+  if (home !== "book-open") return home;
+  if (id === "book-open") return id;
+  const match = /^(challenge|conclusion|gallery|handoff)-([1-8])$/.exec(id);
+  const travelId = Number(Object.keys(GALLERY_TRAVEL).find(key => GALLERY_TRAVEL[key] === id));
+  if (match || travelId || ["travel-past-large-return", "saturday-evening"].includes(id)) {
+    const chapterId = match ? Number(match[2]) : travelId || 4;
+    const kind = match?.[1] || (travelId ? "gallery" : "challenge");
+    if (!routeExists(id)) return home;
+    if (kind === "challenge") return currentChapter(state) === chapterId && !state.completedChallenges[chapterId] ? id : home;
+    if (kind === "conclusion") return home;
+    return state.revealedMemories[chapterId] ? id : home;
+  }
+  if (["order", "letters-clue", "password", "final"].includes(id) && state.illustrations[4]) {
+    const allowed = id === "order" || (id === "letters-clue" && state.orderAnnounced) || (id === "password" && state.lettersFound) || (id === "final" && state.finalUnlocked);
+    return allowed ? id : "order";
+  }
+  return home;
 }
 function showNotebook() {
+  const route = journeyHome(state);
   if (rendering) {
-    history.replaceState(null, "", "#book-open");
-    updateChrome("book-open");
-    return renderFirstNotebook();
+    history.replaceState(null, "", `#${route}`);
+    updateChrome(route);
+    return route === "book-open" ? renderFirstNotebook() : renderers[route]();
   }
-  navigate("book-open", { replace: true });
+  navigate(route, { replace: true });
 }
+function renderOpenNotebook() { return renderFirstNotebook(); }
 const NOTEBOOK_ASSETS = "assets/notebook/v1-4-21";
 function notebookPolaroid(unlocked = false) {
   const image = { src: CONFIG.chapters[1].memoryThumbnail };
@@ -248,14 +227,14 @@ function scrapbookPolaroid({ chapterId, face, annotation = "", action, flip = fa
 }
 
 function renderFirstNotebook(selectedId = null) {
-  const unlocked = Boolean(state.completedChallenges[1]);
-  const revealId = pendingNotebookReveal;
-  pendingNotebookReveal = null;
-  const selected = !unlocked && firstNotebookSlots.find(slot => slot.challengeId === selectedId);
+  const unlocked = Boolean(state.revealedMemories[1]);
+  const revealId = revealMemory(state);
+  if (revealId) saveState();
+  const selected = !unlocked && selectedId === 1 ? { challengeId: 1 } : null;
   app.innerHTML = `<section class="journey-notebook${selected ? " journey-notebook--context" : " journey-notebook--scrapbook"}" aria-labelledby="journey-title">
     <div class="journey-notebook__tabs" aria-hidden="true"><i>♧</i><i>✧</i><i>△</i></div>
     ${selected ? '<button class="journey-notebook__back" type="button" data-action="notebook-back">← Notre voyage</button>' : '<h1 id="journey-title" tabindex="-1">NOTRE VOYAGE</h1>'}
-    ${selected ? `<div class="journey-polaroid journey-polaroid--large">${notebookPolaroid()}</div><h1 id="journey-title" tabindex="-1">Ce souvenir t’attend…</h1><p class="journey-notebook__copy">Pour le découvrir, il va falloir relever un défi.<br>C’est le premier d’une belle aventure.</p>${button("Commencer le défi 1", "notebook-start", "journey-notebook__cta")}` : `<div class="scrapbook-memories">${notebookChapterIds().map(chapterId => scrapbookPolaroid({ chapterId, face: Boolean(state.completedChallenges[chapterId]), annotation: chapterId === 1 ? "Etre un couple" : CONFIG.chapters[chapterId].title, flip: chapterId === revealId && !state.illustrations[chapterId], action: state.completedChallenges[chapterId] ? "gallery" : chapterId === 1 ? "first-challenge" : "continue" })).join("")}</div><p class="journey-notebook__soon">Il y a encore beaucoup<br>de pages à remplir…</p>${state.illustrations[4] ? button("Continuer le voyage", "notebook-finale", "quiet-button") : ""}`}
+    ${selected ? `<div class="journey-polaroid journey-polaroid--large">${notebookPolaroid()}</div><h1 id="journey-title" tabindex="-1">Ce souvenir t’attend…</h1><p class="journey-notebook__copy">Pour le découvrir, il va falloir relever un défi.<br>C’est le premier d’une belle aventure.</p>${button("Commencer le défi 1", "notebook-start", "journey-notebook__cta")}` : `<div class="scrapbook-memories">${visibleChapters(state).map(chapterId => scrapbookPolaroid({ chapterId, face: Boolean(state.revealedMemories[chapterId]), annotation: chapterId === 1 ? "Etre un couple" : CONFIG.chapters[chapterId].title, flip: chapterId === revealId && !state.illustrations[chapterId], action: state.revealedMemories[chapterId] ? "gallery" : chapterId === 1 ? "first-challenge" : "continue" })).join("")}</div><p class="journey-notebook__soon">Il y a encore beaucoup<br>de pages à remplir…</p>${state.illustrations[4] ? button("Continuer le voyage", "notebook-finale", "quiet-button") : ""}`}
     ${selected ? `<img class="journey-notebook__flower" src="${OPENING_ASSETS}/03_fleur_bas_gauche.png" alt="" />` : ""}
   </section>`;
   app.querySelector("#journey-title").focus({ preventScroll: true });
@@ -270,10 +249,7 @@ function renderFirstNotebook(selectedId = null) {
     if (action === "gallery") navigate(souvenirRoute(chapterId), { advance: true });
     else if (action === "first-challenge") renderFirstNotebook(1);
     else {
-      const entry = challengeEntry[chapterId];
-      const challenge = chapterId === 4 ? "saturday-evening" : `challenge-${chapterId}`;
-      const resumedEntry = stepIndex(state.currentStep) >= stepIndex(entry) && stepIndex(state.currentStep) <= stepIndex(challenge) ? state.currentStep : entry;
-      navigate(resumedEntry, { advance: true });
+      navigate(challengeEntry(chapterId), { advance: true });
     }
   }));
   bindAction("notebook-finale", () => navigate("order", { advance: true }));
@@ -285,40 +261,90 @@ function renderFirstNotebook(selectedId = null) {
 function markFirstChallengeCompleted() {
   state.started = true;
   state.onboardingCompleted = true;
-  state.completedChallenges[1] = true;
   state.challengeOne = { ...state.challengeOne, started: true, phase: "doors", openedDoors: CONFIG.challengeOne.rules.map(rule => rule.id), revealLevel: 3, hintVisible: false };
 }
 
 function completeFirstChallenge() { completeChallenge(1); }
 
-// completedChallenges = reward revealed; illustrations = physical souvenir finished.
-// The transient event animates once. Persisted completion prevents replay on reload.
+// Gameplay completion, conclusion, flip and reward completion are distinct stages.
 function completeChallenge(id) {
-  const newlyCompleted = !state.completedChallenges[id];
-  if (id === 1) markFirstChallengeCompleted();
-  else {
-    state.started = true;
-    state.onboardingCompleted = true;
-    state.completedChallenges[id] = true;
-  }
-  advanceStateTo(souvenirRoute(id));
-  saveState();
-  pendingNotebookReveal = newlyCompleted ? id : null;
-  showNotebook();
-}
-
-function finishSouvenir(id) {
   state.started = true;
   state.onboardingCompleted = true;
   if (id === 1) markFirstChallengeCompleted();
-  state.completedChallenges[id] = true;
-  state.galleryViewed[id] = true;
-  state.illustrations[id] = true;
-  const next = nextChapter(id);
-  advanceStateTo(next ? challengeEntry[next] : "order");
-  state.newMemoryChapterId = id;
+  winChallenge(state, id);
+  advanceStateTo(id === 4 ? souvenirRoute(id) : `conclusion-${id}`);
   saveState();
   showNotebook();
+}
+function finishSouvenir(id) {
+  if (!finishReward(state, id)) return showNotebook();
+  const next = currentChapter(state);
+  advanceStateTo(activePause(state)?.id || (next ? challengeEntry(next) : "order"));
+  saveState();
+  showNotebook();
+}
+
+function renderConclusion(id) {
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const colors = ["#c97865", "#dca575", "#e0c783", "#a6b08b", "#92b4c0", "#b6a1bf"];
+  const copy = CONFIG.text.conclusions[id];
+  app.innerHTML = `<section class="paper-card blind-test-finale" data-conclusion="${id}">
+    <svg class="blind-test-finale__rainbow" viewBox="0 0 160 80" aria-hidden="true">
+      ${colors.map((color, i) => `<path d="M ${14+i*7} 70 A ${66-i*7} ${59-i*7} 0 0 1 ${146-i*7} 70" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" style="--rainbow-delay:${i*75}ms" />`).join("")}
+    </svg>
+    <div class="blind-test-finale__message" ${reduced ? "" : "hidden"}>
+      <p>${copy[0]}</p><p><em>${copy[1]}</em></p>
+      ${button("Continuer", "finish-conclusion", id === 8 ? "journey-notebook__cta" : "d1-handover__cta")}
+    </div>
+  </section>`;
+  const timer = reduced ? null : setTimeout(() => { app.querySelector(".blind-test-finale__message").hidden = false; }, 1400);
+  cleanupCurrentScreen = () => clearTimeout(timer);
+  bindAction("finish-conclusion", () => {
+    continueConclusion(state, id);
+    advanceStateTo(souvenirRoute(id));
+    saveState();
+    showNotebook();
+  });
+}
+
+function renderPause(pause) {
+  let previousStatus;
+  let countdown;
+  const update = () => {
+    const now = journeyNow();
+    const status = pauseStatus(state, pause, now);
+    if (status !== previousStatus) {
+      previousStatus = status;
+      const ready = status === "READY_TO_RESUME";
+      app.innerHTML = `<section class="journey-pause" data-pause="${pause.id}" data-pause-status="${status}">
+        <img class="journey-pause__rainbow" src="${OPENING_ASSETS}/02_arc_en_ciel.png" alt="" />
+        <div class="journey-pause__copy">${(ready ? ["Le carnet est prêt à reprendre le voyage."] : pause.text).map(line => `<p>${line}</p>`).join("")}</div>
+        ${ready ? `<img class="journey-pause__front" src="${OPENING_ASSETS}/05_carnet_ferme.png" alt="Le carnet fermé, face avant" />` : '<div class="journey-pause__back" role="img" aria-label="Le carnet fermé, vu de dos"><span></span></div>'}
+        ${!ready && pause.extra ? `<p class="journey-pause__extra">${pause.extra}</p>` : ""}
+        ${ready ? button("Reprendre le voyage", "resume-chapter", "d1-handover__cta") : `<p class="journey-pause__target">${pause.label}</p><output class="journey-pause__countdown" role="timer" aria-label="Temps avant la reprise"></output>`}
+      </section>`;
+      countdown = app.querySelector(".journey-pause__countdown");
+      bindAction("resume-chapter", () => {
+        if (!resumeChapter(state, pause, journeyNow())) return update();
+        advanceStateTo(challengeEntry(pause.next));
+        saveState();
+        showNotebook();
+      });
+    }
+    if (countdown) {
+      const seconds = Math.max(0, Math.ceil((Date.parse(pause.target) - now) / 1000));
+      const days = Math.floor(seconds / 86400);
+      const h = String(Math.floor(seconds % 86400 / 3600)).padStart(2, "0");
+      const m = String(Math.floor(seconds % 3600 / 60)).padStart(2, "0");
+      const s = String(seconds % 60).padStart(2, "0");
+      countdown.textContent = `${days ? `${days} j · ` : ""}${h} h ${m} min ${s} s`;
+    }
+  };
+  update();
+  const timer = setInterval(update, 1000);
+  window.addEventListener("pageshow", update);
+  document.addEventListener("visibilitychange", update);
+  cleanupCurrentScreen = () => { clearInterval(timer); window.removeEventListener("pageshow", update); document.removeEventListener("visibilitychange", update); };
 }
 
 function renderChoiceSequence({ chapterId, title, items, enforceCorrect = false, revealCorrect = false, onDone, decorate }) {
@@ -476,25 +502,9 @@ function renderBlindTest({ chapterId, songs, onDone }) {
   };
   const cta = (label, action) => button(label, action, "journey-notebook__cta");
   const drawFinale = () => {
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const colors = ["#c97865", "#dca575", "#e0c783", "#a6b08b", "#92b4c0", "#b6a1bf"];
-    app.innerHTML = `<section class="paper-card blind-test-finale">
-      <svg class="blind-test-finale__rainbow" viewBox="0 0 160 80" aria-hidden="true">
-        ${colors.map((color, i) => `<path d="M ${14+i*7} 70 A ${66-i*7} ${59-i*7} 0 0 1 ${146-i*7} 70" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" style="--rainbow-delay:${i*75}ms" />`).join("")}
-      </svg>
-      <div class="blind-test-finale__message" ${reduced ? "" : "hidden"}>
-        <p>Il y a des chansons qu’on reconnaît en quelques secondes.</p>
-        <p><em>Et d’autres qu’on n’oublie jamais.</em></p>
-        ${cta("Continuer", "finish-blind-test")}
-      </div>
-    </section>`;
-    const showMessage = () => { app.querySelector(".blind-test-finale__message").hidden = false; };
-    if (!reduced) later(showMessage, 1400);
-    bindAction("finish-blind-test", () => {
-      state.answers[progressKey] = songs.length;
-      saveState();
-      onDone();
-    });
+    state.answers[progressKey] = songs.length;
+    saveState();
+    onDone();
   };
   const drawSong = () => {
     const progress = songs.map((_, songIndex) => `<span class="blind-test-progress__dot${songIndex === index ? " blind-test-progress__dot--active" : ""}"></span>`).join("");
@@ -650,75 +660,7 @@ function renderTravelGallery(chapterId, direction, intensity, nextStep) {
   });
 }
 
-function todayKey() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-}
-const dayIsOpen = (date) => (debugMode ? !state.debugDateLocked : todayKey() >= date);
-
-function renderDayLock(kind) {
-  const friday = kind === "thursday";
-  const unlockDate = friday ? CONFIG.schedule.fridayUnlockDate : CONFIG.schedule.saturdayUnlockDate;
-  const next = friday ? "travel-past-large" : "saturday-intro";
-  if (dayIsOpen(unlockDate)) {
-    if (friday) return navigate(next, { advance: true });
-    app.innerHTML = page("Bonjour, samedi", `<p>Le carnet est prêt à reprendre la route.</p>${button("Ouvrir le carnet", "continue")}`, { guide: "Les pages ont attendu." });
-    return bindAction("continue", () => navigate(next, { advance: true }));
-  }
-  app.innerHTML = page("Referme-moi pour ce soir", `<p>${friday ? "Je crois qu’on est allés assez loin pour ce soir. Reviens me voir demain matin." : "C’est tout pour aujourd’hui. Profite un peu du vrai voyage. On reprend demain."}</p><p class="notice"><strong>Ta progression est sauvegardée.</strong><br>Tu peux fermer le carnet sans crainte.</p>`, { guide: "Même un carnet doit laisser respirer les histoires." });
-}
-
 function normalize(value) { return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, ""); }
-function haversineKm(aLat, aLon, bLat, bLon) {
-  const rad = (value) => value * Math.PI / 180;
-  const dLat = rad(bLat - aLat); const dLon = rad(bLon - aLon);
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(rad(aLat)) * Math.cos(rad(bLat)) * Math.sin(dLon / 2) ** 2;
-  return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function renderGeo() {
-  if (!state.geoRiddleSolved) {
-    app.innerHTML = page("Où allons-nous ?", `<blockquote>« Le père du prince n’est pas un roi. »</blockquote><label class="field-label" for="destination">Ta réponse</label><input id="destination" class="text-input" autocomplete="off" />${button("Vérifier", "solve")}<p class="feedback" role="status"></p>`, { guide: "Un nom se cache peut-être en pleine lumière." });
-    return bindAction("solve", () => {
-      const accepted = new Set(["saintexupery", "aeroportsaintexupery", "lyonsaintexupery", "aeroportlyonsaintexupery"]);
-      if (!accepted.has(normalize(app.querySelector("#destination").value))) return void (app.querySelector(".feedback").textContent = "Ce n’est pas encore le bon départ.");
-      state.geoRiddleSolved = true;
-      saveState();
-      app.innerHTML = page("Exact.", `<p>Encore faut-il y être…</p>${button("Continuer", "continue")}`);
-      bindAction("continue", renderGeo);
-    }, false);
-  }
-  if (state.geoValidated) return navigate("departure", { advance: true });
-  app.innerHTML = `<section class="paper-card screen">${button(debugMode ? "Valider la position (test)" : "Vérifier ma position", "locate")}<div class="feedback" role="status"></div></section>`;
-  bindAction("locate", () => {
-    if (debugMode) { state.geoValidated = true; saveState(); return navigate("departure", { advance: true }); }
-    const feedback = app.querySelector(".feedback");
-    if (!navigator.geolocation) return void (feedback.textContent = "La géolocalisation n’est pas disponible.");
-    feedback.textContent = "Je cherche ta position…";
-    navigator.geolocation.getCurrentPosition(({ coords }) => {
-      const distance = haversineKm(coords.latitude, coords.longitude, CONFIG.geo.latitude, CONFIG.geo.longitude);
-      if (distance <= CONFIG.geo.radiusKm) { state.geoValidated = true; saveState(); navigate("departure", { advance: true }); }
-      else feedback.innerHTML = rainbowGuide("Tu sais où aller. Je t’attends là-bas.");
-    }, (error) => { feedback.textContent = error.code === 1 ? "Localisation refusée. Tu pourras réessayer ici." : "Position indisponible. Réessaie dans un instant."; }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
-  }, false);
-}
-
-function renderAnalysis() {
-  let index = 0;
-  const startedAt = Date.now();
-  app.innerHTML = page("Un instant…", `<div class="analysis-lines" aria-live="polite"></div>`);
-  const target = app.querySelector(".analysis-lines");
-  const interval = setInterval(() => {
-    target.insertAdjacentHTML("beforeend", `<p>${CONFIG.text.analysis[index]}</p>`);
-    index += 1;
-    if (index >= CONFIG.text.analysis.length) {
-      clearInterval(interval);
-      const remaining = Math.max(0, 3000 - (Date.now() - startedAt));
-      setTimeout(() => navigate("resolution-2", { advance: true }), remaining);
-    }
-  }, 700);
-  cleanupCurrentScreen = () => clearInterval(interval);
-}
 
 function renderMajorca() {
   app.innerHTML = page("Le présent vous attendait exactement ici.", `${button("Je l’ai", "have-it")}`, { className: "majorca-screen" });
@@ -734,11 +676,12 @@ function renderSaturdayEvening() {
 }
 
 const renderers = {
+  ...Object.fromEntries(CONFIG.routeOrder.filter(id => id !== 4).map(id => [`conclusion-${id}`, () => renderConclusion(id)])),
+  ...Object.fromEntries(pauses.map(pause => [pause.id, () => renderPause(pause)])),
   install: renderInstallGuide,
   welcome: renderIntro,
   prologue: renderPrologue,
   "notebook-intro": renderNotebookIntro,
-  "book-closed": renderClosedNotebook,
   "book-open": renderOpenNotebook,
   "challenge-1": () => {
     if (state.completedChallenges[1]) {
@@ -753,80 +696,50 @@ const renderers = {
       onComplete: completeFirstChallenge,
     });
   },
-  "resolution-1": completeFirstChallenge,
   "gallery-1": () => openChapterGallery(1, "handoff-1"),
-  "travel-past-medium-1": () => openChapterGallery(1, "handoff-1"),
   "handoff-1": () => renderHandoff(1),
-  "challenge-8": () => state.completedChallenges[8] ? navigate("resolution-8", { advance: true }) : renderBlindTest({ chapterId: 8, songs: CONFIG.chapters[8].songs, onDone: () => completeChallenge(8) }),
-  "resolution-8": () => completeChallenge(8),
+  "challenge-8": () => state.completedChallenges[8] ? showNotebook() : renderBlindTest({ chapterId: 8, songs: CONFIG.chapters[8].songs, onDone: () => completeChallenge(8) }),
   "gallery-8": () => renderGalleryInvitation("travel-future-large"),
   "travel-future-large": () => renderTravelGallery(8, "future", "large", "handoff-8"),
   "handoff-8": () => renderHandoff(8),
-  "thursday-lock": () => renderDayLock("thursday"),
-  "travel-past-large": () => renderTravel("past", "large", "friday-returned"),
-  "friday-returned": () => { app.innerHTML = `<section class="paper-card screen">${rainbowGuide("Bon. Revenons à aujourd’hui.")}${button("Continuer", "continue")}</section>`; bindAction("continue", () => navigate("geo", { advance: true })); },
-  geo: renderGeo,
-  departure: () => {
-    if (state.awaitingFlightReopen) {
-      app.innerHTML = page("À bientôt là-haut.", `<p>Le carnet t’attendra.</p>${button("Rouvrir le carnet", "reopen-book")}`);
-      return bindAction("reopen-book", () => { state.awaitingFlightReopen = false; saveState(); navigate("flight", { advance: true }); });
-    }
-    app.innerHTML = page("Le départ", `<p>Tu es au bon endroit… prête à voyager ?</p>${rainbowGuide("On se retrouve là-haut.")}${button("Refermer le carnet", "close-book")}`);
-    bindAction("close-book", () => { state.awaitingFlightReopen = true; saveState(); renderers.departure(); });
-  },
-  flight: () => { app.innerHTML = page("Quelque part au-dessus des nuages", `<div class="plane" aria-hidden="true">✈</div>${button("Poursuivre le voyage", "continue")}`, { guide: "Tu vois ? Même les nuages ont des pages." }); bindAction("continue", () => navigate("challenge-2", { advance: true })); },
-  "challenge-2": () => state.completedChallenges[2] ? navigate("analysis-2", { advance: true }) : renderCoupleProfileIntro(),
-  "analysis-2": () => completeChallenge(2),
-  "resolution-2": () => completeChallenge(2),
+  "challenge-2": () => state.completedChallenges[2] ? showNotebook() : renderCoupleProfileIntro(),
   "gallery-2": renderCoupleProfileResults,
   "travel-past-medium": () => renderTravelGallery(2, "past", "medium", "handoff-2"),
   "handoff-2": () => renderHandoff(2),
-  "challenge-3": () => state.completedChallenges[3] ? navigate("resolution-3", { advance: true }) : renderChallengeThreeIntro(),
-  "resolution-3": () => completeChallenge(3),
+  "challenge-3": () => state.completedChallenges[3] ? showNotebook() : renderChallengeThreeIntro(),
   "gallery-3": () => renderGalleryInvitation("travel-future-small"),
   "travel-future-small": () => renderTravelGallery(3, "future", "small", "handoff-3"),
   "handoff-3": () => renderHandoff(3),
-  "friday-lock": () => renderDayLock("friday"),
-  "saturday-intro": () => { app.innerHTML = page("Bonjour, samedi", `<p>Tu as bien dormi ? Moi, j’ai rêvé d’un camping-car.</p>${button("Prendre la route", "continue")}`); bindAction("continue", () => navigate("challenge-5", { advance: true })); },
   "challenge-5": () => {
     if (state.completedChallenges[5]) return showNotebook();
     const trip = state.answers["chapter-5"] ||= { started: false, choices: [], phase: "choice" };
     cleanupCurrentScreen = renderRoadTrip(app, trip, saveState, () => completeChallenge(5));
   },
-  "resolution-5": () => completeChallenge(5),
-  "reveal-5": () => completeChallenge(5),
   "gallery-5": () => renderGalleryInvitation("travel-future-small-5"),
   "travel-future-small-5": () => renderTravelGallery(5, "future", "small", "handoff-5"),
   "handoff-5": () => renderHandoff(5),
   "challenge-6": () => {
-    if (state.completedChallenges[6]) return navigate("resolution-6", { advance: true });
+    if (state.completedChallenges[6]) return showNotebook();
     if (!state.answers["chapter-6"] || Array.isArray(state.answers["chapter-6"])) state.answers["chapter-6"] = { answers: [], phase: "intro", revealed: false };
     renderChallengeSix(app, state.answers["chapter-6"], saveState, () => completeChallenge(6));
   },
-  "resolution-6": () => completeChallenge(6),
-  "reveal-6": () => completeChallenge(6),
   "gallery-6": () => renderResolution("Finalement…", "Finalement, ils n’ont peut-être pas hérité que de vos yeux ou de votre caractère.<br>Vous leur avez aussi laissé quelques mondes à explorer.", "Continuer", "handoff-6"),
-  "travel-future-medium-6": () => navigate("handoff-6", { advance: true }),
   "handoff-6": () => renderHandoff(6),
   "challenge-7": () => {
-    if (state.completedChallenges[7]) return navigate("resolution-7", { advance: true });
+    if (state.completedChallenges[7]) return showNotebook();
     app.innerHTML = challengeIntro({ id: 7, title: "Le serpent", subtitle: "Comme au temps des vieux téléphones.", image: "assets/challenge-7/v1-4-16/apple-snake.png", alt: "Un serpent composé de rondelles de pomme", copy: "Fais grandir le serpent<br>en mangeant les pommes.", label: "Jouer", action: 'data-action="play-snake"', footer: "path" });
     bindAction("play-snake", () => {
       app.innerHTML = `<section class="paper-card screen"><div id="familyGame"></div></section>`;
       cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7));
     });
   },
-  "resolution-7": () => completeChallenge(7),
   "gallery-7": () => renderResolution("Bien joué !", "Pommes 10 / 10. Le serpent a bien grandi.", "Continuer", "handoff-7"),
-  "travel-future-medium-7": () => navigate("handoff-7", { advance: true }),
   "handoff-7": () => renderHandoff(7),
   "travel-past-large-return": () => renderTravel("past", "large", "saturday-evening"),
   "saturday-evening": renderSaturdayEvening,
   "challenge-4": renderSaturdayEvening,
-  "resolution-4": () => completeChallenge(4),
   "gallery-4": renderMajorca,
   "handoff-4": renderMajorca,
-  majorca: renderMajorca,
   order: () => { app.innerHTML = page("Huit images, un seul fil", `<p>Tu as maintenant huit images entre les mains. Elles racontent la même histoire. Mais pas dans le bon ordre.</p><p><strong>Remets notre voyage dans le temps.</strong></p>${button("Je pense avoir trouvé l’ordre", "continue")}`, { guide: "Pas d’écran à déplacer. Cette fois, l’histoire se tient vraiment entre tes mains." }); bindAction("continue", () => { state.orderAnnounced = true; saveState(); navigate("letters-clue", { advance: true }); }); },
   "letters-clue": () => { app.innerHTML = page("Bien.", `<p>Maintenant, regarde-les encore une fois.</p><p>Elles ont quelque chose à te dire.</p>${button("Je les ai", "continue")}`); bindAction("continue", () => { state.lettersFound = true; saveState(); navigate("password", { advance: true }); }); },
   password: () => { app.innerHTML = page("Huit lettres", `<input id="password" class="text-input text-input--code" autocomplete="off" autocapitalize="characters" maxlength="16" aria-label="Huit lettres" />${button("Ouvrir la dernière page", "unlock")}<p class="feedback" role="status"></p>`); const submit = () => { if (normalize(app.querySelector("#password").value) === normalize(CONFIG.password)) { state.finalUnlocked = true; saveState(); navigate("final", { advance: true }); } else app.querySelector(".feedback").textContent = "Regarde-les encore une fois."; }; bindAction("unlock", submit, false); app.querySelector("#password").addEventListener("keydown", (event) => { if (event.key === "Enter") submit(); }); },
@@ -844,9 +757,10 @@ function render(id) {
   try {
     cleanupCurrentScreen?.(); cleanupCurrentScreen = null;
     document.body.classList.remove("intro-weather--active");
-    if (!debugMode && stepIndex(id) >= 0 && stepIndex(id) > currentStepIndex()) id = state.currentStep;
+    id = canonicalRoute(id);
+    if (location.hash !== `#${id}`) history.replaceState(null, "", `#${id}`);
     updateChrome(id); scrollTo(0, 0);
-    (renderers[id] || renderers[state.currentStep] || renderers["book-closed"])();
+    (renderers[id] || renderers[state.currentStep] || renderers["book-open"])();
   } catch (error) {
     console.error(error);
     app.innerHTML = page("Le carnet a perdu sa page", `<p>Ta progression est toujours là.</p>${button("Retrouver ma page", "recover")}`);
@@ -861,50 +775,80 @@ function setupDebug() {
   const details = debugPanel.querySelector("details");
   details.addEventListener("toggle", () => debugPanel.classList.toggle("debug-panel--open", details.open));
   const select = debugPanel.querySelector("#debugStep");
-  const debugRoutes = ["install", "book-closed", "book-open", ...STEPS.map((step) => step.id)];
-  select.innerHTML = [...new Set(debugRoutes)].map((id) => `<option value="${id}">${id}</option>`).join("");
-  debugPanel.querySelector("#debugGo").addEventListener("click", () => {
+  const debugPresets = [
+    ["welcome", "Prologue"],
+    ...CONFIG.routeOrder.flatMap(id => [
+      [`available:${id}`, `D${id} — disponible dans le carnet`],
+      [`gameplay:${id}`, `D${id} — gameplay`],
+      ...(id === 4 ? [] : [[`conclusion:${id}`, `D${id} — conclusion arc-en-ciel`]]),
+      [`reveal:${id}`, `D${id} — révélation dans le carnet`],
+      [`memory:${id}`, `D${id} — souvenir / récompense`],
+      [`handoff:${id}`, `D${id} — remise`],
+      [`finished:${id}`, `D${id} — souvenir terminé`],
+      ...(pauseAfter(id) ? ["before", "ready", "resumed"].map(phase => [`${phase}:${id}`, `${pauseAfter(id).id} — ${phase === "before" ? "avant l’horaire" : phase === "ready" ? "reprise disponible" : "chapitre repris"}`]) : []),
+    ]),
+  ];
+  select.innerHTML = debugPresets.map(([value, label]) => `<option value="${value}">${label}</option>`).join("");
+  const applyPreset = value => {
     stopActiveSoundtrack();
-    state.debugDateLocked = false;
-    const resolution = /^resolution-([1-8])$/.exec(select.value);
-    if (resolution) {
-      // A test entry simulates reaching this reward in narrative order.
-      const previous = CONFIG.routeOrder.slice(0, CONFIG.routeOrder.indexOf(Number(resolution[1])));
-      previous.forEach(id => {
-        state.completedChallenges[id] = true;
-        state.galleryViewed[id] = true;
-        state.illustrations[id] = true;
-      });
+    cleanupCurrentScreen?.(); cleanupCurrentScreen = null;
+    state = defaultState();
+    if (value === "welcome") { saveState(); return navigate("welcome", { replace: true }); }
+    state.started = state.onboardingCompleted = true;
+    const [phase, rawId] = value.split(":");
+    const id = Number(rawId);
+    for (const previous of CONFIG.routeOrder.slice(0, CONFIG.routeOrder.indexOf(id))) {
+      winChallenge(state, previous);
+      continueConclusion(state, previous);
+      revealMemory(state);
+      finishReward(state, previous);
+      const pause = pauseAfter(previous);
+      if (pause) {
+        const time = Math.max(journeyNow(), Date.parse(pause.target));
+        state.debugTimeOffsetMs = time - Date.now();
+        resumeChapter(state, pause, time);
+      }
     }
-    if (stepIndex(select.value) >= 0) state.currentStep = select.value;
+    let route = "book-open";
+    if (phase === "gameplay") route = challengeEntry(id);
+    if (["conclusion", "reveal", "memory", "handoff", "finished", "before", "ready", "resumed"].includes(phase)) {
+      winChallenge(state, id);
+      if (phase !== "conclusion") continueConclusion(state, id);
+      if (!["conclusion", "reveal"].includes(phase)) revealMemory(state);
+      if (phase === "memory") route = souvenirRoute(id);
+      if (phase === "handoff") route = `handoff-${id}`;
+      if (["finished", "before", "ready", "resumed"].includes(phase)) {
+        finishReward(state, id);
+        const pause = pauseAfter(id);
+        if (pause && ["before", "ready", "resumed"].includes(phase)) {
+          const time = Date.parse(pause.target) + (phase === "before" ? -60000 : 1000);
+          state.debugTimeOffsetMs = time - Date.now();
+          if (phase === "resumed") resumeChapter(state, pause, time);
+        }
+      }
+    }
+    state.currentStep = state.illustrations[4] ? "order" : route === "book-open" ? (currentChapter(state) ? challengeEntry(currentChapter(state)) : journeyHome(state)) : route;
     saveState();
-    navigate(select.value);
-  });
+    syncTime();
+    navigate(route, { replace: true });
+  };
+  debugPanel.querySelector("#debugGo").addEventListener("click", () => applyPreset(select.value));
   debugPanel.querySelector("#debugUnlock").addEventListener("click", () => {
-    stopActiveSoundtrack();
-    CONFIG.routeOrder.forEach((id) => {
-      state.completedChallenges[id] = true;
-      state.illustrations[id] = true;
-      if (CONFIG.chapters[id]?.gallery) state.galleryViewed[id] = true;
-    });
-    Object.assign(state, { started: true, onboardingCompleted: true, geoRiddleSolved: true, geoValidated: true, orderAnnounced: true, lettersFound: true, finalUnlocked: true, majorcaMomentSeen: true, currentStep: "final", debugDateLocked: false });
-    saveState();
-    navigate("final");
+    applyPreset("finished:4");
+    Object.assign(state, { orderAnnounced: true, lettersFound: true, finalUnlocked: true, currentStep: "final" });
+    saveState(); navigate("final", { replace: true });
   });
-  debugPanel.querySelector("#debugOnboarding").addEventListener("click", () => {
-    stopActiveSoundtrack();
-    Object.assign(state, { started: false, onboardingCompleted: false, openingStep: "welcome", currentStep: "welcome" });
-    saveState();
-    navigate("welcome", { replace: true });
+  debugPanel.querySelector("#debugOnboarding").addEventListener("click", () => applyPreset("welcome"));
+  debugPanel.querySelector("#debugBook").addEventListener("click", () => showNotebook());
+  const timeInput = debugPanel.querySelector("#debugNow");
+  const syncTime = () => { timeInput.value = new Date(journeyNow()).toLocaleString("sv-SE", { timeZone: "Europe/Paris" }).replace(" ", "T"); };
+  syncTime();
+  debugPanel.querySelector("#debugApplyTime").addEventListener("click", () => {
+    const value = Date.parse(`${timeInput.value}+02:00`);
+    if (!Number.isFinite(value)) return;
+    state.debugTimeOffsetMs = value - Date.now(); saveState(); showNotebook();
   });
-  debugPanel.querySelector("#debugBook").addEventListener("click", () => navigate("book-closed"));
-  debugPanel.querySelector("#debugWait").addEventListener("click", () => {
-    state.debugDateLocked = true;
-    state.onboardingCompleted = true;
-    state.currentStep = ["thursday-lock", "friday-lock"].includes(select.value) ? select.value : "thursday-lock";
-    saveState();
-    navigate("book-closed", { replace: true });
-  });
+  debugPanel.querySelector("#debugRealTime").addEventListener("click", () => { state.debugTimeOffsetMs = 0; saveState(); syncTime(); showNotebook(); });
 
   const ruleSelect = debugPanel.querySelector("#debugChallengeOneRule");
   const stageSelect = debugPanel.querySelector("#debugChallengeOneStage");
@@ -926,32 +870,12 @@ function setupDebug() {
       five: { phase: "doors", openedDoors: [1, 2, 3, 4, 5], revealLevel: 1, hintVisible: false },
       six: { phase: "doors", openedDoors: [1, 2, 3, 4, 5, 6], revealLevel: 1, hintVisible: false },
     };
+    state = defaultState();
     state.challengeOne = { ...defaultState().challengeOne, started: stage !== "intro", selectedRule, ...presets[stage] };
     state.completedChallenges[1] = false;
-    Object.assign(state, { started: true, onboardingCompleted: true, currentStep: "challenge-1", debugDateLocked: false });
+    Object.assign(state, { started: true, onboardingCompleted: true, currentStep: "challenge-1" });
     saveState();
     navigate("challenge-1");
-  });
-
-  const memoriesSelect = debugPanel.querySelector("#debugMemories");
-  const memoryIds = CONFIG.routeOrder.filter((id) => CONFIG.chapters[id]?.gallery);
-  memoriesSelect.innerHTML = Array.from({ length: memoryIds.length + 1 }, (_, count) => `<option value="${count}">${count}</option>`).join("");
-  memoriesSelect.value = String(unlockedMemoryIds().length);
-  debugPanel.querySelector("#debugApplyMemories").addEventListener("click", () => {
-    stopActiveSoundtrack();
-    const count = Number(memoriesSelect.value);
-    state.completedChallenges = {};
-    state.galleryViewed = {};
-    state.illustrations = {};
-    memoryIds.slice(0, count).forEach((id) => {
-      state.completedChallenges[id] = true;
-      state.galleryViewed[id] = true;
-      state.illustrations[id] = true;
-    });
-    const nextSteps = ["challenge-1", "challenge-8", "thursday-lock", "challenge-3", "friday-lock", "challenge-6", "challenge-7", "travel-past-large-return"];
-    Object.assign(state, { started: true, onboardingCompleted: true, currentStep: nextSteps[count], newMemoryChapterId: count ? memoryIds[count - 1] : null, debugDateLocked: false });
-    saveState();
-    navigate("book-closed", { replace: true });
   });
 
   const displaySelect = debugPanel.querySelector("#debugDisplayMode");
@@ -960,7 +884,7 @@ function setupDebug() {
     const url = new URL(location.href);
     if (displaySelect.value === "auto") url.searchParams.delete("display");
     else url.searchParams.set("display", displaySelect.value);
-    url.hash = displaySelect.value === "browser" ? "install" : "book-closed";
+    url.hash = displaySelect.value === "browser" ? "install" : "book-open";
     location.replace(url);
   });
   debugPanel.querySelector("#debugRefresh").addEventListener("click", async (event) => {
@@ -992,7 +916,7 @@ let initialRoute;
 if (!isStandaloneApp() && !browserPreviewAllowed()) initialRoute = "install";
 else if (debugMode && initial && routeExists(initial)) initialRoute = initial;
 else if (!state.onboardingCompleted) initialRoute = OPENING_ROUTES.has(state.openingStep) ? state.openingStep : "welcome";
-else initialRoute = "book-closed";
+else initialRoute = journeyHome(state);
 navigate(initialRoute, { replace: true });
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => {
