@@ -1,5 +1,11 @@
-const CACHE_NAME = "voyage-majorque-v1-4-44-road-trip";
+const CACHE_NAME = "voyage-majorque-v1-4-45-d1-gallery";
 const APP_SHELL = [
+  "./assets/challenge-1/v1-4-45/D1_G2_decor.png",
+  "./assets/challenge-1/v1-4-45/D1_G2_final.png",
+  "./assets/challenge-1/v1-4-45/D1_G3_decor.png",
+  "./assets/challenge-1/v1-4-45/D1_G3_final.png",
+  "./assets/challenge-1/v1-4-45/D1_G5_decor.png",
+  "./assets/challenge-1/v1-4-45/D1_G5_final.png",
   "./journey-state.js?v=1.4.43",
   "./assets/challenge-1/v1-4-38/d1-handover.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png",

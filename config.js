@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.44";
+export const APP_VERSION = "1.4.45";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -72,8 +72,9 @@ export const CONFIG = {
       memoryThumbnail: "assets/challenge-1/v1-4-27/parc-de-vincennes.png",
       gallery: [
         { id: "vincennes-01", full: "assets/challenge-1/v1-4-30/d1-vincennes-portrait-characters.png", decor: "assets/challenge-1/v1-4-30/d1-vincennes-portrait-decor.png", immersive: true, alt: "Vincent et Marjolaine sur le banc du parc de Vincennes" },
-        { id: "duomo-02", decor: "assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png", full: "assets/challenge-1/v1-4-36/d1-duomo-portrait-full.png", alt: "Vincent et Marjolaine devant le Duomo" },
-        { src: null, label: "PLACEHOLDER — STRESA 2" },
+        { id: "duomo-02", decor: "assets/challenge-1/v1-4-45/D1_G2_decor.png", full: "assets/challenge-1/v1-4-45/D1_G2_final.png", alt: "Vincent et Marjolaine devant le Duomo" },
+        { id: "D1_G3", decor: "assets/challenge-1/v1-4-45/D1_G3_decor.png", full: "assets/challenge-1/v1-4-45/D1_G3_final.png", alt: "Vincent, Marjolaine enceinte et leur chat devant le mur de miroirs" },
+        { id: "D1_G5", decor: "assets/challenge-1/v1-4-45/D1_G5_decor.png", full: "assets/challenge-1/v1-4-45/D1_G5_final.png", alt: "Vincent et Marjolaine au balcon du Regina Palace à Stresa" },
       ],
       // Option future : { enabled: true, src: "assets/audio/...", startMode: "user", volume: 0.8 }
       soundtrack: null,
