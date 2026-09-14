@@ -1,4 +1,4 @@
-# Voyage canonique — V1.4.43
+# Voyage canonique — V1.4.50
 
 ## Source de vérité
 
@@ -24,11 +24,11 @@ Les gardes de navigation appliquent les mêmes règles aux clics, au hash et au 
 
 ## Conclusions et récompenses
 
-D1/D2/D3/D5/D6/D7/D8/D4 : gameplay → conclusion arc-en-ciel → CTA → carnet → flip → souvenir → remise → état stable, pause ou séquence finale après D4.
+D1/D3/D5/D6/D7/D8/D4 : gameplay → conclusion arc-en-ciel → CTA → carnet → flip → souvenir → remise → état stable, pause ou séquence finale après D4. D2 insère son profil de couple entre le gameplay et la conclusion.
 
 Un seul composant de conclusion reprend la composition D8. Ses copies se trouvent dans `CONFIG.text.conclusions`. D8 conserve exactement ses deux phrases et son CTA « Continuer », sans deuxième conclusion.
 
-D2 conserve ses résultats de profil dans le contenu associé au polaroid. D6 conserve les quatre thèmes, leurs illustrations intermédiaires puis sa conclusion de récompense et la remise physique, sans galerie classique inventée. D7 conserve sa conclusion de récompense. Les galeries et handovers existants restent en place.
+D2 affiche ses résultats de profil immédiatement après la vingtième question, avant sa conclusion. Son polaroid ouvre ensuite directement la galerie portrait canonique. D6 conserve les quatre thèmes, leurs illustrations intermédiaires puis sa conclusion de récompense et la remise physique, sans galerie classique inventée. D7 conserve sa conclusion de récompense. Les galeries et handovers existants restent en place.
 
 D4 suit le flow canonique jusqu'à la remise de sa dernière image physique : défi manuel du coucher de soleil, conclusion arc-en-ciel, retour carnet, flip, galerie portrait puis « Je l’ai ». La séquence spéciale commence ensuite : `password → final-handover → final`. La boîte reste inaccessible avant la validation de `MYMPVTME` et l'état final persiste avec `huntCompleted`.
 

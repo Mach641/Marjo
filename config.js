@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.49";
+export const APP_VERSION = "1.4.50";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -10,7 +10,7 @@ const JOURNEY_CHAPTERS = [
 ];
 
 // Existing gallery transitions remain separate from chapter pauses.
-export const GALLERY_TRAVEL = { 2: "travel-past-medium", 3: "travel-future-small", 5: "travel-future-small-5", 8: "travel-future-large" };
+export const GALLERY_TRAVEL = { 3: "travel-future-small", 5: "travel-future-small-5", 8: "travel-future-large" };
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",

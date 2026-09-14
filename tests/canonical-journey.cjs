@@ -42,11 +42,11 @@ let browser;
   };
   const consume = async id => {
     await page.locator(`[data-chapter="${id}"]`).click();
-    if (id === 1) {
+    if ([1, 2].includes(id)) {
+      if (id === 2) assert.equal(await page.locator('.orientation-screen,.time-travel,.landscape-viewer').count(), 0);
       await page.locator('.d1-portrait-gallery__track').evaluate(e => e.scrollLeft=e.scrollWidth);
       await page.locator('.d1-portrait-gallery__close').click();
-    } else if ([8,2,3,5].includes(id)) {
-      if (id===2) { await page.getByRole('heading',{name:'Votre profil de couple',exact:true}).waitFor(); await page.locator('[data-action="continue"]').click(); }
+    } else if ([8,3,5].includes(id)) {
       await page.locator('.orientation-screen [data-action="continue"]').click();
       await page.locator('.time-travel').click();
       await page.locator('.landscape-viewer__track').evaluate(element => { element.scrollLeft = element.scrollWidth; });
@@ -111,6 +111,26 @@ let browser;
     await page.reload(); await hideDebug(); await assertHub(order.slice(0,i+1),order[i+1]);
     console.log(`D${id} preset: persisted conclusion, one flip, handover, pause/resume, next ${order[i+1]||'none'} OK`);
   }
+  // D2 results persist after the last answer and complete the challenge only when consumed.
+  await seed('welcome');
+  await page.locator('#debugPanel').evaluate(e=>e.style.setProperty('display','block','important'));
+  await page.locator('#debugPanel details').evaluate(e=>e.open=true);
+  await page.locator('#debugStep').selectOption('d2-last-question:2');
+  await page.locator('#debugGo').click();
+  await page.locator('#debugPanel').evaluate(e=>e.style.removeProperty('display')); await hideDebug();
+  await page.locator('[data-profile]').first().click();
+  await page.locator('[data-couple-player]').getByText('Réponse de Vincent').waitFor();
+  await page.locator('[data-profile]').first().click();
+  await page.getByRole('heading',{name:'Votre profil de couple',exact:true}).waitFor();
+  assert.equal((await read()).completedChallenges[2],undefined);
+  assert.equal((await read()).answers['chapter-2'].phase,'results');
+  await page.reload(); await hideDebug();
+  await page.getByRole('heading',{name:'Votre profil de couple',exact:true}).waitFor();
+  await page.locator('[data-action="continue"]').click();
+  await page.locator('[data-conclusion="2"]').waitFor();
+  assert.equal((await read()).answers['chapter-2'].phase,'complete');
+  await page.reload(); await hideDebug();
+  await page.locator('[data-conclusion="2"]').waitFor();
   // One uninterrupted progression: actual gameplay callbacks, not resolution aliases.
   await seed('book-open'); await assertHub([],1);
   for (let i=0;i<order.length;i++) {
@@ -132,6 +152,11 @@ let browser;
     } else if (id===2) {
       await page.locator('[data-action="start-couple-profile"]').click();
       for(let answer=0;answer<40;answer++) { await page.locator('[data-profile]').first().click(); await page.waitForTimeout(400); }
+      await page.getByRole('heading',{name:'Votre profil de couple',exact:true}).waitFor();
+      assert.equal((await read()).completedChallenges[2],undefined);
+      await page.reload(); await hideDebug();
+      await page.getByRole('heading',{name:'Votre profil de couple',exact:true}).waitFor();
+      await page.locator('[data-action="continue"]').click();
     } else if (id===3) {
       await page.locator('[data-action="start-challenge-three"]').click();
       for(let photo=0;photo<3;photo++) { await page.locator('[data-baby-choice]').first().click(); await page.locator('[data-action="next-baby-photo"]').click(); }

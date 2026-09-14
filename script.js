@@ -1,9 +1,9 @@
-import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.49";
+import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.50";
 import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.49";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix, CHALLENGE_SIX_PREVIEWS } from "./challenge-six.js?v=1.4.48";
-import { APP_VERSION, CONFIG, STEPS, GALLERY_TRAVEL } from "./config.js?v=1.4.49";
+import { APP_VERSION, CONFIG, STEPS, GALLERY_TRAVEL } from "./config.js?v=1.4.50";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -390,19 +390,34 @@ function renderChoiceSequence({ chapterId, title, items, enforceCorrect = false,
 function coupleProfileProgress() {
   const stored = state.answers["chapter-2"];
   if (!stored || Array.isArray(stored)) {
-    state.answers["chapter-2"] = { questionIndex: 0, activePlayer: "marjolaine", marjolaine: [], vincent: [] };
+    state.answers["chapter-2"] = { phase: "intro", questionIndex: 0, activePlayer: "marjolaine", marjolaine: [], vincent: [] };
   }
   const progress = state.answers["chapter-2"];
   progress.questionIndex = Math.min(CONFIG.chapters[2].questions.length, Math.max(0, Number(progress.questionIndex) || 0));
   progress.activePlayer = progress.activePlayer === "vincent" ? "vincent" : "marjolaine";
   progress.marjolaine = Array.isArray(progress.marjolaine) ? progress.marjolaine : [];
   progress.vincent = Array.isArray(progress.vincent) ? progress.vincent : [];
+  if (!["intro", "questions", "results", "complete"].includes(progress.phase)) {
+    progress.phase = progress.questionIndex >= CONFIG.chapters[2].questions.length ? "results" : progress.questionIndex > 0 || progress.marjolaine.length || progress.vincent.length ? "questions" : "intro";
+  }
   return progress;
+}
+
+function renderCoupleProfile() {
+  const progress = coupleProfileProgress();
+  if (progress.phase === "results") return renderCoupleProfileResults();
+  if (progress.phase === "questions") return renderCoupleProfileChallenge();
+  return renderCoupleProfileIntro();
 }
 
 function renderCoupleProfileIntro() {
   app.innerHTML = challengeIntro({ id: 2, title: "Notre profil de couple", subtitle: "Un test très scientifique. Évidemment.", image: "assets/challenge-2/v1-4-12/couple-profile-notebook.png", alt: "Un petit carnet ouvert et son crayon", copy: "20 questions. Deux réponses à chaque fois.<br><em>D’abord Marjolaine. Puis Vincent.</em>", label: "Commencer le test", action: 'data-action="start-couple-profile"', footer: "coast" });
-  bindAction("start-couple-profile", renderCoupleProfileChallenge);
+  bindAction("start-couple-profile", () => {
+    const progress = coupleProfileProgress();
+    progress.phase = "questions";
+    saveState();
+    renderCoupleProfileChallenge();
+  });
 }
 
 function renderCoupleProfileChallenge() {
@@ -413,7 +428,11 @@ function renderCoupleProfileChallenge() {
   cleanupCurrentScreen = () => { disposed = true; clearTimeout(feedbackTimer); };
   const questions = CONFIG.chapters[2].questions;
   const progress = coupleProfileProgress();
-  if (progress.questionIndex >= questions.length) return completeChallenge(2);
+  if (progress.questionIndex >= questions.length) {
+    progress.phase = "results";
+    saveState();
+    return renderCoupleProfileResults();
+  }
   const question = questions[progress.questionIndex];
   const playerName = progress.activePlayer === "marjolaine" ? "Marjolaine" : "Vincent";
   const questionProgress = questions.map((_, index) => `<span class="blind-test-progress__dot${index === progress.questionIndex ? " blind-test-progress__dot--active" : ""}"></span>`).join("");
@@ -443,7 +462,11 @@ function renderCoupleProfileChallenge() {
       progress.questionIndex += 1;
       progress.activePlayer = "marjolaine";
       saveState();
-      if (progress.questionIndex >= questions.length) completeChallenge(2);
+      if (progress.questionIndex >= questions.length) {
+        progress.phase = "results";
+        saveState();
+        renderCoupleProfileResults();
+      }
       else renderCoupleProfileChallenge();
     }, 500);
   }));
@@ -467,7 +490,11 @@ function renderCoupleProfileResults() {
   const result = (name, key) => `<article class="couple-result"><h2>${name}</h2><div class="couple-result__symbol" aria-hidden="true">${profiles[key].symbol}</div><h3>${profiles[key].name}</h3><p>${profiles[key].description}</p></article>`;
   const crossedComment = marjolaineKey === vincentKey ? "Même profil.<br>Ça explique probablement beaucoup de choses." : "Pas tout à fait le même profil…<br>mais visiblement la même équipe.";
   app.innerHTML = page("Votre profil de couple", `<div class="couple-results">${result("Marjolaine", marjolaineKey)}${result("Vincent", vincentKey)}</div><p class="couple-results__comment">${crossedComment}</p><p class="couple-results__diagnostic">${CONFIG.text.diagnostic}</p>${button("Continuer", "continue")}`);
-  bindAction("continue", () => renderGalleryInvitation("travel-past-medium"));
+  bindAction("continue", () => {
+    progress.phase = "complete";
+    saveState();
+    completeChallenge(2);
+  });
 }
 
 function renderChallengeThreeIntro() {
@@ -606,9 +633,9 @@ function renderGalleryInvitation(travelStep) {
 
 function openChapterGallery(chapterId, nextStep) {
   const chapter = CONFIG.chapters[chapterId];
-  const namedGallery = [1, 4, 5].includes(chapterId);
+  const namedGallery = [1, 2, 4, 5].includes(chapterId);
   const accessibleLabel = namedGallery ? `Images — ${chapter.title}` : "Fenêtre sur votre histoire";
-  cleanupCurrentScreen = ([1, 4, 6].includes(chapterId) ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
+  cleanupCurrentScreen = ([1, 2, 4, 6].includes(chapterId) ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
     accessibleLabel,
     images: chapter.gallery,
     revealedScenes: state.revealedScenes,
@@ -630,8 +657,8 @@ function openChapterGallery(chapterId, nextStep) {
 function openChapterGalleryReview(chapterId) {
   const chapter = CONFIG.chapters[chapterId];
   if (!state.galleryViewed[chapterId] || !chapter?.gallery) return navigate("book-open", { replace: true });
-  const namedGallery = [1, 4, 5].includes(chapterId);
-  cleanupCurrentScreen = ([1, 4, 6].includes(chapterId) ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
+  const namedGallery = [1, 2, 4, 5].includes(chapterId);
+  cleanupCurrentScreen = ([1, 2, 4, 6].includes(chapterId) ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
     accessibleLabel: `Souvenir — ${chapter.title}`,
     images: chapter.gallery,
     revealedScenes: state.revealedScenes,
@@ -781,9 +808,8 @@ const renderers = {
   "gallery-8": () => renderGalleryInvitation("travel-future-large"),
   "travel-future-large": () => renderTravelGallery(8, "future", "large", "handoff-8"),
   "handoff-8": () => renderHandoff(8),
-  "challenge-2": () => state.completedChallenges[2] ? showNotebook() : renderCoupleProfileIntro(),
-  "gallery-2": renderCoupleProfileResults,
-  "travel-past-medium": () => renderTravelGallery(2, "past", "medium", "handoff-2"),
+  "challenge-2": () => state.completedChallenges[2] ? showNotebook() : renderCoupleProfile(),
+  "gallery-2": () => openChapterGallery(2, "handoff-2"),
   "handoff-2": () => renderHandoff(2),
   "challenge-3": () => state.completedChallenges[3] ? showNotebook() : renderChallengeThreeIntro(),
   "gallery-3": () => renderGalleryInvitation("travel-future-small"),
@@ -854,6 +880,8 @@ function setupDebug() {
   const select = debugPanel.querySelector("#debugStep");
   const debugPresets = [
     ["welcome", "Prologue"],
+    ["d2-last-question:2", "D2 — dernière question"],
+    ["d2-profile:2", "D2 — profil de couple"],
     ...ROAD_PREVIEWS.map(([phase, label]) => [`road-${phase}:5`, `D5 — ${label}`]),
     ...CHALLENGE_SIX_PREVIEWS.map(([phase, label]) => [`${phase}:6`, label]),
     ...CONFIG.routeOrder.flatMap(id => [
@@ -901,6 +929,11 @@ function setupDebug() {
     }
     let route = "book-open";
     if (phase === "gameplay") route = challengeEntry(id);
+    if (id === 2 && ["d2-last-question", "d2-profile"].includes(phase)) {
+      const answered = phase === "d2-last-question" ? 19 : 20;
+      state.answers["chapter-2"] = { phase: phase === "d2-last-question" ? "questions" : "results", questionIndex: answered, activePlayer: "marjolaine", marjolaine: Array(answered).fill("A"), vincent: Array(answered).fill("A") };
+      route = "challenge-2";
+    }
     if (id === 4 && ["d4-active", "d4-cta"].includes(phase)) {
       state.answers["chapter-4"] = { phase: "sunset" };
       route = "challenge-4";
