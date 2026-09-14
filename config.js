@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.45";
+export const APP_VERSION = "1.4.46";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -74,6 +74,7 @@ export const CONFIG = {
         { id: "vincennes-01", full: "assets/challenge-1/v1-4-30/d1-vincennes-portrait-characters.png", decor: "assets/challenge-1/v1-4-30/d1-vincennes-portrait-decor.png", immersive: true, alt: "Vincent et Marjolaine sur le banc du parc de Vincennes" },
         { id: "duomo-02", decor: "assets/challenge-1/v1-4-45/D1_G2_decor.png", full: "assets/challenge-1/v1-4-45/D1_G2_final.png", alt: "Vincent et Marjolaine devant le Duomo" },
         { id: "D1_G3", decor: "assets/challenge-1/v1-4-45/D1_G3_decor.png", full: "assets/challenge-1/v1-4-45/D1_G3_final.png", alt: "Vincent, Marjolaine enceinte et leur chat devant le mur de miroirs" },
+        { id: "D1_G4", decor: "assets/challenge-1/v1-4-45/D1_G4_decor.png", full: "assets/challenge-1/v1-4-45/D1_G4_final.png" },
         { id: "D1_G5", decor: "assets/challenge-1/v1-4-45/D1_G5_decor.png", full: "assets/challenge-1/v1-4-45/D1_G5_final.png", alt: "Vincent et Marjolaine au balcon du Regina Palace à Stresa" },
       ],
       // Option future : { enabled: true, src: "assets/audio/...", startMode: "user", volume: 0.8 }
@@ -84,7 +85,13 @@ export const CONFIG = {
       publicChallengeTitle: "Notre profil de couple",
       galleryTitle: "Regarde.",
       letter: "Y",
-      gallery: [{ src: null, label: "PLACEHOLDER — VIE À TROIS" }],
+      gallery: [
+        { id: "D2_G1", decor: "assets/challenge-1/v1-4-45/D2_G1_decor.png", full: "assets/challenge-1/v1-4-45/D2_G1_final.png" },
+        { id: "D2_G2", decor: "assets/challenge-1/v1-4-45/D2_G2_decor.png", full: "assets/challenge-1/v1-4-45/D2_G2_final.png" },
+        { id: "D2_G3", decor: "assets/challenge-1/v1-4-45/D2_G3_decor.png", full: "assets/challenge-1/v1-4-45/D2_G3_final.png" },
+        { id: "D2_G4", decor: "assets/challenge-1/v1-4-45/D2_G4_decor.png", full: "assets/challenge-1/v1-4-45/D2_G4_final.png" },
+        { id: "D2_G5", decor: "assets/challenge-1/v1-4-45/D2_G5_decor.png", full: "assets/challenge-1/v1-4-45/D2_G5_final.png" },
+      ],
       soundtrack: null,
       profiles: {
         A: { symbol: "◆", name: "L’équipe organisée", description: "Planning, relais, organisation : vous aimez sentir que les choses sont sous contrôle… ou au moins faire semblant." },
@@ -234,7 +241,11 @@ export const CONFIG = {
       publicChallengeTitle: "À toi de nous emmener à Stockholm",
       galleryTitle: "Stockholm",
       letter: "V",
-      gallery: [{ src: null, label: "PLACEHOLDER — STOCKHOLM" }],
+      gallery: [
+        { src: null, label: "PLACEHOLDER — STOCKHOLM" },
+        { id: "D5_G2", decor: "assets/challenge-1/v1-4-45/D5_G2_decor.png", full: "assets/challenge-1/v1-4-45/D5_G2_final.png" },
+        { id: "D5_G3", decor: "assets/challenge-1/v1-4-45/D5_G3_decor.png", full: "assets/challenge-1/v1-4-45/D5_G3_final.png" },
+      ],
       soundtrack: null,
       routeEvents: [
         { text: "La route s’ouvre devant nous.", action: "Démarrer" },

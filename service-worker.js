@@ -1,5 +1,21 @@
-const CACHE_NAME = "voyage-majorque-v1-4-45-d1-gallery";
+const CACHE_NAME = "voyage-majorque-v1-4-46-gallery";
 const APP_SHELL = [
+  "./assets/challenge-1/v1-4-45/D1_G4_decor.png",
+  "./assets/challenge-1/v1-4-45/D1_G4_final.png",
+  "./assets/challenge-1/v1-4-45/D2_G1_decor.png",
+  "./assets/challenge-1/v1-4-45/D2_G1_final.png",
+  "./assets/challenge-1/v1-4-45/D2_G2_decor.png",
+  "./assets/challenge-1/v1-4-45/D2_G2_final.png",
+  "./assets/challenge-1/v1-4-45/D2_G3_decor.png",
+  "./assets/challenge-1/v1-4-45/D2_G3_final.png",
+  "./assets/challenge-1/v1-4-45/D2_G4_decor.png",
+  "./assets/challenge-1/v1-4-45/D2_G4_final.png",
+  "./assets/challenge-1/v1-4-45/D2_G5_decor.png",
+  "./assets/challenge-1/v1-4-45/D2_G5_final.png",
+  "./assets/challenge-1/v1-4-45/D5_G2_decor.png",
+  "./assets/challenge-1/v1-4-45/D5_G2_final.png",
+  "./assets/challenge-1/v1-4-45/D5_G3_decor.png",
+  "./assets/challenge-1/v1-4-45/D5_G3_final.png",
   "./assets/challenge-1/v1-4-45/D1_G2_decor.png",
   "./assets/challenge-1/v1-4-45/D1_G2_final.png",
   "./assets/challenge-1/v1-4-45/D1_G3_decor.png",
