@@ -568,16 +568,21 @@ noscript { display: block; margin: 30px; text-align: center; }
 
 
 /* Défi 6 uniquement. */
-.challenge-six__intro { display: block; width: min(100%, 380px); max-height: 350px; object-fit: contain; margin: 16px auto; }
-.challenge-six__dots { display: flex; gap: 8px; margin: 8px 0 18px; }
-.challenge-six__dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
-.challenge-six__dots .is-current { background: var(--terracotta); }
-.challenge-six__selected { border-color: var(--terracotta); background: #fff8ef; }
-.challenge-six .choice:disabled { opacity: 1; cursor: default; }
-.challenge-six__feedback { margin: 18px 0; }
-.challenge-six__illustration { aspect-ratio: 4 / 3; display: grid; place-items: center; background: #eee5d4; color: var(--muted); text-align: center; margin: 18px 0; }
-.challenge-six__illustration img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
-@media (hover: none) { .challenge-six .choice:not(.challenge-six__selected):hover { border-color: var(--line); background: #fffdf8; } }
+.challenge-six { display: flex; flex-direction: column; justify-content: center; min-height: calc(100svh - 34px); }
+.challenge-six .gameplay-header h1 { font-size: clamp(24px, 7vw, 32px); line-height: 1.2; }
+.challenge-six__allowance { margin: 2px 0 28px; color: var(--muted); font: italic 15px/1.4 Georgia, serif; text-align: center; }
+.challenge-six__primary { align-self: center; margin-top: 10px; }
+.challenge-six__primary:disabled { opacity: .42; cursor: default; }
+.challenge-six__secondary { width: min(78vw, 290px); margin: 22px auto 0; font: 600 17px/1.2 Georgia, serif; }
+.challenge-six__timer { display: block; margin: 2px auto 10px; color: var(--terracotta-dark); font: 400 clamp(48px, 15vw, 66px)/1 Georgia, serif; font-variant-numeric: tabular-nums; letter-spacing: .03em; }
+.challenge-six__ratings { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 9px; width: 100%; max-width: 390px; margin: 2px auto 22px; }
+.challenge-six__rating { min-width: 0; min-height: 48px; padding: 0; border: 1px solid #bca47b; border-radius: 8px 5px 9px 6px; background: #fffaf1; color: var(--ink); font: 700 17px/1 Georgia, serif; cursor: pointer; }
+.challenge-six__rating.is-selected { border-color: var(--terracotta-dark); background: var(--terracotta); color: #fffaf0; box-shadow: 0 4px 0 rgba(130, 60, 45, .16); }
+@media (max-height: 700px) {
+  .challenge-six { justify-content: flex-start; }
+  .challenge-six .gameplay-header__divider { margin-top: 14px; margin-bottom: 18px; }
+  .challenge-six__ratings { gap: 7px; margin-bottom: 14px; }
+}
 
 /* Défi 7 : grille et commandes du Snake. */
 .snake-intro { display: block; width: min(100%, 360px); max-height: 340px; object-fit: contain; margin: 16px auto; }

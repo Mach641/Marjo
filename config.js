@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.47";
+export const APP_VERSION = "1.4.48";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -57,7 +57,7 @@ export const CONFIG = {
       2: ["Notre couple ne tient pas dans une case.", "Un souvenir en raconte un peu plus."],
       3: ["Ces petits visages ont déjà toute une histoire.", "Une page de cette histoire t’attend."],
       5: ["Chaque chemin dessine une suite possible.", "Découvrons celle qui se cache dans le carnet."],
-      6: ["Il y a des mondes que l’on aime partager.", "Et des souvenirs que l’on transmet."],
+      6: ["Ils vous poseront sûrement des centaines de questions.<br>Certaines auront une réponse.<br>D’autres beaucoup moins.<br><br>Mais ce qu’ils retiendront surtout,<br>c’est que vous aurez pris le temps d’y répondre.", "Il est temps de voir ce qu’ils ont gardé de tout ça."],
       7: ["Le chemin s’est allongé, pomme après pomme.", "Un souvenir t’attend au bout."],
       8: ["Il y a des chansons qu’on reconnaît en quelques secondes.", "Et d’autres qu’on n’oublie jamais."],
     },
@@ -255,16 +255,11 @@ export const CONFIG = {
     },
     6: {
       title: "Retour en France",
-      publicChallengeTitle: "Magie, histoire… ou les deux ?",
+      publicChallengeTitle: "À vous de les convaincre",
       galleryTitle: "Regarde.",
       letter: "T",
       gallery: [{ src: null, label: "PLACEHOLDER — MAISON FAMILIALE" }],
       soundtrack: null,
-      questions: [
-        { prompt: "PLACEHOLDER — Le premier matin dans notre maison", answer: "Les deux" },
-        { prompt: "PLACEHOLDER — Un détail extraordinaire du quotidien", answer: "Magie" },
-        { prompt: "PLACEHOLDER — Un souvenir transmis aux enfants", answer: "Histoire" },
-      ],
     },
     7: {
       title: "Adolescence",

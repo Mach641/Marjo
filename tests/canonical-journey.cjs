@@ -48,8 +48,11 @@ let browser;
       if (id===2) { await page.getByRole('heading',{name:'Votre profil de couple',exact:true}).waitFor(); await page.locator('[data-action="continue"]').click(); }
       await page.locator('.orientation-screen [data-action="continue"]').click();
       await page.locator('.time-travel').click();
+      await page.locator('.landscape-viewer__track').evaluate(element => { element.scrollLeft = element.scrollWidth; });
       await page.locator('.landscape-viewer__close').click();
-    } else if ([6,7].includes(id)) {
+    } else if (id === 6) {
+      await page.locator('.d1-portrait-gallery__close').click();
+    } else if (id === 7) {
       assert.equal(await page.locator('.landscape-viewer,.orientation-screen').count(), 0);
       await page.locator('[data-action="continue"]').click();
     }
@@ -126,12 +129,12 @@ let browser;
       for(let step=0;step<5;step++) { await page.locator('[data-trip-choice]').first().click(); await page.locator('[data-trip-next]').click(); }
       await page.locator('[data-trip-next]').click();
     } else if (id===6) {
-      await page.locator('[data-six-next]').click();
-      for(let theme=0;theme<4;theme++) {
-        for(let q=0;q<6;q++) { await page.locator('[data-six-choice]').first().click(); await page.locator('[data-six-next]').click(); }
-        await page.locator(`[data-six-illustration="${theme+1}"]`).waitFor();
-        await page.locator('[data-six-next]').click();
-        if(theme<3) await page.locator('[data-six-next]').click();
+      await page.locator('[data-six-start]').click();
+      for(let question=0;question<14;question++) {
+        await page.locator('[data-six-launch]').click();
+        await page.locator('[data-six-finished]').click();
+        await page.locator('[data-six-score="5"]').click();
+        await page.locator('[data-six-rate]').click();
       }
     } else if (id===7) {
       // Deterministic apple positions and clock; exercise the real game/win callback.

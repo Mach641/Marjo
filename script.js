@@ -1,9 +1,9 @@
-import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.47";
+import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.48";
 import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.37";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
-import { renderChallengeSix } from "./challenge-six.js?v=1.4.23";
-import { APP_VERSION, CONFIG, STEPS, GALLERY_TRAVEL } from "./config.js?v=1.4.47";
+import { renderChallengeSix, CHALLENGE_SIX_PREVIEWS } from "./challenge-six.js?v=1.4.48";
+import { APP_VERSION, CONFIG, STEPS, GALLERY_TRAVEL } from "./config.js?v=1.4.48";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -597,7 +597,7 @@ function openChapterGallery(chapterId, nextStep) {
   const chapter = CONFIG.chapters[chapterId];
   const namedGallery = chapterId === 1 || chapterId === 5;
   const accessibleLabel = namedGallery ? `Images — ${chapter.title}` : "Fenêtre sur votre histoire";
-  cleanupCurrentScreen = (chapterId === 1 ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
+  cleanupCurrentScreen = ([1, 6].includes(chapterId) ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
     accessibleLabel,
     images: chapter.gallery,
     revealedScenes: state.revealedScenes,
@@ -605,7 +605,7 @@ function openChapterGallery(chapterId, nextStep) {
     onRevealScene: () => saveState(),
     reveal: true,
     soundtrack: activeSoundtrack,
-    placeholderLabel: namedGallery ? `PLACEHOLDER — ${chapter.title.toUpperCase()}` : "PLACEHOLDER — IMAGE À REMPLACER",
+    placeholderLabel: chapterId === 6 ? chapter.gallery[0].label : namedGallery ? `PLACEHOLDER — ${chapter.title.toUpperCase()}` : "PLACEHOLDER — IMAGE À REMPLACER",
     onClose: () => {
       cleanupCurrentScreen = null;
       stopActiveSoundtrack();
@@ -620,14 +620,14 @@ function openChapterGalleryReview(chapterId) {
   const chapter = CONFIG.chapters[chapterId];
   if (!state.galleryViewed[chapterId] || !chapter?.gallery) return navigate("book-open", { replace: true });
   const namedGallery = chapterId === 1 || chapterId === 5;
-  cleanupCurrentScreen = (chapterId === 1 ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
+  cleanupCurrentScreen = ([1, 6].includes(chapterId) ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
     accessibleLabel: `Souvenir — ${chapter.title}`,
     images: chapter.gallery,
     revealedScenes: state.revealedScenes,
     sceneKeyPrefix: String(chapterId),
     onRevealScene: () => saveState(),
     reveal: false,
-    placeholderLabel: namedGallery ? `PLACEHOLDER — ${chapter.title.toUpperCase()}` : "PLACEHOLDER — IMAGE À REMPLACER",
+    placeholderLabel: chapterId === 6 ? chapter.gallery[0].label : namedGallery ? `PLACEHOLDER — ${chapter.title.toUpperCase()}` : "PLACEHOLDER — IMAGE À REMPLACER",
     onClose: () => {
       cleanupCurrentScreen = null;
       stopActiveSoundtrack();
@@ -722,10 +722,10 @@ const renderers = {
   "handoff-5": () => renderHandoff(5),
   "challenge-6": () => {
     if (state.completedChallenges[6]) return showNotebook();
-    if (!state.answers["chapter-6"] || Array.isArray(state.answers["chapter-6"])) state.answers["chapter-6"] = { answers: [], phase: "intro", revealed: false };
-    renderChallengeSix(app, state.answers["chapter-6"], saveState, () => completeChallenge(6));
+    if (!state.answers["chapter-6"] || Array.isArray(state.answers["chapter-6"])) state.answers["chapter-6"] = { phase: "intro", questionIndex: 0, notes: [], endAt: null, selectedScore: null };
+    cleanupCurrentScreen = renderChallengeSix(app, state.answers["chapter-6"], saveState, () => completeChallenge(6));
   },
-  "gallery-6": () => renderResolution("Finalement…", "Finalement, ils n’ont peut-être pas hérité que de vos yeux ou de votre caractère.<br>Vous leur avez aussi laissé quelques mondes à explorer.", "Continuer", "handoff-6"),
+  "gallery-6": () => openChapterGallery(6, "handoff-6"),
   "handoff-6": () => renderHandoff(6),
   "challenge-7": () => {
     if (state.completedChallenges[7]) return showNotebook();
@@ -780,6 +780,7 @@ function setupDebug() {
   const debugPresets = [
     ["welcome", "Prologue"],
     ...ROAD_PREVIEWS.map(([phase, label]) => [`road-${phase}:5`, `D5 — ${label}`]),
+    ...CHALLENGE_SIX_PREVIEWS.map(([phase, label]) => [`${phase}:6`, label]),
     ...CONFIG.routeOrder.flatMap(id => [
       [`available:${id}`, `D${id} — disponible dans le carnet`],
       [`gameplay:${id}`, `D${id} — gameplay`],
@@ -820,6 +821,21 @@ function setupDebug() {
       roadPreviewAt = roadPreview[2];
       state.answers["chapter-5"] = { started: true, choices: roadPreviewAt === null ? [] : [0], phase: roadPreviewAt === null ? "choice" : "reveal" };
       route = "challenge-5";
+    }
+    if (id === 6 && phase.startsWith("d6-")) {
+      const notes = length => Array.from({ length }, (_, index) => ({ question: index + 1, score: 5, ratedBy: index % 2 ? "Marjolaine" : "Vincent" }));
+      const presets = {
+        "d6-intro": { phase: "intro", questionIndex: 0, notes: [], endAt: null, selectedScore: null },
+        "d6-read-1": { phase: "read", questionIndex: 0, notes: [], endAt: null, selectedScore: null },
+        "d6-read-2": { phase: "read", questionIndex: 2, notes: notes(2), endAt: null, selectedScore: null },
+        "d6-timer": { phase: "timer", questionIndex: 0, notes: [], endAt: Date.now() + 45000, selectedScore: null },
+        "d6-expiring": { phase: "timer", questionIndex: 0, notes: [], endAt: Date.now() + 2000, selectedScore: null },
+        "d6-rating-vincent": { phase: "rating", questionIndex: 0, notes: [], endAt: null, selectedScore: null },
+        "d6-rating-marjolaine": { phase: "rating", questionIndex: 1, notes: notes(1), endAt: null, selectedScore: null },
+        "d6-last": { phase: "read", questionIndex: 13, notes: notes(13), endAt: null, selectedScore: null },
+      };
+      state.answers["chapter-6"] = presets[phase];
+      route = "challenge-6";
     }
     if (["conclusion", "reveal", "memory", "handoff", "finished", "before", "ready", "resumed"].includes(phase)) {
       winChallenge(state, id);

@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-47-gallery-refresh";
+const CACHE_NAME = "voyage-majorque-v1-4-48-challenge-six";
 const APP_SHELL = [
   "./assets/challenge-1/v1-4-45/D1_G4_decor.png",
   "./assets/challenge-1/v1-4-45/D1_G4_final.png",
@@ -22,7 +22,7 @@ const APP_SHELL = [
   "./assets/challenge-1/v1-4-45/D1_G3_final.png",
   "./assets/challenge-1/v1-4-45/D1_G5_decor.png",
   "./assets/challenge-1/v1-4-45/D1_G5_final.png",
-  "./journey-state.js?v=1.4.47",
+  "./journey-state.js?v=1.4.48",
   "./assets/challenge-1/v1-4-38/d1-handover.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-full.png",
@@ -56,7 +56,7 @@ const APP_SHELL = [
   "./assets/opening/v1-4-18/10_scotch_bleu.png",
   "./assets/opening/v1-4-17/OoohBaby-Regular.ttf",
   "./assets/challenge-7/v1-4-16/apple-snake.png",
-  "./challenge-six.js?v=1.4.23",
+  "./challenge-six.js?v=1.4.48",
   "./assets/challenge-6/v1-4-15/wizards.png",
   "./assets/challenge-5/v1-4-14/camper.png",
   "./assets/challenge-5/v1-4-14/map.png",
@@ -64,9 +64,9 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.44",
-  "./script.js?v=1.4.47",
-  "./config.js?v=1.4.47",
+  "./styles.css?v=1.4.48",
+  "./script.js?v=1.4.48",
+  "./config.js?v=1.4.48",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",
