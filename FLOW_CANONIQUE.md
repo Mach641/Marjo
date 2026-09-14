@@ -24,13 +24,13 @@ Les gardes de navigation appliquent les mêmes règles aux clics, au hash et au 
 
 ## Conclusions et récompenses
 
-D1/D2/D3/D5/D6/D7/D8 : gameplay → conclusion arc-en-ciel → CTA → carnet → flip → souvenir → remise → état stable ou pause.
+D1/D2/D3/D5/D6/D7/D8/D4 : gameplay → conclusion arc-en-ciel → CTA → carnet → flip → souvenir → remise → état stable, pause ou séquence finale après D4.
 
-Un seul composant de conclusion reprend la composition D8. Ses copies se trouvent dans `CONFIG.text.conclusions`. Les six nouvelles copies sont provisoires ; D8 conserve exactement ses deux phrases et son CTA « Continuer », sans deuxième conclusion.
+Un seul composant de conclusion reprend la composition D8. Ses copies se trouvent dans `CONFIG.text.conclusions`. D8 conserve exactement ses deux phrases et son CTA « Continuer », sans deuxième conclusion.
 
 D2 conserve ses résultats de profil dans le contenu associé au polaroid. D6 conserve les quatre thèmes, leurs illustrations intermédiaires puis sa conclusion de récompense et la remise physique, sans galerie classique inventée. D7 conserve sa conclusion de récompense. Les galeries et handovers existants restent en place.
 
-D4 n'a pas de conclusion arc-en-ciel standard : le moment du banc, sa révélation, Majorque et la séquence `order → letters-clue → password → final` sont conservés. Aucun défi supplémentaire.
+D4 suit le flow canonique jusqu'à la remise de sa dernière image physique : défi manuel du coucher de soleil, conclusion arc-en-ciel, retour carnet, flip, galerie portrait puis « Je l’ai ». La séquence spéciale commence ensuite : `password → final-handover → final`. La boîte reste inaccessible avant la validation de `MYMPVTME` et l'état final persiste avec `huntCompleted`.
 
 ## Trois pauses, un composant
 
@@ -58,11 +58,11 @@ Suppression de la branche interactive aéroport : configuration de coordonnées,
 
 Les routes `geo`, `departure`, `flight`, `friday-returned`, `travel-past-large`, `thursday-lock`, `friday-lock`, `saturday-intro`, les anciens `resolution-*`/`reveal-*` et `book-closed` ne sont plus proposées ni déclarées. Une ancienne URL retombe sur l'état canonique autorisé, sans restaurer son écran.
 
-Les voyages temporels génériques restent utilisés légitimement par les galeries et le retour au présent D4. Leurs animations n'ont pas été supprimées avec la branche aéroport. Aucun ancien hub « Mes souvenirs ».
+Les voyages temporels génériques restent utilisés légitimement par les galeries. Leurs animations n'ont pas été supprimées avec la branche aéroport. Aucun ancien hub « Mes souvenirs ».
 
 ## Mode test
 
-Le sélecteur propose pour chaque défi : disponible, gameplay, conclusion (sauf D4), révélation, contenu, remise, souvenir terminé ; et pour chaque pause : avant cible, reprise disponible, chapitre repris. Ces fixtures utilisent les transitions de production et simulent un instant cohérent avec les chapitres déjà repris.
+Le sélecteur propose pour chaque défi : disponible, gameplay, conclusion, révélation, contenu, remise, souvenir terminé ; et pour chaque pause : avant cible, reprise disponible, chapitre repris. D4 ajoute les étapes du coucher de soleil, de la galerie, du mot de passe, de la boîte et de la fin persistée. Ces fixtures utilisent les transitions de production et simulent un instant cohérent avec les chapitres déjà repris.
 
 L'horloge de test se règle en heure de Paris. « Heure réelle » retire l'override. Il n'y a plus de raccourci aéroport, de contrôle GPS ni de bypass automatique des pauses.
 
@@ -78,7 +78,7 @@ Le test navigateur nécessite Playwright ; `PLAYWRIGHT_MODULE` et `CHROME_PATH` 
 Contrôles réalisés :
 
 - Machine d'état : ordre, refus des actions prématurées, instant limite de chaque pause, sérialisation/reprise, flip unique, absence de D9.
-- Navigateur : huit parcours réels, sept conclusions et leur reload, récompenses, pauses et reprises ; six portes, sept chansons, quarante réponses de couple, trois photos, cinq choix de route, vingt-quatre questions D6 et ses quatre illustrations, dix pommes D7 (horloge et positions déterministes dans le test uniquement), D4 et mot de passe final.
+- Navigateur : huit parcours réels, huit conclusions et leur reload, récompenses, pauses et reprises ; six portes, sept chansons, quarante réponses de couple, trois photos, cinq choix de route, quatorze questions D6, dix pommes D7 (horloge et positions déterministes dans le test uniquement), D4, mot de passe final, handover de la boîte et reload de l'état terminé.
 - Production sans debug : horloge contrôlée, chaque pause avant/après échéance, reload hors ligne, reprise, URLs legacy, galerie D1 déjà vue directement en FULL sans perte de progression.
 - Migration d'une sauvegarde version 3 et protection de la conclusion contre une navigation directe vers sa galerie.
 

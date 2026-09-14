@@ -1,5 +1,6 @@
-const CACHE_NAME = "voyage-majorque-v1-4-48-challenge-six";
+const CACHE_NAME = "voyage-majorque-v1-4-49-challenge-four-finale";
 const APP_SHELL = [
+  "./assets/finale/v1-4-49/colis.png",
   "./assets/challenge-1/v1-4-45/D1_G4_decor.png",
   "./assets/challenge-1/v1-4-45/D1_G4_final.png",
   "./assets/challenge-1/v1-4-45/D2_G1_decor.png",
@@ -22,7 +23,7 @@ const APP_SHELL = [
   "./assets/challenge-1/v1-4-45/D1_G3_final.png",
   "./assets/challenge-1/v1-4-45/D1_G5_decor.png",
   "./assets/challenge-1/v1-4-45/D1_G5_final.png",
-  "./journey-state.js?v=1.4.48",
+  "./journey-state.js?v=1.4.49",
   "./assets/challenge-1/v1-4-38/d1-handover.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-full.png",
@@ -33,7 +34,7 @@ const APP_SHELL = [
   "./assets/opening/v1-4-17/tape-rose.png",
   "./assets/opening/v1-4-17/tape-blue.png",
   "./assets/challenge-1/v1-4-28/d1-01-parc-de-vincennes.webp",
-  "./d1-portrait-gallery.js?v=1.4.37",
+  "./d1-portrait-gallery.js?v=1.4.49",
   "./assets/challenge-1/v1-4-27/parc-de-vincennes.png",
   "./gameplay-header.js?v=1.4.23",
   "./assets/gameplay/v1-4-23/divider-terracotta.png",
@@ -64,9 +65,9 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
-  "./styles.css?v=1.4.48",
-  "./script.js?v=1.4.48",
-  "./config.js?v=1.4.48",
+  "./styles.css?v=1.4.49",
+  "./script.js?v=1.4.49",
+  "./config.js?v=1.4.49",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",

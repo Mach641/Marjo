@@ -30,6 +30,7 @@ let browser;
   const seed = async (route, value = {}) => {
     await go('welcome');
     await page.evaluate(({key, route, value}) => localStorage.setItem(key, JSON.stringify({ version: 4, started: true, onboardingCompleted: true, currentStep: route, ...value })), {key, route, value});
+    await page.reload();
     await go(route); await page.reload(); await hideDebug();
   };
   const cards = () => page.locator('.scrapbook-polaroid').evaluateAll(nodes => nodes.map(node => ({id: +node.dataset.chapter, face: node.dataset.scrapbookAction === 'gallery', flip: node.classList.contains('scrapbook-polaroid--reveal')})));
@@ -51,6 +52,12 @@ let browser;
       await page.locator('.landscape-viewer__track').evaluate(element => { element.scrollLeft = element.scrollWidth; });
       await page.locator('.landscape-viewer__close').click();
     } else if (id === 6) {
+      await page.locator('.d1-portrait-gallery__close').click();
+    } else if (id === 4) {
+      await page.locator('.d1-portrait-gallery__slide').waitFor();
+      assert.equal(await page.locator('.d1-portrait-gallery__slide').count(), 1);
+      assert.equal(await page.locator('.d1-portrait-gallery__slide figcaption').count(), 0);
+      await page.locator('.d1-portrait-gallery__close').waitFor({ state: 'visible' });
       await page.locator('.d1-portrait-gallery__close').click();
     } else if (id === 7) {
       assert.equal(await page.locator('.landscape-viewer,.orientation-screen').count(), 0);
@@ -84,18 +91,22 @@ let browser;
     await seed('welcome');
     await page.locator('#debugPanel').evaluate(e=>e.style.setProperty('display','block','important'));
     await page.locator('#debugPanel details').evaluate(e=>e.open=true);
-    await page.locator('#debugStep').selectOption(`${id===4?'reveal':'conclusion'}:${id}`);
+    await page.locator('#debugStep').selectOption(`conclusion:${id}`);
     await page.locator('#debugGo').click(); await hideDebug();
-    if(id!==4) {
-      await page.locator(`[data-conclusion="${id}"]`).waitFor();
-      assert.equal((await read()).revealedMemories[id],undefined);
-      await page.reload(); await hideDebug();
-      await page.locator(`[data-conclusion="${id}"]`).waitFor();
-      await page.locator('[data-action="finish-conclusion"]').click();
-    }
+    await page.locator(`[data-conclusion="${id}"]`).waitFor();
+    assert.equal((await read()).revealedMemories[id],undefined);
+    await page.reload(); await hideDebug();
+    await page.locator(`[data-conclusion="${id}"]`).waitFor();
+    await page.locator('[data-action="finish-conclusion"]').click();
     await assertHub(order.slice(0,i+1), null, id);
     await page.reload(); await hideDebug(); await assertHub(order.slice(0,i+1),null);
     await consume(id);
+    if (id === 4) {
+      await page.getByRole('heading',{name:'Le voyage touche à sa fin…'}).waitFor();
+      await page.reload(); await hideDebug();
+      await page.getByRole('heading',{name:'Le voyage touche à sa fin…'}).waitFor();
+      continue;
+    }
     await finishPause(id,order.slice(0,i+1),order[i+1]);
     await page.reload(); await hideDebug(); await assertHub(order.slice(0,i+1),order[i+1]);
     console.log(`D${id} preset: persisted conclusion, one flip, handover, pause/resume, next ${order[i+1]||'none'} OK`);
@@ -156,31 +167,46 @@ let browser;
         await page.locator(`[data-direction="${direction}"]`).click();
         await page.evaluate(()=>window.snakeTick());
       }
-    } else {
-      await page.locator('.time-travel').click();
-      await page.getByText('Marche jusqu’au banc.',{exact:true}).waitFor();
+    } else if (id===4) {
+      await page.locator('[data-action="start-majorca"]').click();
+      await page.getByRole('heading',{name:'Va voir le coucher de soleil'}).waitFor();
       await page.locator('[data-action="complete-majorca"]').click();
     }
-    if(id!==4) {
-      await page.locator(`[data-conclusion="${id}"]`).waitFor();
-      await page.locator('[data-action="finish-conclusion"]').click();
-    }
+    await page.locator(`[data-conclusion="${id}"]`).waitFor();
+    await page.locator('[data-action="finish-conclusion"]').click();
     await assertHub(order.slice(0,i+1), null, id);
     // Finish the existing animation before interactions; inspect a single flip.
     await page.locator('.scrapbook-polaroid--reveal').evaluate(e=>e.getAnimations().forEach(a=>a.finish()));
     await consume(id);
+    if (id === 4) {
+      await page.getByRole('heading',{name:'Le voyage touche à sa fin…'}).waitFor();
+      const state=await read();
+      assert.deepEqual(Object.keys(state.illustrations).map(Number).sort(),order.slice(0,i+1).sort((a,b)=>a-b));
+      continue;
+    }
     await finishPause(id,order.slice(0,i+1), order[i+1]);
     const state=await read();
     assert.deepEqual(Object.keys(state.illustrations).map(Number).sort(),order.slice(0,i+1).sort((a,b)=>a-b));
     console.log(`Real D${id}: complete → reward → souvenir → handover → hub OK`);
   }
-  await page.locator('[data-action="notebook-finale"]').click();
-  await page.getByRole('heading',{name:'Huit images, un seul fil'}).waitFor();
-  await page.locator('[data-action="continue"]').click();
-  await page.locator('[data-action="continue"]').click();
-  await page.locator('#password').fill('MYMPVTME');
+  const passwordInputs = page.locator('.finale-password__boxes input');
+  assert.equal(await passwordInputs.count(),8);
+  assert.equal(await page.locator('[data-action="unlock"]').isDisabled(),true);
+  for (let index=0;index<8;index++) await passwordInputs.nth(index).fill('A');
   await page.locator('[data-action="unlock"]').click();
-  await page.getByRole('heading',{name:'La boîte',exact:true}).waitFor();
+  await page.getByText('Pas tout à fait… regarde encore les huit images.').waitFor();
+  assert.equal(await passwordInputs.nth(0).inputValue(),'A');
+  for (const [index,letter] of [...'MYMPVTME'].entries()) await passwordInputs.nth(index).fill(letter.toLowerCase());
+  await page.locator('[data-action="unlock"]').click();
+  await page.getByRole('heading',{name:/Vincent a encore/}).waitFor();
+  assert.match(await page.locator('.final-box-handover__illustration').getAttribute('src'),/assets\/finale\/v1-4-49\/colis\.png/);
+  await page.reload(); await hideDebug();
+  await page.getByRole('heading',{name:/Vincent a encore/}).waitFor();
+  await page.locator('[data-action="finish-hunt"]').click();
+  await page.getByText('C’est fini.',{exact:true}).waitFor();
+  assert.equal((await read()).huntCompleted,true);
+  await page.reload(); await hideDebug();
+  await page.getByText('C’est fini.',{exact:true}).waitFor();
   assert.deepEqual(errors,[]);
-  console.log('All eight real flows and shortcuts passed; final sequence retained.');
+  console.log('All eight real flows and shortcuts passed; D4 password, box handover and final persistence OK.');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{await browser?.close();server.close();});

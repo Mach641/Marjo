@@ -1,4 +1,4 @@
-import { CONFIG } from "./config.js?v=1.4.48";
+import { CONFIG } from "./config.js?v=1.4.49";
 
 export const pauses = CONFIG.journeyChapters.flatMap(chapter => chapter.pause ? [chapter.pause] : []);
 export const pauseAfter = id => pauses.find(pause => pause.after === id);
@@ -26,7 +26,7 @@ export function visibleChapters(state) {
 export function winChallenge(state, id) {
   if (currentChapter(state) !== id || state.completedChallenges[id]) return false;
   state.completedChallenges[id] = true;
-  state.rewardStage = { chapterId: id, phase: id === 4 ? "reveal" : "conclusion" };
+  state.rewardStage = { chapterId: id, phase: "conclusion" };
   return true;
 }
 export function continueConclusion(state, id) {

@@ -96,6 +96,6 @@ let browser;
  await p.addStyleTag({content:'#debugPanel{display:none!important}'});
  await p.locator('[data-trip-choice="2"]').click();await p.locator('.stockholm-result:not([hidden])').waitFor();
  assert.equal(await p.locator('.stockholm-illustration').getAttribute('data-illustration'),'1-3');
- const cached=await p.evaluate(async()=>{const c=await caches.open('voyage-majorque-v1-4-44-road-trip');return Promise.all(['./road-trip.js?v=1.4.44','./config.js?v=1.4.43','./assets/challenge-5/v1-4-14/map.png','./assets/challenge-5/v1-4-14/camper.png'].map(async u=>!!await c.match(u)));});
+ const cached=await p.evaluate(async()=>{const c=await caches.open('voyage-majorque-v1-4-49-challenge-four-finale');return Promise.all(['./road-trip.js?v=1.4.44','./config.js?v=1.4.49','./assets/challenge-5/v1-4-14/map.png','./assets/challenge-5/v1-4-14/camper.png','./assets/finale/v1-4-49/colis.png'].map(async u=>!!await c.match(u)));});
  assert.ok(cached.every(Boolean));console.log('Fresh offline cache and D5 route: OK');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server.close();});

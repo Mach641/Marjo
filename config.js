@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.48";
+export const APP_VERSION = "1.4.49";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -60,6 +60,7 @@ export const CONFIG = {
       6: ["Ils vous poseront sûrement des centaines de questions.<br>Certaines auront une réponse.<br>D’autres beaucoup moins.<br><br>Mais ce qu’ils retiendront surtout,<br>c’est que vous aurez pris le temps d’y répondre.", "Il est temps de voir ce qu’ils ont gardé de tout ça."],
       7: ["Le chemin s’est allongé, pomme après pomme.", "Un souvenir t’attend au bout."],
       8: ["Il y a des chansons qu’on reconnaît en quelques secondes.", "Et d’autres qu’on n’oublie jamais."],
+      4: ["Tu étais là.<br>Au bon endroit,<br>au bon moment.", "Ce dernier souvenir est à toi."],
     },
     diagnostic: "Votre histoire ne tient dans aucune case.",
   },
@@ -235,7 +236,14 @@ export const CONFIG = {
         { src: null, answer: "Lenny", alt: "PLACEHOLDER — seconde photo bébé" },
       ],
     },
-    4: { title: "Majorque", publicChallengeTitle: "Samedi soir", letter: "P" },
+    4: {
+      title: "Majorque",
+      publicChallengeTitle: "Le coucher de soleil",
+      galleryTitle: "Majorque",
+      letter: "P",
+      gallery: [{ src: null, label: "PLACEHOLDER — COUCHER DE SOLEIL À MAJORQUE" }],
+      soundtrack: null,
+    },
     5: {
       title: "Stockholm",
       publicChallengeTitle: "À toi de nous emmener à Stockholm",
@@ -292,10 +300,9 @@ export const CONFIG = {
 export const STEPS = [
   "welcome", "prologue", "notebook-intro",
   ...CONFIG.routeOrder.flatMap(id => [
-    ...(id === 4 ? ["travel-past-large-return", "saturday-evening"] : []),
-    `challenge-${id}`, ...(id === 4 ? [] : [`conclusion-${id}`]),
+    `challenge-${id}`, `conclusion-${id}`,
     `gallery-${id}`, ...(GALLERY_TRAVEL[id] ? [GALLERY_TRAVEL[id]] : []), `handoff-${id}`,
     ...JOURNEY_CHAPTERS.filter(chapter => chapter.pause?.after === id).map(chapter => chapter.pause.id),
   ]),
-  "order", "letters-clue", "password", "final",
+  "password", "final-handover", "final",
 ].map(id => ({ id, label: id.replaceAll("-", " ") }));

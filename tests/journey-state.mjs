@@ -12,11 +12,9 @@ for (const [index,id] of order.entries()) {
   assert.equal(winChallenge(state,id),true);
   assert.equal(winChallenge(state,id),false);
   state=JSON.parse(JSON.stringify(state));
-  if(id!==4) {
-    assert.equal(journeyHome(state),`conclusion-${id}`);
-    assert.equal(revealMemory(state),null);
-    assert.equal(continueConclusion(state,id),true);
-  }
+  assert.equal(journeyHome(state),`conclusion-${id}`);
+  assert.equal(revealMemory(state),null);
+  assert.equal(continueConclusion(state,id),true);
   assert.equal(finishReward(state,id),false);
   assert.equal(revealMemory(state),id);
   assert.equal(revealMemory(state),null);
