@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f4ead8" />
+  <title>D3 — Crop calibrator</title>
+  <link rel="stylesheet" href="d3-crop-calibrator.css" />
+</head>
+<body>
+  <main id="cropCalibrator">
+    <p class="crop-calibrator__loading">Chargement du calibrateur…</p>
+  </main>
+  <script>
+    if (new URLSearchParams(location.search).get("debug") !== "1") location.replace("./?debug=1&display=pwa");
+  </script>
+  <script type="module" src="d3-crop-calibrator.js"></script>
+</body>
+</html>
