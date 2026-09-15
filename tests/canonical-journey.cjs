@@ -42,16 +42,15 @@ let browser;
   };
   const consume = async id => {
     await page.locator(`[data-chapter="${id}"]`).click();
-    if ([1, 2].includes(id)) {
-      if (id === 2) assert.equal(await page.locator('.orientation-screen,.time-travel,.landscape-viewer').count(), 0);
+    if ([1, 2, 3, 5, 6, 7, 8].includes(id)) {
+      assert.equal(await page.locator('.orientation-screen,.time-travel,.landscape-viewer').count(), 0);
+      if ([3, 5, 7, 8].includes(id)) {
+        await page.reload(); await hideDebug();
+        await page.locator('.d1-portrait-gallery__track').waitFor();
+        assert.equal(await page.locator('.orientation-screen,.time-travel,.landscape-viewer').count(), 0);
+      }
       await page.locator('.d1-portrait-gallery__track').evaluate(e => e.scrollLeft=e.scrollWidth);
-      await page.locator('.d1-portrait-gallery__close').click();
-    } else if ([8,3,5].includes(id)) {
-      await page.locator('.orientation-screen [data-action="continue"]').click();
-      await page.locator('.time-travel').click();
-      await page.locator('.landscape-viewer__track').evaluate(element => { element.scrollLeft = element.scrollWidth; });
-      await page.locator('.landscape-viewer__close').click();
-    } else if (id === 6) {
+      await page.locator('.d1-portrait-gallery__close').waitFor({ state: 'visible' });
       await page.locator('.d1-portrait-gallery__close').click();
     } else if (id === 4) {
       await page.locator('.d1-portrait-gallery__slide').waitFor();
@@ -59,9 +58,6 @@ let browser;
       assert.equal(await page.locator('.d1-portrait-gallery__slide figcaption').count(), 0);
       await page.locator('.d1-portrait-gallery__close').waitFor({ state: 'visible' });
       await page.locator('.d1-portrait-gallery__close').click();
-    } else if (id === 7) {
-      assert.equal(await page.locator('.landscape-viewer,.orientation-screen').count(), 0);
-      await page.locator('[data-action="continue"]').click();
     }
     await page.locator('[data-action="have-it"]').click();
   };
@@ -192,6 +188,12 @@ let browser;
         await page.locator(`[data-direction="${direction}"]`).click();
         await page.evaluate(()=>window.snakeTick());
       }
+      await page.getByRole('heading',{name:'Bien joué !'}).waitFor();
+      assert.equal((await read()).completedChallenges[7],undefined);
+      assert.equal((await read()).answers['chapter-7'].phase,'payoff');
+      await page.reload(); await hideDebug();
+      await page.getByRole('heading',{name:'Bien joué !'}).waitFor();
+      await page.locator('[data-action="continue"]').click();
     } else if (id===4) {
       await page.locator('[data-action="start-majorca"]').click();
       await page.getByRole('heading',{name:'Va voir le coucher de soleil'}).waitFor();

@@ -1,4 +1,4 @@
-# Voyage canonique — V1.4.50
+# Voyage canonique — V1.4.51
 
 ## Source de vérité
 
@@ -24,11 +24,11 @@ Les gardes de navigation appliquent les mêmes règles aux clics, au hash et au 
 
 ## Conclusions et récompenses
 
-D1/D3/D5/D6/D7/D8/D4 : gameplay → conclusion arc-en-ciel → CTA → carnet → flip → souvenir → remise → état stable, pause ou séquence finale après D4. D2 insère son profil de couple entre le gameplay et la conclusion.
+D1/D3/D5/D6/D8/D4 : gameplay → conclusion arc-en-ciel → CTA → carnet → flip → souvenir → remise → état stable, pause ou séquence finale après D4. D2 insère son profil de couple entre le gameplay et la conclusion. D7 insère son résultat « Pommes 10 / 10 » avant la conclusion.
 
 Un seul composant de conclusion reprend la composition D8. Ses copies se trouvent dans `CONFIG.text.conclusions`. D8 conserve exactement ses deux phrases et son CTA « Continuer », sans deuxième conclusion.
 
-D2 affiche ses résultats de profil immédiatement après la vingtième question, avant sa conclusion. Son polaroid ouvre ensuite directement la galerie portrait canonique. D6 conserve les quatre thèmes, leurs illustrations intermédiaires puis sa conclusion de récompense et la remise physique, sans galerie classique inventée. D7 conserve sa conclusion de récompense. Les galeries et handovers existants restent en place.
+D2 affiche ses résultats de profil immédiatement après la vingtième question, avant sa conclusion. Les polaroids D1, D2, D3, D5, D7 et D8 ouvrent directement la galerie portrait canonique, sans interstitiel d’orientation ni voyage temporel. D6 conserve les quatre thèmes, leurs illustrations intermédiaires puis sa conclusion de récompense et la remise physique, sans galerie classique inventée. Les galeries et handovers existants restent en place.
 
 D4 suit le flow canonique jusqu'à la remise de sa dernière image physique : défi manuel du coucher de soleil, conclusion arc-en-ciel, retour carnet, flip, galerie portrait puis « Je l’ai ». La séquence spéciale commence ensuite : `password → final-handover → final`. La boîte reste inaccessible avant la validation de `MYMPVTME` et l'état final persiste avec `huntCompleted`.
 
@@ -58,11 +58,11 @@ Suppression de la branche interactive aéroport : configuration de coordonnées,
 
 Les routes `geo`, `departure`, `flight`, `friday-returned`, `travel-past-large`, `thursday-lock`, `friday-lock`, `saturday-intro`, les anciens `resolution-*`/`reveal-*` et `book-closed` ne sont plus proposées ni déclarées. Une ancienne URL retombe sur l'état canonique autorisé, sans restaurer son écran.
 
-Les voyages temporels génériques restent utilisés légitimement par les galeries. Leurs animations n'ont pas été supprimées avec la branche aéroport. Aucun ancien hub « Mes souvenirs ».
+Les anciens interstitiels d’orientation et voyages temporels avant galerie ne font plus partie du parcours canonique. Aucun ancien hub « Mes souvenirs ».
 
 ## Mode test
 
-Le sélecteur propose pour chaque défi : disponible, gameplay, conclusion, révélation, contenu, remise, souvenir terminé ; et pour chaque pause : avant cible, reprise disponible, chapitre repris. D4 ajoute les étapes du coucher de soleil, de la galerie, du mot de passe, de la boîte et de la fin persistée. Ces fixtures utilisent les transitions de production et simulent un instant cohérent avec les chapitres déjà repris.
+Le sélecteur propose pour chaque défi : disponible, gameplay, conclusion, révélation, contenu, remise, souvenir terminé ; et pour chaque pause : avant cible, reprise disponible, chapitre repris. Des accès ciblent aussi la dernière étape D3, la route finale D5, le payoff D7 et la dernière chanson D8. D4 ajoute les étapes du coucher de soleil, de la galerie, du mot de passe, de la boîte et de la fin persistée. Ces fixtures utilisent les transitions de production et simulent un instant cohérent avec les chapitres déjà repris.
 
 L'horloge de test se règle en heure de Paris. « Heure réelle » retire l'override. Il n'y a plus de raccourci aéroport, de contrôle GPS ni de bypass automatique des pauses.
 
@@ -86,4 +86,4 @@ Aucun changement des assets, des questions, du gameplay, du prologue ou des modu
 
 Les nouvelles conclusions et pauses sont fonctionnellement testées, pas validées artistiquement. Revue visuelle avec Vincent et test iPhone physique encore nécessaires.
 
-Cache : `voyage-majorque-v1-4-43-chapter-pauses`.
+Cache : `voyage-majorque-v1-4-51-canonical-galleries`.

@@ -1,16 +1,14 @@
-import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.50";
+import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.51";
 import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.49";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix, CHALLENGE_SIX_PREVIEWS } from "./challenge-six.js?v=1.4.48";
-import { APP_VERSION, CONFIG, STEPS, GALLERY_TRAVEL } from "./config.js?v=1.4.50";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.51";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
-import { openGalleryViewer } from "./gallery-viewer.js?v=1.4.35";
 import { renderRoadTrip, ROAD_PREVIEWS } from "./road-trip.js?v=1.4.44";
 let roadPreviewAt = null;
-import { playTimeTravel } from "./time-travel.js?v=1.3.2";
 
 const app = document.querySelector("#app");
 const header = document.querySelector(".site-header");
@@ -196,10 +194,9 @@ function canonicalRoute(id) {
   if (home !== "book-open") return home;
   if (id === "book-open") return id;
   const match = /^(challenge|conclusion|gallery|handoff)-([1-8])$/.exec(id);
-  const travelId = Number(Object.keys(GALLERY_TRAVEL).find(key => GALLERY_TRAVEL[key] === id));
-  if (match || travelId) {
-    const chapterId = match ? Number(match[2]) : travelId;
-    const kind = match?.[1] || "gallery";
+  if (match) {
+    const chapterId = Number(match[2]);
+    const kind = match[1];
     if (!routeExists(id)) return home;
     if (kind === "challenge") return currentChapter(state) === chapterId && !state.completedChallenges[chapterId] ? id : home;
     if (kind === "conclusion") return home;
@@ -571,11 +568,6 @@ function renderBlindTest({ chapterId, songs, onDone }) {
   bindAction("start-blind-test", drawSong);
 }
 
-function renderResolution(title, text, cta, next, options = {}) {
-  app.innerHTML = page(title, `<p>${text}</p>${button(cta, "continue")}`, options);
-  bindAction("continue", () => navigate(next, { advance: true }));
-}
-
 function stopActiveSoundtrack() {
   activeSoundtrack?.stop();
   activeSoundtrack = null;
@@ -593,49 +585,11 @@ async function beginGallerySoundtrack(chapterId) {
   }
 }
 
-function renderGalleryResolution(chapterId, title, text, cta, next, options = {}) {
-  const soundtrack = CONFIG.chapters[chapterId]?.soundtrack;
-  if (!soundtrack?.enabled || !soundtrack.src) return renderResolution(title, text, cta, next, options);
-  app.innerHTML = page(title, `<p>${text}</p>${button("Continuer en musique", "continue")}`, options);
-  bindAction("continue", async () => {
-    await beginGallerySoundtrack(chapterId);
-    navigate(next, { advance: true });
-  });
-}
-
-function renderGalleryInvitation(travelStep) {
-  app.innerHTML = `<section class="paper-card screen orientation-screen"><p class="orientation-invite">Tourne-moi.</p>${button("Ouvrir quand même", "continue", "quiet-button")}</section>`;
-
-  const landscape = matchMedia("(orientation: landscape)");
-  let travelling = false;
-  const removeOrientationListeners = () => {
-    landscape.removeEventListener?.("change", handleOrientation);
-    window.removeEventListener("orientationchange", handleOrientation);
-    window.removeEventListener("resize", handleOrientation);
-  };
-  const startTravel = () => {
-    if (travelling) return;
-    travelling = true;
-    removeOrientationListeners();
-    navigate(travelStep, { advance: true });
-  };
-  function handleOrientation() {
-    if (landscape.matches || innerWidth > innerHeight) startTravel();
-  }
-
-  landscape.addEventListener?.("change", handleOrientation);
-  window.addEventListener("orientationchange", handleOrientation);
-  window.addEventListener("resize", handleOrientation);
-  cleanupCurrentScreen = removeOrientationListeners;
-  bindAction("continue", startTravel);
-  handleOrientation();
-}
-
 function openChapterGallery(chapterId, nextStep) {
   const chapter = CONFIG.chapters[chapterId];
   const namedGallery = [1, 2, 4, 5].includes(chapterId);
   const accessibleLabel = namedGallery ? `Images — ${chapter.title}` : "Fenêtre sur votre histoire";
-  cleanupCurrentScreen = ([1, 2, 4, 6].includes(chapterId) ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
+  cleanupCurrentScreen = renderD1PortraitGallery(app, {
     accessibleLabel,
     images: chapter.gallery,
     revealedScenes: state.revealedScenes,
@@ -658,7 +612,7 @@ function openChapterGalleryReview(chapterId) {
   const chapter = CONFIG.chapters[chapterId];
   if (!state.galleryViewed[chapterId] || !chapter?.gallery) return navigate("book-open", { replace: true });
   const namedGallery = [1, 2, 4, 5].includes(chapterId);
-  cleanupCurrentScreen = ([1, 2, 4, 6].includes(chapterId) ? options => renderD1PortraitGallery(app, options) : openGalleryViewer)({
+  cleanupCurrentScreen = renderD1PortraitGallery(app, {
     accessibleLabel: `Souvenir — ${chapter.title}`,
     images: chapter.gallery,
     revealedScenes: state.revealedScenes,
@@ -686,17 +640,26 @@ function renderHandoff(chapterId) {
   bindAction("have-it", () => finishSouvenir(chapterId));
 }
 
-function renderTravel(direction, intensity, next) {
-  cleanupCurrentScreen = playTimeTravel(app, { direction, intensity, visualDirections: CONFIG.timeTravel.visualDirections, debug: debugMode }, () => {
-    cleanupCurrentScreen = null;
-    navigate(next, { advance: true });
+function renderChallengeSevenPayoff() {
+  app.innerHTML = page("Bien joué !", `<p>Pommes 10 / 10. Le serpent a bien grandi.</p>${button("Continuer", "continue")}`);
+  bindAction("continue", () => {
+    state.answers["chapter-7"] = { phase: "complete" };
+    saveState();
+    completeChallenge(7);
   });
 }
 
-function renderTravelGallery(chapterId, direction, intensity, nextStep) {
-  cleanupCurrentScreen = playTimeTravel(app, { direction, intensity, visualDirections: CONFIG.timeTravel.visualDirections, debug: debugMode }, () => {
-    cleanupCurrentScreen = null;
-    openChapterGallery(chapterId, nextStep);
+function renderChallengeSeven() {
+  if (state.completedChallenges[7]) return showNotebook();
+  if (state.answers["chapter-7"]?.phase === "payoff") return renderChallengeSevenPayoff();
+  app.innerHTML = challengeIntro({ id: 7, title: "Le serpent", subtitle: "Comme au temps des vieux téléphones.", image: "assets/challenge-7/v1-4-16/apple-snake.png", alt: "Un serpent composé de rondelles de pomme", copy: "Fais grandir le serpent<br>en mangeant les pommes.", label: "Jouer", action: 'data-action="play-snake"', footer: "path" });
+  bindAction("play-snake", () => {
+    app.innerHTML = `<section class="paper-card screen"><div id="familyGame"></div></section>`;
+    cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => {
+      state.answers["chapter-7"] = { phase: "payoff" };
+      saveState();
+      renderChallengeSevenPayoff();
+    });
   });
 }
 
@@ -805,15 +768,13 @@ const renderers = {
   "gallery-1": () => openChapterGallery(1, "handoff-1"),
   "handoff-1": () => renderHandoff(1),
   "challenge-8": () => state.completedChallenges[8] ? showNotebook() : renderBlindTest({ chapterId: 8, songs: CONFIG.chapters[8].songs, onDone: () => completeChallenge(8) }),
-  "gallery-8": () => renderGalleryInvitation("travel-future-large"),
-  "travel-future-large": () => renderTravelGallery(8, "future", "large", "handoff-8"),
+  "gallery-8": () => openChapterGallery(8, "handoff-8"),
   "handoff-8": () => renderHandoff(8),
   "challenge-2": () => state.completedChallenges[2] ? showNotebook() : renderCoupleProfile(),
   "gallery-2": () => openChapterGallery(2, "handoff-2"),
   "handoff-2": () => renderHandoff(2),
   "challenge-3": () => state.completedChallenges[3] ? showNotebook() : renderChallengeThreeIntro(),
-  "gallery-3": () => renderGalleryInvitation("travel-future-small"),
-  "travel-future-small": () => renderTravelGallery(3, "future", "small", "handoff-3"),
+  "gallery-3": () => openChapterGallery(3, "handoff-3"),
   "handoff-3": () => renderHandoff(3),
   "challenge-5": () => {
     if (state.completedChallenges[5]) return showNotebook();
@@ -821,8 +782,7 @@ const renderers = {
     cleanupCurrentScreen = renderRoadTrip(app, trip, saveState, () => completeChallenge(5), { previewAt: roadPreviewAt });
     roadPreviewAt = null;
   },
-  "gallery-5": () => renderGalleryInvitation("travel-future-small-5"),
-  "travel-future-small-5": () => renderTravelGallery(5, "future", "small", "handoff-5"),
+  "gallery-5": () => openChapterGallery(5, "handoff-5"),
   "handoff-5": () => renderHandoff(5),
   "challenge-6": () => {
     if (state.completedChallenges[6]) return showNotebook();
@@ -831,15 +791,8 @@ const renderers = {
   },
   "gallery-6": () => openChapterGallery(6, "handoff-6"),
   "handoff-6": () => renderHandoff(6),
-  "challenge-7": () => {
-    if (state.completedChallenges[7]) return showNotebook();
-    app.innerHTML = challengeIntro({ id: 7, title: "Le serpent", subtitle: "Comme au temps des vieux téléphones.", image: "assets/challenge-7/v1-4-16/apple-snake.png", alt: "Un serpent composé de rondelles de pomme", copy: "Fais grandir le serpent<br>en mangeant les pommes.", label: "Jouer", action: 'data-action="play-snake"', footer: "path" });
-    bindAction("play-snake", () => {
-      app.innerHTML = `<section class="paper-card screen"><div id="familyGame"></div></section>`;
-      cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => completeChallenge(7));
-    });
-  },
-  "gallery-7": () => renderResolution("Bien joué !", "Pommes 10 / 10. Le serpent a bien grandi.", "Continuer", "handoff-7"),
+  "challenge-7": renderChallengeSeven,
+  "gallery-7": () => openChapterGallery(7, "handoff-7"),
   "handoff-7": () => renderHandoff(7),
   "challenge-4": renderChallengeFour,
   "gallery-4": () => openChapterGallery(4, "handoff-4"),
@@ -882,6 +835,10 @@ function setupDebug() {
     ["welcome", "Prologue"],
     ["d2-last-question:2", "D2 — dernière question"],
     ["d2-profile:2", "D2 — profil de couple"],
+    ["d3-last:3", "D3 — dernière photo"],
+    ["d5-final:5", "D5 — route finale"],
+    ["d7-payoff:7", "D7 — serpent terminé"],
+    ["d8-last:8", "D8 — dernière chanson"],
     ...ROAD_PREVIEWS.map(([phase, label]) => [`road-${phase}:5`, `D5 — ${label}`]),
     ...CHALLENGE_SIX_PREVIEWS.map(([phase, label]) => [`${phase}:6`, label]),
     ...CONFIG.routeOrder.flatMap(id => [
@@ -933,6 +890,22 @@ function setupDebug() {
       const answered = phase === "d2-last-question" ? 19 : 20;
       state.answers["chapter-2"] = { phase: phase === "d2-last-question" ? "questions" : "results", questionIndex: answered, activePlayer: "marjolaine", marjolaine: Array(answered).fill("A"), vincent: Array(answered).fill("A") };
       route = "challenge-2";
+    }
+    if (id === 3 && phase === "d3-last") {
+      state.answers["chapter-3"] = ["Lenny", "Milan"];
+      route = "challenge-3";
+    }
+    if (id === 5 && phase === "d5-final") {
+      state.answers["chapter-5"] = { started: true, choices: [0, 0, 0, 0, 0], phase: "final" };
+      route = "challenge-5";
+    }
+    if (id === 7 && phase === "d7-payoff") {
+      state.answers["chapter-7"] = { phase: "payoff" };
+      route = "challenge-7";
+    }
+    if (id === 8 && phase === "d8-last") {
+      state.answers["blind-test-8"] = CONFIG.chapters[8].songs.length - 1;
+      route = "challenge-8";
     }
     if (id === 4 && ["d4-active", "d4-cta"].includes(phase)) {
       state.answers["chapter-4"] = { phase: "sunset" };

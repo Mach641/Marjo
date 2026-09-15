@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.50";
+export const APP_VERSION = "1.4.51";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -8,9 +8,6 @@ const JOURNEY_CHAPTERS = [
   { id: "saturday-morning", challenges: [6, 7], pause: { id: "pause-3", after: 7, next: 8, target: "2026-09-19T18:00:00+02:00", label: "Samedi 19 septembre à 18 h", text: ["Deux souvenirs de plus.", "Le carnet peut se reposer un peu. On reprend ce soir."] } },
   { id: "saturday-evening", challenges: [8, 4] },
 ];
-
-// Existing gallery transitions remain separate from chapter pauses.
-export const GALLERY_TRAVEL = { 3: "travel-future-small", 5: "travel-future-small-5", 8: "travel-future-large" };
 
 export const CONFIG = {
   storageKey: "voyage-majorque-v1",
@@ -301,7 +298,7 @@ export const STEPS = [
   "welcome", "prologue", "notebook-intro",
   ...CONFIG.routeOrder.flatMap(id => [
     `challenge-${id}`, `conclusion-${id}`,
-    `gallery-${id}`, ...(GALLERY_TRAVEL[id] ? [GALLERY_TRAVEL[id]] : []), `handoff-${id}`,
+    `gallery-${id}`, `handoff-${id}`,
     ...JOURNEY_CHAPTERS.filter(chapter => chapter.pause?.after === id).map(chapter => chapter.pause.id),
   ]),
   "password", "final-handover", "final",

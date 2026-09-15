@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-50-d2-canonical-flow";
+const CACHE_NAME = "voyage-majorque-v1-4-51-canonical-galleries";
 const APP_SHELL = [
   "./assets/finale/v1-4-49/colis.png",
   "./assets/challenge-1/v1-4-45/D1_G4_decor.png",
@@ -23,7 +23,7 @@ const APP_SHELL = [
   "./assets/challenge-1/v1-4-45/D1_G3_final.png",
   "./assets/challenge-1/v1-4-45/D1_G5_decor.png",
   "./assets/challenge-1/v1-4-45/D1_G5_final.png",
-  "./journey-state.js?v=1.4.50",
+  "./journey-state.js?v=1.4.51",
   "./assets/challenge-1/v1-4-38/d1-handover.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-full.png",
@@ -66,14 +66,12 @@ const APP_SHELL = [
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
   "./styles.css?v=1.4.49",
-  "./script.js?v=1.4.50",
-  "./config.js?v=1.4.50",
+  "./script.js?v=1.4.51",
+  "./config.js?v=1.4.51",
   "./challenge-one.js?v=1.4.23",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",
-  "./gallery-viewer.js?v=1.4.35",
   "./road-trip.js?v=1.4.44",
-  "./time-travel.js?v=1.3.2",
   "./assets/img/Lenny_1.png",
   "./assets/icons/icon-192-v1.png",
   "./assets/icons/icon-512-v1.png",
