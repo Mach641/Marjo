@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.51";
+export const APP_VERSION = "1.4.52";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -39,9 +39,11 @@ export const CONFIG = {
         "Est-ce que tu veux découvrir avec moi pourquoi ?",
       ],
       prologue: [
-        "Je t’invite à ouvrir des pages,<br>à relever quelques défis,<br>à te laisser surprendre.",
-        "On ira faire un tour du côté des souvenirs,<br>et imaginer d’autres possibles,<br>et on verra comment tout cela s’assemble.",
-        "Pas besoin d’être parfaite,<br>juste d’être curieuse.",
+        "Je t’invite à ouvrir quelques pages,<br>à relever quelques défis,<br>et à te laisser surprendre.",
+        "Tu verras des choses que tu n’as encore jamais vues.<br>Des instants qui ont existé sans laisser d’image.<br>Des souvenirs qui auraient mérité d’être gardés quelque part.",
+        "Alors je les ai recréés.",
+        "Tu verras ce qui a été, ce qui aurait pu être, et peut-être aussi un peu de ce qui pourra être.<br>Des morceaux de votre histoire dont certains restent encore à inventer.",
+        "On y va ?",
       ],
       notebook: [
         "C’est lui qui va nous accompagner.<br>Il contiendra les étapes de notre voyage,<br>avec ses défis et ses découvertes.",
