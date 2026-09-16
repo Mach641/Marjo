@@ -1,9 +1,9 @@
-import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.52";
+import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.53";
 import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.49";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix, CHALLENGE_SIX_PREVIEWS } from "./challenge-six.js?v=1.4.48";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.52";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.53";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -408,7 +408,7 @@ function renderCoupleProfile() {
 }
 
 function renderCoupleProfileIntro() {
-  app.innerHTML = challengeIntro({ id: 2, title: "Notre profil de couple", subtitle: "Un test très scientifique. Évidemment.", image: "assets/challenge-2/v1-4-12/couple-profile-notebook.png", alt: "Un petit carnet ouvert et son crayon", copy: "20 questions. Deux réponses à chaque fois.<br><em>D’abord Marjolaine. Puis Vincent.</em>", label: "Commencer le test", action: 'data-action="start-couple-profile"', footer: "coast" });
+  app.innerHTML = challengeIntro({ id: 2, title: "Notre profil de couple", subtitle: "Un test très scientifique. Évidemment.", image: "assets/challenge-2/v1-4-12/couple-profile-notebook.png", alt: "Un petit carnet ouvert et son crayon", copy: "12 questions. Deux réponses à chaque fois.<br><em>D’abord Marjolaine. Puis Vincent.</em>", label: "Commencer le test", action: 'data-action="start-couple-profile"', footer: "coast" });
   bindAction("start-couple-profile", () => {
     const progress = coupleProfileProgress();
     progress.phase = "questions";
@@ -887,7 +887,7 @@ function setupDebug() {
     let route = "book-open";
     if (phase === "gameplay") route = challengeEntry(id);
     if (id === 2 && ["d2-last-question", "d2-profile"].includes(phase)) {
-      const answered = phase === "d2-last-question" ? 19 : 20;
+      const answered = phase === "d2-last-question" ? 11 : 12;
       state.answers["chapter-2"] = { phase: phase === "d2-last-question" ? "questions" : "results", questionIndex: answered, activePlayer: "marjolaine", marjolaine: Array(answered).fill("A"), vincent: Array(answered).fill("A") };
       route = "challenge-2";
     }

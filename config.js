@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.52";
+export const APP_VERSION = "1.4.53";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -100,29 +100,11 @@ export const CONFIG = {
         D: { symbol: "♡", name: "Les amoureux avant tout", description: "Le couple n’a pas disparu sous la logistique, la fatigue et les journées trop remplies. Il a juste trouvé de nouvelles façons de se dire “je t’aime”." },
       },
       questions: [
-        { prompt: "Un dimanche matin, votre salon ressemble à une zone sinistrée. Votre premier réflexe ?", options: [
-          { symbol: "◆", profile: "A", text: "On range tout avant de faire quoi que ce soit." },
-          { symbol: "♡", profile: "D", text: "On se retrouve cinq minutes tous les deux avant d’affronter le chantier." },
-          { symbol: "✦", profile: "C", text: "On se moque du bazar et on improvise autour." },
-          { symbol: "●", profile: "B", text: "On commence par souffler un peu, puis on s’y met." },
-        ] },
         { prompt: "Votre définition d’un moment romantique depuis que vous êtes parents ?", options: [
           { symbol: "●", profile: "B", text: "Dix minutes tranquilles sur le canapé, ça compte déjà beaucoup." },
           { symbol: "✦", profile: "C", text: "Un fou rire au milieu d’un moment complètement bancal." },
           { symbol: "♡", profile: "D", text: "Un moment où on se retrouve vraiment tous les deux, même très court." },
           { symbol: "◆", profile: "A", text: "Un vrai dîner à deux, organisé à l’avance." },
-        ] },
-        { prompt: "Quand une journée part complètement de travers, vous êtes plutôt…", options: [
-          { symbol: "✦", profile: "C", text: "« Bon, autant en rire. »" },
-          { symbol: "◆", profile: "A", text: "« On se pose, on organise, on reprend le contrôle. »" },
-          { symbol: "♡", profile: "D", text: "« Tant qu’on reste soudés tous les deux, ça ira. »" },
-          { symbol: "●", profile: "B", text: "« On fait comme on peut, un truc après l’autre. »" },
-        ] },
-        { prompt: "À la maison, qui repère le plus vite qu’un petit détail cloche ?", options: [
-          { symbol: "♡", profile: "D", text: "Celui qui remarque surtout que l’autre n’a pas l’air dans son assiette." },
-          { symbol: "●", profile: "B", text: "Celui qui a encore assez d’énergie pour le remarquer." },
-          { symbol: "◆", profile: "A", text: "Celui qui garde un œil sur tout." },
-          { symbol: "✦", profile: "C", text: "Celui qui transforme le problème en blague." },
         ] },
         { prompt: "Votre couple face au manque de sommeil, c’est…", options: [
           { symbol: "◆", profile: "A", text: "Une équipe qui se répartit les rôles." },
@@ -135,18 +117,6 @@ export const CONFIG = {
           { symbol: "✦", profile: "C", text: "Improviser au dernier moment selon l’humeur." },
           { symbol: "◆", profile: "A", text: "Quelque chose de prévu pour vraiment en profiter." },
           { symbol: "●", profile: "B", text: "Ne rien faire et récupérer ensemble." },
-        ] },
-        { prompt: "Un désaccord éclate pour une raison ridicule. Vous…", options: [
-          { symbol: "●", profile: "B", text: "Prenez un peu de distance puis revenez calmement." },
-          { symbol: "♡", profile: "D", text: "Supportez très mal de rester froids l’un avec l’autre trop longtemps." },
-          { symbol: "✦", profile: "C", text: "Finissez par rire de la raison initiale." },
-          { symbol: "◆", profile: "A", text: "Essayez de régler ça tout de suite." },
-        ] },
-        { prompt: "La phrase qui revient le plus souvent chez vous ?", options: [
-          { symbol: "✦", profile: "C", text: "« Attends, ça c’est quand même très drôle. »" },
-          { symbol: "♡", profile: "D", text: "« Viens là. »" },
-          { symbol: "◆", profile: "A", text: "« On s’organise comment ? »" },
-          { symbol: "●", profile: "B", text: "« Tu peux prendre le relais deux minutes ? »" },
         ] },
         { prompt: "Dans votre couple, le romantisme aujourd’hui ressemble plutôt à…", options: [
           { symbol: "◆", profile: "A", text: "Des attentions préparées à l’avance." },
@@ -172,12 +142,6 @@ export const CONFIG = {
           { symbol: "♡", profile: "D", text: "Ne jamais vraiment vous perdre de vue." },
           { symbol: "◆", profile: "A", text: "Savoir vous organiser." },
         ] },
-        { prompt: "Une sortie familiale se transforme en galère. Vous réagissez comment ?", options: [
-          { symbol: "◆", profile: "A", text: "Vous trouvez immédiatement un plan B." },
-          { symbol: "♡", profile: "D", text: "Vous vous assurez d’abord que l’autre tient le coup." },
-          { symbol: "●", profile: "B", text: "Vous simplifiez tout et faites au plus facile." },
-          { symbol: "✦", profile: "C", text: "Vous décidez que ce sera une excellente anecdote plus tard." },
-        ] },
         { prompt: "À la fin d’une longue journée, votre geste préféré ?", options: [
           { symbol: "✦", profile: "C", text: "Se regarder avec l’air de dire « on a survécu »." },
           { symbol: "●", profile: "B", text: "S’affaler côte à côte et souffler enfin." },
@@ -196,23 +160,11 @@ export const CONFIG = {
           { symbol: "◆", profile: "A", text: "« On avait tellement moins de choses à organiser. »" },
           { symbol: "●", profile: "B", text: "« On ne savait pas ce que voulait dire être vraiment fatigués. »" },
         ] },
-        { prompt: "Le plus grand changement dans votre couple ?", options: [
-          { symbol: "◆", profile: "A", text: "Vous êtes devenus une vraie équipe logistique." },
-          { symbol: "✦", profile: "C", text: "Vous avez inventé encore plus de codes et de blagues à vous." },
-          { symbol: "♡", profile: "D", text: "Vous avez dû apprendre à protéger votre place de couple dans une vie beaucoup plus remplie." },
-          { symbol: "●", profile: "B", text: "Vous avez appris à mieux vous relayer." },
-        ] },
         { prompt: "Si votre couple avait un super-pouvoir, ce serait…", options: [
           { symbol: "●", profile: "B", text: "Continuer à avancer même avec très peu d’énergie." },
           { symbol: "♡", profile: "D", text: "Réussir à se retrouver même quand tout le reste prend toute la place." },
           { symbol: "◆", profile: "A", text: "Anticiper les catastrophes." },
           { symbol: "✦", profile: "C", text: "Transformer le chaos en complicité." },
-        ] },
-        { prompt: "Un souvenir parfait de votre vie à trois, ce serait plutôt…", options: [
-          { symbol: "✦", profile: "C", text: "Une scène un peu chaotique mais dont vous riez encore." },
-          { symbol: "♡", profile: "D", text: "Un moment où vous regardez votre enfant puis vous vous regardez tous les deux, sans avoir besoin de parler." },
-          { symbol: "●", profile: "B", text: "Un moment tout simple où tout le monde est enfin bien." },
-          { symbol: "◆", profile: "A", text: "Une journée où tout s’est déroulé comme prévu." },
         ] },
         { prompt: "Au fond, votre nouvelle vie ressemble surtout à…", options: [
           { symbol: "♡", profile: "D", text: "Une histoire d’amour qui a grandi pour faire de la place à quelqu’un d’autre." },
