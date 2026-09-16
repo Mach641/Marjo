@@ -227,6 +227,7 @@ for (const [name, input] of Object.entries(coordinateInputs)) {
 difficulty.addEventListener("change", () => {
   currentSetting().difficulty = difficulty.value;
   saveSettings();
+  output.value = exportConfiguration();
 });
 
 photoSelect.addEventListener("change", () => showPhoto(Number(photoSelect.value)));
