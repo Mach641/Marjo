@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-54-prologue-screen-1-copy";
+const CACHE_NAME = "voyage-majorque-v1-4-54-lenny-hd-sources";
 const APP_SHELL = [
   "./assets/finale/v1-4-49/colis.png",
   "./assets/challenge-1/v1-4-45/D1_G4_decor.png",
