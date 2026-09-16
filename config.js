@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.53";
+export const APP_VERSION = "1.4.54";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -33,9 +33,12 @@ export const CONFIG = {
   text: {
     opening: {
       welcome: [
+        "Je suis un arc-en-ciel.",
         "Je suis né parce que la pluie et le soleil se sont rencontrés.",
-        "Les paysages changent, les chemins aussi, parfois même la destination.",
-        "Mais certains voyages restent beaux pour une raison beaucoup plus simple.",
+        "Je suis né parce que votre voyage a commencé.",
+        "On dit souvent que ce n’est pas la destination qui compte, mais le chemin pour y parvenir.",
+        "Je ne suis pas tout à fait d’accord.",
+        "Je pense que certains voyages restent beaux pour une raison beaucoup plus simple.",
         "Est-ce que tu veux découvrir avec moi pourquoi ?",
       ],
       prologue: [
