@@ -554,11 +554,11 @@ noscript { display: block; margin: 30px; text-align: center; }
 .stockholm-trip--reveal { overflow: visible; min-height: 0; padding-inline: 8px; }
 .stockholm-stage { position: relative; width: 100%; aspect-ratio: 530 / 735; }
 .stockholm-stage > .stockholm-map, .stockholm-illustration { position: absolute; inset: 0; width: 100%; height: 100%; }
-.stockholm-illustration { display: grid; place-items: center; background: #eee5d4; color: var(--muted); opacity: 0; border-radius: 6px; overflow: hidden; }
-.stockholm-illustration > img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
-.stockholm-illustration > div { padding: 24px; border-block: 1px dashed #b8a17d; }
-.stockholm-illustration small { display: block; margin-top: 12px; font: italic 16px/1.4 Georgia, serif; }
+.stockholm-illustration { display: grid; place-items: center; opacity: 0; }
+.stockholm-illustration > img { display: block; width: 100%; height: auto; max-height: 100%; object-fit: contain; box-shadow: 0 2px 8px #59452d1a; }
 .stockholm-result { margin-top: 22px; }
+.stockholm-result h1 { margin-bottom: 12px; font-size: clamp(1.9rem, 7vw, 2.7rem); }
+.stockholm-result p { max-width: 32ch; margin: 0 auto 22px; font: 1rem/1.55 Georgia, serif; }
 .stockholm-result .primary-button, .stockholm-trip > .primary-button { margin-top: 16px; }
 .stockholm-preview { margin-top: 20px; }
 .stockholm-trip > .stockholm-map { max-width: 420px; margin: 20px auto; }

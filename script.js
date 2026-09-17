@@ -1,13 +1,13 @@
-import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.54";
+import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.55";
 import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.49";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix, CHALLENGE_SIX_PREVIEWS } from "./challenge-six.js?v=1.4.48";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.54";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.55";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
-import { renderRoadTrip, ROAD_PREVIEWS } from "./road-trip.js?v=1.4.44";
+import { renderRoadTrip, ROAD_PREVIEWS } from "./road-trip.js?v=1.4.55";
 let roadPreviewAt = null;
 
 const app = document.querySelector("#app");

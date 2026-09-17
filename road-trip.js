@@ -20,7 +20,7 @@ export const ROAD_STEPS = [
           610
         ],
         "label": "Suisse",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step1-suisse.jpg"
       },
       {
         "title": "Par l’Alsace",
@@ -34,7 +34,7 @@ export const ROAD_STEPS = [
           610
         ],
         "label": "Alsace",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step1-alsace.jpg"
       },
       {
         "title": "Par l’Italie et l’Autriche",
@@ -48,7 +48,7 @@ export const ROAD_STEPS = [
           740
         ],
         "label": "Italie / Autriche",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step1-italie-autriche.jpg"
       }
     ]
   },
@@ -68,7 +68,7 @@ export const ROAD_STEPS = [
           570
         ],
         "label": "Zurich",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step2-zurich.jpg"
       },
       {
         "title": "Strasbourg",
@@ -82,7 +82,7 @@ export const ROAD_STEPS = [
           535
         ],
         "label": "Strasbourg",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step2-strasbourg.jpg"
       },
       {
         "title": "Munich",
@@ -96,7 +96,7 @@ export const ROAD_STEPS = [
           585
         ],
         "label": "Munich",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step2-munich.jpg"
       }
     ]
   },
@@ -116,7 +116,7 @@ export const ROAD_STEPS = [
           420
         ],
         "label": "Hambourg",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step3-hambourg-danemark.jpg"
       },
       {
         "title": "Berlin puis la Baltique",
@@ -130,7 +130,7 @@ export const ROAD_STEPS = [
           475
         ],
         "label": "Berlin",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step3-berlin-baltique.jpg"
       },
       {
         "title": "Prague avant de remonter",
@@ -144,7 +144,7 @@ export const ROAD_STEPS = [
           550
         ],
         "label": "Prague",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step3-prague.jpg"
       }
     ]
   },
@@ -164,7 +164,7 @@ export const ROAD_STEPS = [
           300
         ],
         "label": "Copenhague",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step4-copenhague.jpg"
       },
       {
         "title": "Une nuit au bord de la mer",
@@ -178,7 +178,7 @@ export const ROAD_STEPS = [
           340
         ],
         "label": "Bord de mer",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step4-bord-de-mer.jpg"
       },
       {
         "title": "Une étape en pleine nature",
@@ -192,7 +192,7 @@ export const ROAD_STEPS = [
           270
         ],
         "label": "Nature",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step4-nature.jpg"
       }
     ]
   },
@@ -212,7 +212,7 @@ export const ROAD_STEPS = [
           225
         ],
         "label": "La côte",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step5-cote-suede.jpg"
       },
       {
         "title": "Par les lacs et les forêts",
@@ -226,7 +226,7 @@ export const ROAD_STEPS = [
           115
         ],
         "label": "Lacs et forêts",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step5-lacs-forets.jpg"
       },
       {
         "title": "On file jusqu’à Stockholm",
@@ -240,7 +240,7 @@ export const ROAD_STEPS = [
           150
         ],
         "label": "Stockholm",
-        "image": null
+        "image": "assets/challenge-5/v1-4-55/d5-step5-stockholm.jpg"
       }
     ]
   }
@@ -311,7 +311,7 @@ export function renderRoadTrip(container, trip, save, onComplete, { previewAt = 
   if (final) body = `<h1>Voilà notre route.</h1><p>Pas forcément la plus courte.<br>Pas forcément la plus logique.<br>Mais sûrement la nôtre.</p>${map(stage,false,true)}${cta('Continuer le voyage →')}`;
   else if (reveal) {
    const o = step.options[trip.choices[stage]];
-   body = `<div class="stockholm-stage">${map(stage,true,false)}<div class="stockholm-illustration" data-illustration="${stage+1}-${trip.choices[stage]+1}" aria-hidden="true">${o.image ? `<img src="${esc(o.image)}" alt="${esc(o.title)}"/>` : `<div><span>Illustration à venir</span><small>${esc(o.title)}</small></div>`}</div></div><div class="stockholm-result" hidden><h1>${esc(o.title)}</h1><p>${esc(o.text)}</p>${cta(stage===4 ? 'Voir notre route →' : 'Suivant →')}</div>${previewAt !== null ? '<button type="button" class="quiet-button stockholm-preview" data-trip-play>Lire la suite de l’animation</button>' : ''}`;
+   body = `<div class="stockholm-stage">${map(stage,true,false)}<div class="stockholm-illustration" data-illustration="${stage+1}-${trip.choices[stage]+1}" aria-hidden="true"><img src="${esc(o.image)}" alt="${esc(o.title)}"/></div></div><div class="stockholm-result" hidden><h1>${esc(o.title)}</h1><p>${esc(o.text)}</p>${cta(stage===4 ? 'Voir notre route →' : 'Suivant →')}</div>${previewAt !== null ? '<button type="button" class="quiet-button stockholm-preview" data-trip-play>Lire la suite de l’animation</button>' : ''}`;
   } else {
    body = `${gameplayHeader({theme:"À toi de nous emmener à Stockholm",title:step.title,description:step.subtitle})}<div class="stockholm-overview">${map(stage,false,false)}<ol class="stockholm-destinations">${step.options.map((o,i) => `<li class="stockholm-destination--${i}">${esc(o.label)}</li>`).join('')}</ol></div><p class="kicker">ÉTAPE ${stage+1}</p><div class="choice-list">${step.options.map((o,i) => `<button type="button" class="choice" data-trip-choice="${i}">${o.title}</button>`).join('')}</div>`;
   }
