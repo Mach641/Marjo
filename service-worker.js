@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-57-editorial-copy";
+const CACHE_NAME = "voyage-majorque-v1-4-58-d3-gallery";
 const APP_SHELL = [
   "./assets/finale/v1-4-49/colis.png",
   "./assets/challenge-1/v1-4-45/D1_G4_decor.png",
@@ -23,7 +23,7 @@ const APP_SHELL = [
   "./assets/challenge-1/v1-4-45/D1_G3_final.png",
   "./assets/challenge-1/v1-4-45/D1_G5_decor.png",
   "./assets/challenge-1/v1-4-45/D1_G5_final.png",
-  "./journey-state.js?v=1.4.57",
+  "./journey-state.js?v=1.4.58",
   "./assets/challenge-1/v1-4-38/d1-handover.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-full.png",
@@ -81,8 +81,8 @@ const APP_SHELL = [
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
   "./styles.css?v=1.4.56",
-  "./script.js?v=1.4.57",
-  "./config.js?v=1.4.57",
+  "./script.js?v=1.4.58",
+  "./config.js?v=1.4.58",
   "./challenge-one.js?v=1.4.57",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",
@@ -95,6 +95,12 @@ const APP_SHELL = [
   "./assets/challenge-8/v1-4-26/music-notes.png",
   "./assets/challenge-2/v1-4-12/couple-profile-notebook.png",
   "./assets/challenge-3/v1-4-13/baby-polaroids.png",
+  "./assets/challenge-3/v1-4-58/D3_G1_decor.png",
+  "./assets/challenge-3/v1-4-58/D3_G1_final.png",
+  "./assets/challenge-3/v1-4-58/D3_G2_decor.png",
+  "./assets/challenge-3/v1-4-58/D3_G2_final.png",
+  "./assets/challenge-3/v1-4-58/D3_G3_decor.png",
+  "./assets/challenge-3/v1-4-58/D3_G3_final.png",
   "./assets/challenge-1/v1-4-6/intro-door.png",
   "./assets/challenge-1/v1-4-5/closed-door-1.png",
   "./assets/challenge-1/v1-4-5/closed-door-2.png",

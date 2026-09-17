@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.57";
+export const APP_VERSION = "1.4.58";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -182,7 +182,11 @@ export const CONFIG = {
       publicChallengeTitle: "Qui est qui ?",
       galleryTitle: "Regarde.",
       letter: "M",
-      gallery: [{ src: null, label: "PLACEHOLDER — VIE À QUATRE" }],
+      gallery: [
+        { id: "D3_G1", decor: "assets/challenge-3/v1-4-58/D3_G1_decor.png", full: "assets/challenge-3/v1-4-58/D3_G1_final.png" },
+        { id: "D3_G2", decor: "assets/challenge-3/v1-4-58/D3_G2_decor.png", full: "assets/challenge-3/v1-4-58/D3_G2_final.png" },
+        { id: "D3_G3", decor: "assets/challenge-3/v1-4-58/D3_G3_decor.png", full: "assets/challenge-3/v1-4-58/D3_G3_final.png" },
+      ],
       soundtrack: null,
       babyPhotos: [
         { src: "assets/img/Lenny_1.png", answer: "Lenny", alt: "Photo de Lenny bébé" },
