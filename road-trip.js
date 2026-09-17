@@ -313,9 +313,9 @@ export function renderRoadTrip(container, trip, save, onComplete, { previewAt = 
    const o = step.options[trip.choices[stage]];
    body = `<div class="stockholm-stage">${map(stage,true,false)}<div class="stockholm-illustration" data-illustration="${stage+1}-${trip.choices[stage]+1}" aria-hidden="true"><img src="${esc(o.image)}" alt="${esc(o.title)}"/></div></div><div class="stockholm-result" hidden><h1>${esc(o.title)}</h1><p>${esc(o.text)}</p>${cta(stage===4 ? 'Voir notre route →' : 'Suivant →')}</div>${previewAt !== null ? '<button type="button" class="quiet-button stockholm-preview" data-trip-play>Lire la suite de l’animation</button>' : ''}`;
   } else {
-   body = `${gameplayHeader({theme:"À toi de nous emmener à Stockholm",title:step.title,description:step.subtitle})}<div class="stockholm-overview">${map(stage,false,false)}<ol class="stockholm-destinations">${step.options.map((o,i) => `<li class="stockholm-destination--${i}">${esc(o.label)}</li>`).join('')}</ol></div><p class="kicker">ÉTAPE ${stage+1}</p><div class="choice-list">${step.options.map((o,i) => `<button type="button" class="choice" data-trip-choice="${i}">${o.title}</button>`).join('')}</div>`;
+   body = `${gameplayHeader({theme:"À toi de nous emmener à Stockholm",title:step.title,description:step.subtitle})}<div class="stockholm-choice-progress" aria-label="Étape ${stage+1} sur ${ROAD_STEPS.length}"><span>ÉTAPE ${stage+1} / ${ROAD_STEPS.length}</span><span class="stockholm-choice-progress__dots" aria-hidden="true">${ROAD_STEPS.map((_,i) => `<i class="${i <= stage ? 'is-active' : ''}"></i>`).join('')}</span></div><div class="stockholm-overview">${map(stage,false,false)}</div><div class="choice-list">${step.options.map((o,i) => `<button type="button" class="choice" data-trip-choice="${i}">${o.title}</button>`).join('')}</div>`;
   }
-  container.innerHTML = `<section class="paper-card stockholm-trip ${reveal ? 'stockholm-trip--reveal' : ''}">${body}</section>`;
+  container.innerHTML = `<section class="paper-card stockholm-trip ${reveal ? 'stockholm-trip--reveal' : !final ? 'stockholm-trip--choice' : ''}">${body}</section>`;
   if (!fromRect) window.scrollTo(0,0);
   if (final) { next(onComplete); return; }
   if (!reveal) {
