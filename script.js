@@ -1,13 +1,13 @@
-import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.56";
+import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.57";
 import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.49";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
-import { renderChallengeSix, CHALLENGE_SIX_PREVIEWS } from "./challenge-six.js?v=1.4.48";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.56";
-import { renderChallengeOne } from "./challenge-one.js?v=1.4.23";
+import { renderChallengeSix, CHALLENGE_SIX_PREVIEWS } from "./challenge-six.js?v=1.4.57";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.57";
+import { renderChallengeOne } from "./challenge-one.js?v=1.4.57";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
-import { renderRoadTrip, ROAD_PREVIEWS } from "./road-trip.js?v=1.4.56";
+import { renderRoadTrip, ROAD_PREVIEWS } from "./road-trip.js?v=1.4.57";
 let roadPreviewAt = null;
 
 const app = document.querySelector("#app");
@@ -408,7 +408,7 @@ function renderCoupleProfile() {
 }
 
 function renderCoupleProfileIntro() {
-  app.innerHTML = challengeIntro({ id: 2, title: "Notre profil de couple", subtitle: "Un test très scientifique. Évidemment.", image: "assets/challenge-2/v1-4-12/couple-profile-notebook.png", alt: "Un petit carnet ouvert et son crayon", copy: "12 questions. Deux réponses à chaque fois.<br><em>D’abord Marjolaine. Puis Vincent.</em>", label: "Commencer le test", action: 'data-action="start-couple-profile"', footer: "coast" });
+  app.innerHTML = challengeIntro({ id: 2, title: "Notre profil de couple", subtitle: "Depuis que nous sommes devenus trois, pas mal de choses ont changé.", image: "assets/challenge-2/v1-4-12/couple-profile-notebook.png", alt: "Un petit carnet ouvert et son crayon", copy: "Les nuits. Les journées.<br>Les habitudes. Le temps à deux.<br><br>Mais notre couple, lui, est toujours quelque part au milieu.<br><br>Alors il est temps de faire un test très scientifique. Évidemment.<br><br>12 questions. Deux réponses à chaque fois.<br>D'abord Marjolaine. Puis Vincent.", label: "Commencer le test", action: 'data-action="start-couple-profile"', footer: "coast" });
   bindAction("start-couple-profile", () => {
     const progress = coupleProfileProgress();
     progress.phase = "questions";
@@ -495,7 +495,7 @@ function renderCoupleProfileResults() {
 }
 
 function renderChallengeThreeIntro() {
-  app.innerHTML = challengeIntro({ id: 3, title: "Qui est qui ?", subtitle: "Deux petits visages qui se ressemblent beaucoup.", image: "assets/challenge-3/v1-4-13/baby-polaroids.png", alt: "Deux portraits de bébés en polaroids", copy: "À toi de reconnaître qui se cache<br>derrière chaque petit visage.", label: "Commencer le défi", action: 'data-action="start-challenge-three"', footer: "balloon" });
+  app.innerHTML = challengeIntro({ id: 3, title: "Qui est qui ?", subtitle: "Il y a quelques années,<br>tu connaissais déjà ce petit visage par cœur.", image: "assets/challenge-3/v1-4-13/baby-polaroids.png", alt: "Deux portraits de bébés en polaroids", copy: "Puis un deuxième est arrivé.<br><br>Et bizarrement…<br>ils ont décidé de beaucoup se ressembler.<br><br>Alors voyons si une maman peut vraiment<br>reconnaître ses enfants les yeux fermés.", label: "Commencer le défi", action: 'data-action="start-challenge-three"', footer: "balloon" });
   bindAction("start-challenge-three", renderChallengeThreeQuestions);
 }
 
@@ -563,7 +563,7 @@ function renderBlindTest({ chapterId, songs, onDone }) {
       });
     });
   };
-  app.innerHTML = challengeIntro({ id: 8, title: "Le blind test", subtitle: "Des chansons qui ont accompagné notre histoire.", image: "assets/challenge-8/v1-4-10/guitar.png", alt: "Une guitare dessinée dans le carnet", copy: "Écoute bien et fais confiance à ta mémoire.<br>À toi de retrouver les chansons.", label: "Commencer le blind test", action: 'data-action="start-blind-test"', footer: "coast" });
+  app.innerHTML = challengeIntro({ id: 8, title: "Le blind test", subtitle: "Bien sûr qu'il y aura un blind test !", image: "assets/challenge-8/v1-4-10/guitar.png", alt: "Une guitare dessinée dans le carnet", copy: "Ces chansons, tu les connais par cœur.<br><br>Je sais que tu vas les trouver.<br>Mais ce soir, je voulais simplement te les faire entendre.<br><br>Alors prends le temps de les écouter.<br><br>Elles ont accompagné notre histoire.", label: "Commencer le blind test", action: 'data-action="start-blind-test"', footer: "coast" });
   app.querySelector(".challenge-landing__label").remove();
   bindAction("start-blind-test", drawSong);
 }
@@ -652,7 +652,7 @@ function renderChallengeSevenPayoff() {
 function renderChallengeSeven() {
   if (state.completedChallenges[7]) return showNotebook();
   if (state.answers["chapter-7"]?.phase === "payoff") return renderChallengeSevenPayoff();
-  app.innerHTML = challengeIntro({ id: 7, title: "Le serpent", subtitle: "Comme au temps des vieux téléphones.", image: "assets/challenge-7/v1-4-16/apple-snake.png", alt: "Un serpent composé de rondelles de pomme", copy: "Fais grandir le serpent<br>en mangeant les pommes.", label: "Jouer", action: 'data-action="play-snake"', footer: "path" });
+  app.innerHTML = challengeIntro({ id: 7, title: "Le serpent", subtitle: "On vient de parler du futur.", image: "assets/challenge-7/v1-4-16/apple-snake.png", alt: "Un serpent composé de rondelles de pomme", copy: "Alors pour changer…<br>petit retour dans le passé.<br><br>À une époque où un téléphone<br>servait encore parfois à jouer à ça.<br><br>Fais grandir le serpent.<br>Dix pommes, et on continue.", label: "Jouer", action: 'data-action="play-snake"', footer: "path" });
   bindAction("play-snake", () => {
     app.innerHTML = `<section class="paper-card screen"><div id="familyGame"></div></section>`;
     cleanupCurrentScreen = renderFamilyGame(app.querySelector("#familyGame"), () => {
@@ -668,12 +668,12 @@ function renderChallengeFour() {
   const progress = state.answers["chapter-4"] ||= { phase: "intro" };
   if (progress.phase === "intro") {
     saveState();
-    app.innerHTML = challengeIntro({ id: 4, title: "Le dernier souvenir", subtitle: "Majorque", image: `${OPENING_ASSETS}/02_arc_en_ciel.png`, alt: "", copy: "Pour le dernier défi,<br>il suffit de regarder devant toi.", label: "Découvrir le défi", action: 'data-action="start-majorca"', footer: "coast" });
+    app.innerHTML = challengeIntro({ id: 4, title: "Le dernier souvenir", subtitle: "Jusqu'ici, le carnet t'a emmenée<br>dans ce qui a été…", image: `${OPENING_ASSETS}/02_arc_en_ciel.png`, alt: "", copy: "puis dans ce qui pourrait être.<br><br>Pour le dernier défi,<br>il n'y a plus besoin d'imaginer quoi que ce soit.<br><br>Il suffit de regarder devant toi.", label: "Découvrir le défi", action: 'data-action="start-majorca"', footer: "coast" });
     bindAction("start-majorca", () => { progress.phase = "sunset"; saveState(); renderChallengeFour(); });
     return;
   }
   app.innerHTML = `<section class="paper-card screen majorca-challenge">
-    ${gameplayHeader({ theme: "Samedi soir", title: "Va voir le coucher de soleil", description: "Marche jusqu’au banc.<br>Quand le soleil commence à descendre sur Majorque, prends simplement le temps de regarder." })}
+    ${gameplayHeader({ theme: "Samedi soir", title: "Va voir le coucher de soleil.", description: "Marche jusqu'au banc.<br><br>Quand le soleil commence à descendre sur Majorque,<br>prends simplement le temps de regarder." })}
     ${button("Le soleil se couche", "complete-majorca", "journey-notebook__cta")}
   </section>`;
   bindAction("complete-majorca", () => completeChallenge(4));

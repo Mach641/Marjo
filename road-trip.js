@@ -302,13 +302,13 @@ export function renderRoadTrip(container, trip, save, onComplete, { previewAt = 
   cancelAnimationFrame(frame);
   if (disposed) return;
   if (!trip.started) {
-   container.innerHTML = challengeIntro({ id:5, title:"À toi de nous emmener à Stockholm", subtitle:"Il n’y a pas de bonne route vers le futur.", image:`${ASSETS}/camper.png`, alt:"Camping-car devant les montagnes", copy:"Choisis simplement celle<br>qui te ressemble le plus.", label:"Choisir l’itinéraire", action:"data-trip-next", footer:"path" });
+   container.innerHTML = challengeIntro({ id:5, title:"À toi de nous emmener à Stockholm", subtitle:"Il y a des voyages que l'on choisit.", image:`${ASSETS}/camper.png`, alt:"Camping-car devant les montagnes", copy:"Et puis il y a ceux que la vie<br>nous propose un peu plus vite que prévu.<br><br>Pour celui-ci, la destination est déjà décidée.<br><br>Mais tu m'as demandé une chose :<br><br>prendre le temps d'y aller.<br><br>Partir tous les quatre en camping-car,<br>sans oublier Mallow,<br>profiter du chemin<br>et transformer ce départ en voyage.<br><br>Puisque cette nouvelle vie nous emmène là-bas,<br>je veux que le chemin pour y arriver soit le tien.<br><br>Dans le prochain défi,<br>c'est toi qui choisis la route.<br><br>À toi de nous emmener à Stockholm.", label:"Choisir notre itinéraire", action:"data-trip-next", footer:"path" });
    next(() => { trip.started = true; save(); draw(); }); return;
   }
   const final = trip.phase === 'final', reveal = trip.phase === 'reveal';
   const stage = trip.choices.length - (reveal ? 1 : 0), step = ROAD_STEPS[stage];
   let body;
-  if (final) body = `<h1>Voilà notre route.</h1><p>Pas forcément la plus courte.<br>Pas forcément la plus logique.<br>Mais sûrement la nôtre.</p>${map(stage,false,true)}${cta('Continuer le voyage →')}`;
+  if (final) body = `<h1>Voilà notre route.</h1><p>Peut-être qu'on la suivra exactement.<br><br>Peut-être qu'on changera encore<br>quelques étapes d'ici là.<br><br>Mais maintenant, on sait au moins<br>par où tu aimerais nous emmener.<br><br>Et je crois que ce voyage<br>vient déjà un peu de commencer.</p>${map(stage,false,true)}${cta('Continuer le voyage')}`;
   else if (reveal) {
    const o = step.options[trip.choices[stage]];
    body = `<div class="stockholm-stage">${map(stage,true,false)}<div class="stockholm-illustration" data-illustration="${stage+1}-${trip.choices[stage]+1}" aria-hidden="true"><img src="${esc(o.image)}" alt="${esc(o.title)}"/></div></div><div class="stockholm-result" hidden><h1>${esc(o.title)}</h1><p>${esc(o.text)}</p>${cta(stage===4 ? 'Voir notre route →' : 'Suivant →')}</div>${previewAt !== null ? '<button type="button" class="quiet-button stockholm-preview" data-trip-play>Lire la suite de l’animation</button>' : ''}`;

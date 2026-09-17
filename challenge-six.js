@@ -78,10 +78,10 @@ export function renderChallengeSix(container, progress, save, complete) {
       container.innerHTML = challengeIntro({
         id: 6,
         title: "À vous de les convaincre",
-        subtitle: "Les questions de Lenny et Milan.",
+        subtitle: "Les enfants grandissent.",
         image: "assets/challenge-6/v1-4-15/wizards.png",
         alt: "Dumbledore et Gandalf croisent leurs baguettes",
-        copy: "Lenny et Milan ont quelques questions.<br>Certaines méritent une vraie réponse.<br>D’autres… probablement pas.<br><br>Tu auras 1 ou 2 minutes pour défendre ton idée.<br>Puis l’autre décidera s’il est convaincu.",
+        copy: "Et avec eux arrivent les questions.<br><br>Certaines sont faciles.<br>Certaines beaucoup moins.<br><br>Même sur nos thèmes de prédilection,<br>ce ne sera pas facile de les convaincre.<br><br>Dans ce défi, Lenny et Milan<br>ont quelques questions pour vous.<br><br>À vous de les convaincre.<br><br>Tu auras 1 ou 2 minutes pour défendre ton idée.<br>Puis l'autre décidera s'il est convaincu.",
         label: "Commencer",
         action: "data-six-start",
         footer: "balloon",

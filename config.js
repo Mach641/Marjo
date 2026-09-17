@@ -1,11 +1,11 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.56";
+export const APP_VERSION = "1.4.57";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
-  { id: "thursday", challenges: [1, 2], pause: { id: "pause-1", after: 2, next: 3, target: "2026-09-18T12:00:00+02:00", label: "Vendredi 18 septembre à 12 h", text: ["Deux souvenirs retrouvés.", "On s’arrête ici pour ce soir. On reprend demain, dans l’avion."], extra: "En attendant, quel souvenir aimerais-tu emporter partout avec toi ?" } },
-  { id: "friday", challenges: [3, 5], pause: { id: "pause-2", after: 5, next: 6, target: "2026-09-19T08:00:00+02:00", label: "Samedi 19 septembre à 8 h", text: ["Deux souvenirs de plus.", "On s’arrête à nouveau pour aujourd’hui. On reprend demain matin."] } },
-  { id: "saturday-morning", challenges: [6, 7], pause: { id: "pause-3", after: 7, next: 8, target: "2026-09-19T18:00:00+02:00", label: "Samedi 19 septembre à 18 h", text: ["Deux souvenirs de plus.", "Le carnet peut se reposer un peu. On reprend ce soir."] } },
+  { id: "thursday", challenges: [1, 2], pause: { id: "pause-1", after: 2, next: 3, target: "2026-09-18T12:00:00+02:00", label: "Vendredi 18 septembre à 12 h", text: ["Deux souvenirs retrouvés.", "On s'arrête ici pour ce soir.<br>On reprend demain, dans l'avion."], extra: "En attendant, quel souvenir aimerais-tu emporter partout avec toi ?" } },
+  { id: "friday", challenges: [3, 5], pause: { id: "pause-2", after: 5, next: 6, target: "2026-09-19T08:00:00+02:00", label: "Samedi 19 septembre à 8 h", text: ["Ça fait beaucoup de kilomètres pour aujourd'hui.", "Le carnet peut se refermer un moment.", "Demain, nous irons encore un peu plus loin.", "Pas sur la route.", "Dans le temps.", "Profite de cette soirée.<br>Je serai là demain matin."] } },
+  { id: "saturday-morning", challenges: [6, 7], pause: { id: "pause-3", after: 7, next: 8, target: "2026-09-19T18:00:00+02:00", label: "Samedi 19 septembre à 18 h", text: ["On a déjà parcouru beaucoup d'années aujourd'hui.", "Lenny et Milan ont grandi.", "Et pourtant, le carnet<br>n'est pas encore arrivé au bout.", "Il reste un dernier voyage dans le temps.", "Mais celui-là peut attendre ce soir.", "Profite de l'après-midi.<br>On se retrouve un peu plus tard."] } },
   { id: "saturday-evening", challenges: [8, 4] },
 ];
 
@@ -55,14 +55,14 @@ export const CONFIG = {
     },
     // Provisional copy except D8, whose validated conclusion is unchanged.
     conclusions: {
-      1: ["Tu connais les règles de notre monde.", "Un souvenir de nous t’attend maintenant."],
-      2: ["Notre couple ne tient pas dans une case.", "Un souvenir en raconte un peu plus."],
-      3: ["Ces petits visages ont déjà toute une histoire.", "Une page de cette histoire t’attend."],
-      5: ["Chaque chemin dessine une suite possible.", "Découvrons celle qui se cache dans le carnet."],
-      6: ["Ils vous poseront sûrement des centaines de questions.<br>Certaines auront une réponse.<br>D’autres beaucoup moins.<br><br>Mais ce qu’ils retiendront surtout,<br>c’est que vous aurez pris le temps d’y répondre.", "Il est temps de voir ce qu’ils ont gardé de tout ça."],
-      7: ["Le chemin s’est allongé, pomme après pomme.", "Un souvenir t’attend au bout."],
-      8: ["Il y a des chansons qu’on reconnaît en quelques secondes.", "Et d’autres qu’on n’oublie jamais."],
-      4: ["Tu étais là.<br>Au bon endroit,<br>au bon moment.", "Ce dernier souvenir est à toi."],
+      1: ["Drôle de façon de construire une histoire d'amour, non ?<br><br>Des pommes coupées, des chaussons, un morceau de chocolat trempé dans un café…<br><br>Ce sont tous ces petits riens qui rendent notre histoire unique.", "Et finalement, ce sont eux qui, petit à petit, ont fabriqué notre « nous ».<br><br>Maintenant, chose promise, chose due : le premier souvenir est là pour toi."],
+      2: ["Notre histoire ne tient dans aucune case.<br><br>Elle tient dans des nuits trop courtes,<br>des journées trop remplies,<br>des relais, des fous rires, des moments volés…<br><br>Notre vie à deux a changé.", "Parce qu'un jour,<br>elle est devenue une vie à trois.<br><br>Et le carnet se souvient de ce que ça a changé."],
+      3: ["Pas si facile, finalement.<br><br>Quelques mois, les mêmes joues,<br>parfois les mêmes expressions…<br><br>et déjà deux histoires complètement différentes.<br><br>Il y a quelques années,<br>aucun de ces deux petits visages<br>n'existait encore dans notre vie.", "Aujourd'hui, il est difficile<br>d'imaginer notre histoire sans eux.<br><br>Le carnet, lui, se souvient<br>du moment où nous sommes devenus quatre."],
+      5: ["Jusqu'ici, le carnet t'a montré<br>des endroits où nous sommes déjà allés.<br><br>Des moments qui existent quelque part<br>derrière nous.<br><br>Mais à partir de maintenant,<br>quelque chose change.<br><br>Les prochaines pages racontent<br>des souvenirs qui n'existent pas encore.", "Des endroits où nous irons peut-être.<br>Des moments que nous vivrons peut-être.<br><br>Et des souvenirs que, pour une fois,<br>nous pouvons commencer à imaginer ensemble."],
+      6: ["Ils vous poseront sûrement des centaines de questions.<br><br>Certaines auront une réponse.<br>D'autres beaucoup moins.<br><br>Mais ce qu'ils retiendront surtout,<br>c'est que vous aurez pris le temps d'y répondre.", "Il est temps de voir<br>ce qu'ils auront gardé de tout ça."],
+      7: ["Quand on était enfants, on pouvait passer dix minutes à jouer à un jeu comme celui-ci.<br><br>Puis recommencer.<br>Et recommencer encore.<br><br>La vie était belle, on avait le temps devant nous.<br><br>Et puis un jour, sans vraiment s'en rendre compte, on devient les parents.", "Et oui… les années ont passé.<br>Les enfants ont grandi.<br><br>Et le carnet commence maintenant à imaginer ce qu'ils deviendront."],
+      8: ["Il y a des chansons qu'on reconnaît en quelques secondes.", "Et d'autres qu'on n'oublie jamais."],
+      4: ["Tu étais là.<br><br>Au bon endroit,<br>au bon moment.", "Ce dernier souvenir est à toi."],
     },
     diagnostic: "Votre histoire ne tient dans aucune case.",
   },

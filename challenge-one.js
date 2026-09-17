@@ -90,7 +90,7 @@ export function renderChallengeOne(root, options) {
   const selected = () => options.rules.find((rule) => rule.id === current.selectedRule);
 
   function renderIntro() {
-    root.innerHTML = challengeIntro({ id: 1, title: "Les règles de notre monde", subtitle: "Avant de parcourir notre histoire…", image: "assets/challenge-1/v1-4-6/intro-door.png", alt: "La grande porte de notre monde", copy: "Voyons si tu connais encore<br>les règles de notre monde à nous.", label: "Découvrir les règles", action: 'data-rules-action="discover"', footer: "path" });
+    root.innerHTML = challengeIntro({ id: 1, title: "Les règles de notre monde", subtitle: "Avant de commencer ce voyage, il faut vérifier quelque chose.", image: "assets/challenge-1/v1-4-6/intro-door.png", alt: "La grande porte de notre monde", copy: "Au début de notre histoire, nous avons inventé nos propres règles.<br><br>Elles se sont transformées en habitudes et en petites manies. Et puis, on en a ajouté quelques-unes sur le chemin.<br><br>Elles ne sont écrites nulle part, mais elles font partie de nous.<br><br>Voyons si tu t'en souviens toujours.", label: "Découvrir les règles", action: 'data-rules-action="discover"', footer: "path" });
   }
 
   function renderDoors() {
