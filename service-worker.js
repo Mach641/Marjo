@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-58-d3-gallery";
+const CACHE_NAME = "voyage-majorque-v1-4-58-d2-polaroid";
 const APP_SHELL = [
   "./assets/finale/v1-4-49/colis.png",
   "./assets/challenge-1/v1-4-45/D1_G4_decor.png",
@@ -81,7 +81,7 @@ const APP_SHELL = [
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
   "./styles.css?v=1.4.56",
-  "./script.js?v=1.4.58",
+  "./script.js?v=1.4.58-d2-polaroid",
   "./config.js?v=1.4.58",
   "./challenge-one.js?v=1.4.57",
   "./family-game.js?v=1.4.23",

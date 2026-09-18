@@ -222,7 +222,7 @@ function notebookPolaroid(unlocked = false) {
 }
 function scrapbookPolaroid({ chapterId, face, annotation = "", action, flip = false }) {
   // Only explicit decor thumbnails belong in the notebook, never gallery images.
-  const decor = CONFIG.chapters[chapterId]?.memoryThumbnail;
+  const decor = chapterId === 2 ? CONFIG.chapters[2].gallery[0].decor : CONFIG.chapters[chapterId]?.memoryThumbnail;
   return `<div class="scrapbook-memory"><button class="scrapbook-polaroid${flip ? " scrapbook-polaroid--reveal" : ""}" type="button" data-chapter="${chapterId}" data-scrapbook-action="${action}" aria-label="${face ? `Revoir le souvenir ${annotation}` : "Découvrir le prochain souvenir"}">
     ${face ? (decor ? `<img class="scrapbook-polaroid__image" src="${decor}" alt="" />` : '<span class="scrapbook-polaroid__image" aria-hidden="true"></span>') : '<span class="scrapbook-polaroid__back" aria-hidden="true">?</span>'}
     <span class="scrapbook-polaroid__caption">${face ? annotation : ""}</span>
