@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.58";
+export const APP_VERSION = "1.4.59";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -199,7 +199,7 @@ export const CONFIG = {
       publicChallengeTitle: "Le coucher de soleil",
       galleryTitle: "Majorque",
       letter: "P",
-      gallery: [{ src: null, label: "PLACEHOLDER — COUCHER DE SOLEIL À MAJORQUE" }],
+      gallery: [{ id: "D4_G1", decor: "assets/challenge-4/v1-4-59/D4_G1_decor.png", full: "assets/challenge-4/v1-4-59/D4_G1_final.png" }],
       soundtrack: null,
     },
     5: {
@@ -208,9 +208,12 @@ export const CONFIG = {
       galleryTitle: "Stockholm",
       letter: "V",
       gallery: [
-        { src: null, label: "PLACEHOLDER — STOCKHOLM" },
+        { id: "D5_G1", decor: "assets/challenge-5/v1-4-59/D5_G1_decor.png", full: "assets/challenge-5/v1-4-59/D5_G1_final.png" },
         { id: "D5_G2", decor: "assets/challenge-1/v1-4-45/D5_G2_decor.png", full: "assets/challenge-1/v1-4-45/D5_G2_final.png" },
         { id: "D5_G3", decor: "assets/challenge-1/v1-4-45/D5_G3_decor.png", full: "assets/challenge-1/v1-4-45/D5_G3_final.png" },
+        { id: "D5_G4", decor: "assets/challenge-5/v1-4-59/D5_G4_decor.png", full: "assets/challenge-5/v1-4-59/D5_G4_final.png" },
+        { id: "D5_G5", decor: "assets/challenge-5/v1-4-59/D5_G5_decor.png", full: "assets/challenge-5/v1-4-59/D5_G5_final.png" },
+        { id: "D5_G6", decor: "assets/challenge-5/v1-4-59/D5_G6_decor.png", full: "assets/challenge-5/v1-4-59/D5_G6_final.png" },
       ],
       soundtrack: null,
       routeEvents: [
