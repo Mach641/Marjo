@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.61";
+export const APP_VERSION = "1.4.62";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -216,7 +216,7 @@ export const CONFIG = {
       publicChallengeTitle: "Le coucher de soleil",
       galleryTitle: "Majorque",
       letter: "P",
-      gallery: [{ id: "D4_G1", decor: "assets/challenge-4/v1-4-59/D4_G1_decor.png", full: "assets/challenge-4/v1-4-59/D4_G1_final.png" }],
+      gallery: [{ id: "D4_G1", decor: "assets/challenge-4/v1-4-62/D4_G1_decor.png", full: "assets/challenge-4/v1-4-62/D4_G1_final.png" }],
       soundtrack: null,
     },
     5: {
@@ -257,7 +257,11 @@ export const CONFIG = {
       publicChallengeTitle: "Le serpent",
       galleryTitle: "Regarde.",
       letter: "M",
-      gallery: [{ src: null, label: "PLACEHOLDER — ADOLESCENCE" }],
+      gallery: [
+        { id: "D7_G1", decor: "assets/challenge-7/v1-4-62/D7_G1_decor.png", full: "assets/challenge-7/v1-4-62/D7_G1_final.png" },
+        { id: "D7_G2", decor: "assets/challenge-7/v1-4-62/D7_G2_decor.png", full: "assets/challenge-7/v1-4-62/D7_G2_final.png" },
+        { id: "D7_G3", decor: "assets/challenge-7/v1-4-62/D7_G3_decor.png", full: "assets/challenge-7/v1-4-62/D7_G3_final.png" },
+      ],
       soundtrack: null,
     },
     8: {
@@ -265,7 +269,9 @@ export const CONFIG = {
       publicChallengeTitle: "Blind test guitare",
       galleryTitle: "Regarde.",
       letter: "E",
-      gallery: [{ src: null, label: "PLACEHOLDER — FUTUR LOINTAIN" }],
+      gallery: [
+        { id: "D8_G1", decor: "assets/challenge-8/v1-4-62/D8_G1_decor.png", full: "assets/challenge-8/v1-4-62/D8_G1_final.png" },
+      ],
       soundtrack: null,
       songs: [
         { title: "Lady Marmalade", artist: "Christina Aguilera" },
