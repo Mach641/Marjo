@@ -233,7 +233,8 @@ p { margin: 0 0 20px; line-height: 1.68; }
 .challenge-three-intro__art { display: block; width: min(92%, 390px); max-height: 330px; margin: 14px auto; object-fit: contain; }
 .challenge-three-question .kicker { text-align: left; }
 .challenge-three-question__subtitle { color: var(--muted); }
-.baby-photo { display: block; width: min(84%, 290px); aspect-ratio: 1 / 1; margin: 14px auto 20px; border: 9px solid #fffdf8; outline: 1px solid var(--line); object-fit: cover; box-shadow: 0 6px 14px rgba(65, 45, 25, 0.1); transform: rotate(-0.7deg); }
+.baby-photo { position: relative; display: block; width: min(84%, 290px); aspect-ratio: 1 / 1; margin: 14px auto 20px; overflow: hidden; border: 9px solid #fffdf8; outline: 1px solid var(--line); box-shadow: 0 6px 14px rgba(65, 45, 25, 0.1); transform: rotate(-0.7deg); }
+.baby-photo__image { position: absolute; display: block; max-width: none; }
 .baby-photo--placeholder { display: grid; place-items: center; padding: 22px; color: var(--muted); background: #e8decc; text-align: center; }
 .challenge-three-choice:disabled { opacity: 1; cursor: default; }
 .challenge-three-choice--selected { border-color: var(--terracotta); background: #fff8ef; }

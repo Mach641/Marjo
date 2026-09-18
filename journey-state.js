@@ -1,4 +1,4 @@
-import { CONFIG } from "./config.js?v=1.4.59";
+import { CONFIG } from "./config.js?v=1.4.60";
 
 export const pauses = CONFIG.journeyChapters.flatMap(chapter => chapter.pause ? [chapter.pause] : []);
 export const pauseAfter = id => pauses.find(pause => pause.after === id);

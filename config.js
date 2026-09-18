@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.59";
+export const APP_VERSION = "1.4.60";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -189,9 +189,26 @@ export const CONFIG = {
       ],
       soundtrack: null,
       babyPhotos: [
-        { src: "assets/img/Lenny_1.png", answer: "Lenny", alt: "Photo de Lenny bébé" },
-        { src: null, answer: "Milan", alt: "PLACEHOLDER — photo de Milan bébé" },
-        { src: null, answer: "Lenny", alt: "PLACEHOLDER — seconde photo bébé" },
+        {"id": "lenny-01", "src": "assets/challenge-3/crop-calibrator/Lenny_Full_2.jpeg", "answer": "lenny", "difficulty": "medium", "crop": {"x": 32.5, "y": 9.8, "width": 42.9, "height": 36.5}},
+        {"id": "lenny-02", "src": "assets/challenge-3/crop-calibrator/Lenny_Full_4.jpeg", "answer": "lenny", "difficulty": "hard", "crop": {"x": 31.6, "y": 43.4, "width": 33.6, "height": 19.8}},
+        {"id": "lenny-03", "src": "assets/challenge-3/crop-calibrator/Lenny_Full_5.jpeg", "answer": "lenny", "difficulty": "very-hard", "crop": {"x": 29.6, "y": 17, "width": 31.5, "height": 12.4}},
+        {"id": "lenny-04", "src": "assets/challenge-3/crop-calibrator/Lenny_Full_6.jpeg", "answer": "lenny", "difficulty": "medium", "crop": {"x": 54.6, "y": 51.2, "width": 34.5, "height": 22.2}},
+        {"id": "lenny-05", "src": "assets/challenge-3/crop-calibrator/Lenny_Full_7.jpeg", "answer": "lenny", "difficulty": "easy", "crop": {"x": 31.6, "y": 15.9, "width": 43.3, "height": 21.2}},
+        {"id": "lenny-06", "src": "assets/challenge-3/crop-calibrator/Lenny_Full_9.jpeg", "answer": "lenny", "difficulty": "medium", "crop": {"x": 17, "y": 27.7, "width": 48.2, "height": 47.1}},
+        {"id": "lenny-07", "src": "assets/challenge-3/crop-calibrator/Lenny_Full_10.jpeg", "answer": "lenny", "difficulty": "very-hard", "crop": {"x": 35.2, "y": 19.1, "width": 21.6, "height": 10.7}},
+        {"id": "lenny-08", "src": "assets/challenge-3/crop-calibrator/Lenny_Full_11.jpeg", "answer": "lenny", "difficulty": "hard", "crop": {"x": 15.8, "y": 28.8, "width": 50.9, "height": 34.9}},
+        {"id": "lenny-09", "src": "assets/challenge-3/crop-calibrator/Lenny_Full_14.jpeg", "answer": "lenny", "difficulty": "hard", "crop": {"x": 25.7, "y": 24.3, "width": 25.8, "height": 23.5}},
+        {"id": "lenny-10", "src": "assets/challenge-3/crop-calibrator/Lenny_Full_16.jpeg", "answer": "lenny", "difficulty": "very-hard", "crop": {"x": 39.5, "y": 20.8, "width": 26.3, "height": 10.2}},
+        {"id": "milan-01", "src": "assets/challenge-3/crop-calibrator/Milan_Full_1.JPG", "answer": "milan", "difficulty": "medium", "crop": {"x": 21.8, "y": 12.7, "width": 29.7, "height": 30.3}},
+        {"id": "milan-02", "src": "assets/challenge-3/crop-calibrator/Milan_Full_3.JPG", "answer": "milan", "difficulty": "hard", "crop": {"x": 32.1, "y": 20.2, "width": 21.4, "height": 15.1}},
+        {"id": "milan-03", "src": "assets/challenge-3/crop-calibrator/Milan_Full_4.JPG", "answer": "milan", "difficulty": "easy", "crop": {"x": 13.6, "y": 4.5, "width": 53.7, "height": 46.4}},
+        {"id": "milan-04", "src": "assets/challenge-3/crop-calibrator/Milan_Full_5.JPG", "answer": "milan", "difficulty": "very-hard", "crop": {"x": 31, "y": 15.6, "width": 23.5, "height": 12.4}},
+        {"id": "milan-05", "src": "assets/challenge-3/crop-calibrator/Milan_Full_7.JPG", "answer": "milan", "difficulty": "hard", "crop": {"x": 33.7, "y": 9.5, "width": 30.9, "height": 19.7}},
+        {"id": "milan-06", "src": "assets/challenge-3/crop-calibrator/Milan_Full_9.JPG", "answer": "milan", "difficulty": "hard", "crop": {"x": 24.2, "y": 17.4, "width": 34.6, "height": 28.9}},
+        {"id": "milan-07", "src": "assets/challenge-3/crop-calibrator/Milan_Full_10.jpeg", "answer": "milan", "difficulty": "medium", "crop": {"x": 11.9, "y": 0, "width": 64.2, "height": 53.8}},
+        {"id": "milan-08", "src": "assets/challenge-3/crop-calibrator/Milan_Full_14.JPG", "answer": "milan", "difficulty": "very-hard", "crop": {"x": 57.2, "y": 57.9, "width": 13.4, "height": 9.2}},
+        {"id": "milan-09", "src": "assets/challenge-3/crop-calibrator/Milan_Full_15.JPG", "answer": "milan", "difficulty": "easy", "crop": {"x": 32.7, "y": 4.4, "width": 35.4, "height": 32}},
+        {"id": "milan-10", "src": "assets/challenge-3/crop-calibrator/IMG_3281.JPG", "answer": "milan", "difficulty": "hard", "crop": {"x": 43.4, "y": 26.1, "width": 19.4, "height": 11.2}}
       ],
     },
     4: {

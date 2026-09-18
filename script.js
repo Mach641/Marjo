@@ -1,9 +1,9 @@
-import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.59";
+import { pauses, pauseAfter, createJourneyProgress, activePause, pauseStatus, currentChapter, visibleChapters, winChallenge, continueConclusion, revealMemory, finishReward, resumeChapter, journeyHome } from "./journey-state.js?v=1.4.60";
 import { renderD1PortraitGallery } from "./d1-portrait-gallery.js?v=1.4.49";
 import { gameplayHeader } from "./gameplay-header.js?v=1.4.23";
 import { challengeIntro } from "./challenge-intro.js?v=1.4.19";
 import { renderChallengeSix, CHALLENGE_SIX_PREVIEWS } from "./challenge-six.js?v=1.4.57";
-import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.59";
+import { APP_VERSION, CONFIG, STEPS } from "./config.js?v=1.4.60";
 import { renderChallengeOne } from "./challenge-one.js?v=1.4.57";
 import { renderFamilyGame } from "./family-game.js?v=1.4.23";
 import { createGallerySoundtrack } from "./gallery-soundtrack.js?v=1.2.1";
@@ -499,23 +499,43 @@ function renderChallengeThreeIntro() {
 }
 
 function renderChallengeThreeQuestions() {
-  const photos = CONFIG.chapters[3].babyPhotos;
+  const sourcePhotos = CONFIG.chapters[3].babyPhotos;
+  const orderKey = "chapter-3-order";
+  let order = state.answers[orderKey];
+  if (!Array.isArray(order) || order.length !== sourcePhotos.length || new Set(order).size !== sourcePhotos.length || order.some((id) => !sourcePhotos.some((photo) => photo.id === id))) {
+    order = sourcePhotos.map((photo) => photo.id);
+    for (let i = order.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    state.answers[orderKey] = order;
+    state.answers["chapter-3"] = [];
+    saveState();
+  }
+  const photos = order.map((id) => sourcePhotos.find((photo) => photo.id === id));
   const answers = [...(state.answers["chapter-3"] || [])];
   let index = Math.min(answers.length, photos.length - 1);
   const draw = () => {
     const photo = photos[index];
-    const photoMarkup = photo.src ? `<img class="baby-photo" src="${photo.src}" alt="${photo.alt}" />` : `<div class="baby-photo baby-photo--placeholder">${photo.alt}</div>`;
+    const { x, y, width, height } = photo.crop;
+    const photoMarkup = `<div class="baby-photo"><img class="baby-photo__image" src="${photo.src}" alt="Photo de bébé à reconnaître" style="left: ${-x / width * 100}%; top: ${-y / height * 100}%; width: ${10000 / width}%; height: ${10000 / height}%;" /></div>`;
     app.innerHTML = `<section class="paper-card screen challenge-three-question">${gameplayHeader({ theme: "Qui est qui ?", title: "Lenny ou Milan ?", description: "À toi de reconnaître qui se cache derrière chaque petit visage." })}${photoMarkup}<div class="choice-list"><button class="choice challenge-three-choice paper-choice" type="button" aria-pressed="false" data-baby-choice="Lenny"><span class="paper-choice__text">Lenny</span><span class="paper-choice__circle" aria-hidden="true"></span></button><button class="choice challenge-three-choice paper-choice" type="button" aria-pressed="false" data-baby-choice="Milan"><span class="paper-choice__text">Milan</span><span class="paper-choice__circle" aria-hidden="true"></span></button></div><div class="challenge-three-feedback" role="status"></div></section>`;
+    const photoImage = app.querySelector(".baby-photo__image");
+    const sizeCrop = () => {
+      photoImage.parentElement.style.aspectRatio = `${photoImage.naturalWidth * width} / ${photoImage.naturalHeight * height}`;
+    };
+    if (photoImage.complete && photoImage.naturalWidth) sizeCrop();
+    else photoImage.addEventListener("load", sizeCrop, { once: true });
     app.querySelectorAll("[data-baby-choice]").forEach((choice) => choice.addEventListener("click", () => {
       const selected = choice.dataset.babyChoice;
-      const correct = selected === photo.answer;
+      const correct = selected.toLowerCase() === photo.answer;
       app.querySelectorAll("[data-baby-choice]").forEach((node) => { node.disabled = true; });
       choice.classList.add("challenge-three-choice--selected");
       choice.setAttribute("aria-pressed", "true");
       answers[index] = selected;
       state.answers["chapter-3"] = answers;
       saveState();
-      app.querySelector(".challenge-three-feedback").innerHTML = `<p><strong>${correct ? "Bien vu !" : "Presque !"}</strong><br>C’était ${photo.answer}.</p>${button("Suivant →", "next-baby-photo")}`;
+      app.querySelector(".challenge-three-feedback").innerHTML = `<p><strong>${correct ? "Bien vu !" : "Presque !"}</strong><br>C’était ${photo.answer === "lenny" ? "Lenny" : "Milan"}.</p>${button("Suivant →", "next-baby-photo")}`;
       bindAction("next-baby-photo", () => {
         index += 1;
         if (index >= photos.length) completeChallenge(3);
