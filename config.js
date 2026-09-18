@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.60";
+export const APP_VERSION = "1.4.61";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -244,7 +244,12 @@ export const CONFIG = {
       publicChallengeTitle: "À vous de les convaincre",
       galleryTitle: "Regarde.",
       letter: "T",
-      gallery: [{ src: null, label: "PLACEHOLDER — MAISON FAMILIALE" }],
+      gallery: [
+        { id: "D6_G1", decor: "assets/challenge-6/v1-4-61/D6_G1_decor.png", full: "assets/challenge-6/v1-4-61/D6_G1_final.png" },
+        { id: "D6_G2", decor: "assets/challenge-6/v1-4-61/D6_G2_decor.png", full: "assets/challenge-6/v1-4-61/D6_G2_final.png" },
+        { id: "D6_G3", decor: "assets/challenge-6/v1-4-61/D6_G3_decor.png", full: "assets/challenge-6/v1-4-61/D6_G3_final.png" },
+        { id: "D6_G4", decor: "assets/challenge-6/v1-4-61/D6_G4_decor.png", full: "assets/challenge-6/v1-4-61/D6_G4_final.png" },
+      ],
       soundtrack: null,
     },
     7: {
