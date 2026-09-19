@@ -26,13 +26,13 @@ export const RINGS = [
   {
     id: "ring-3",
     label: "Bague 3",
-    brand: "MARQUE À RENSEIGNER",
-    model: "MODÈLE À RENSEIGNER",
+    brand: "VALQUERE",
+    model: "Halo",
     details: "",
     images: [
-      "PLACEHOLDER_RING_3_VIEW_1",
-      "PLACEHOLDER_RING_3_VIEW_2",
-      "PLACEHOLDER_RING_3_VIEW_3",
+      "assets/secret-ring/v1/ring-3-view-1.png",
+      "assets/secret-ring/v1/ring-3-view-2.png",
+      "assets/secret-ring/v1/ring-3-view-3.png",
     ],
   },
 ];
