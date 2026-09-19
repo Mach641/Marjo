@@ -14,13 +14,13 @@ export const RINGS = [
   {
     id: "ring-2",
     label: "Bague 2",
-    brand: "MARQUE À RENSEIGNER",
-    model: "MODÈLE À RENSEIGNER",
+    brand: "TIFFANY & CO.",
+    model: "Soleste",
     details: "",
     images: [
-      "PLACEHOLDER_RING_2_VIEW_1",
-      "PLACEHOLDER_RING_2_VIEW_2",
-      "PLACEHOLDER_RING_2_VIEW_3",
+      "assets/secret-ring/v1/ring-2-view-1.png",
+      "assets/secret-ring/v1/ring-2-view-2.png",
+      "assets/secret-ring/v1/ring-2-view-3.png",
     ],
   },
   {
