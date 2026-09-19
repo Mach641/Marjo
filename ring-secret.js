@@ -100,7 +100,7 @@ function renderRing() {
     <div class="carousel-dots" aria-label="Angle affiché">${ring.images.map((_, index) => `<span class="carousel-dot${index === 0 ? " is-active" : ""}" data-dot="${index}"></span>`).join("")}</div>
     ${ringIndex === 0 ? '<p class="swipe-hint">Fais glisser pour la voir sous tous les angles.</p>' : ""}
     ${mode === "branded" ? `<div class="ring-information"><p class="ring-brand">${ring.brand}</p><p class="ring-model">${ring.model}</p>${ring.details ? `<p class="ring-details">${ring.details}</p>` : ""}</div>` : ""}
-    <div class="secret-actions">${button(ringIndex === RINGS.length - 1 ? "Faire mon choix" : "Bague suivante", "next-ring")}</div>
+    <div class="secret-actions">${button(ringIndex === RINGS.length - 1 ? "Continuer" : "Bague suivante", "next-ring")}</div>
   </section>`;
 
   const carousel = root.querySelector("[data-carousel]");
@@ -122,21 +122,8 @@ function renderRing() {
     if (ringIndex < RINGS.length - 1) {
       ringIndex += 1;
       renderRing();
-    } else renderChoice();
+    } else renderFinal();
   });
-  scrollTo({ top: 0, behavior: "instant" });
-}
-
-function renderChoice() {
-  const choices = RINGS.map((ring) => `<button class="ring-choice" type="button" data-choice="${ring.id}">${imageSlot(ring.images[0], `${ring.label}, première vue`, "ring-choice__image")}<span>${ring.label}</span></button>`).join("");
-  root.innerHTML = `<section class="secret-page secret-choice-page">
-    ${rainbow()}
-    <h1>Alors ?</h1>
-    <p class="secret-subtitle">Laquelle préfères-tu ?</p>
-    <div class="ring-choices">${choices}</div>
-    <div class="ring-choice-none"><button type="button" data-choice="none">Aucune des trois</button><p>Ce sont des propositions. On peut continuer à chercher.</p></div>
-  </section>`;
-  root.querySelectorAll("[data-choice]").forEach((choice) => choice.addEventListener("click", renderFinal, { once: true }));
   scrollTo({ top: 0, behavior: "instant" });
 }
 
