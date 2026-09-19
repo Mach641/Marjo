@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-66-secret-ring-3";
+const CACHE_NAME = "voyage-majorque-v1-4-67-secret-ring-final";
 const APP_SHELL = [
   "./un-dernier-petit-detail.html",
   "./ring-secret.css?v=1.0.0",
@@ -12,6 +12,7 @@ const APP_SHELL = [
   "./assets/secret-ring/v1/ring-3-view-1.png",
   "./assets/secret-ring/v1/ring-3-view-2.png",
   "./assets/secret-ring/v1/ring-3-view-3.png",
+  "./assets/secret-ring/ring-tonight-watercolor.png",
   "./assets/finale/v1-4-49/colis.png",
   "./assets/challenge-1/v1-4-45/D1_G4_decor.png",
   "./assets/challenge-1/v1-4-45/D1_G4_final.png",
