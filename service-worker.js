@@ -1,5 +1,8 @@
-const CACHE_NAME = "voyage-majorque-v1-4-62-d7-d8-gallery";
+const CACHE_NAME = "voyage-majorque-v1-4-63-secret-ring";
 const APP_SHELL = [
+  "./un-dernier-petit-detail.html",
+  "./ring-secret.css?v=1.0.0",
+  "./ring-secret.js?v=1.0.0",
   "./assets/finale/v1-4-49/colis.png",
   "./assets/challenge-1/v1-4-45/D1_G4_decor.png",
   "./assets/challenge-1/v1-4-45/D1_G4_final.png",
