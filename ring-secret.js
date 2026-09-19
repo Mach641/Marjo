@@ -62,10 +62,10 @@ function renderIntro() {
     <div class="secret-copy">
       <p>Tu te doutes bien que celle-ci n’est pas la vraie bague.</p>
       <p>Mais je n’ai pas oublié de chercher.</p>
-      <p>J’ai trois propositions à te montrer. Et cette fois, je veux que ce soit <strong>TOI</strong> qui choisisses.</p>
-      <p>Tes goûts sont… affirmés.</p>
-      <p>Et pour la bague que tu porteras toute ta vie, la seule que je t’offrirai, je veux que tu la trouves parfaite.</p>
-      <p>Alors je te laisse même choisir comment tu veux les découvrir.</p>
+      <p>On peut le dire je crois... Tes goûts sont affirmés !</p>
+      <p>J'ai longtemps hésite à me lancer et t'en choisir une... avec le risque de me tromper. J'ai pesé le pour et le contre, j'ai meme fait appel à une amie pour te sonder ;)</p>
+      <p>Finalement, je préfère te montrer mes 3 bagues préférées.<br>Et j'aimerais que ce soit toi qui choisisse la bague que tu porteras toute ta vie.</p>
+      <p>Pour les découvrir, je te laisse le choix.</p>
       <p>Tu peux voir les bagues avec leur marque…</p>
       <p>…ou ne rien savoir du tout et choisir uniquement avec tes yeux.</p>
     </div>
