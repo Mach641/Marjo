@@ -1,5 +1,5 @@
 // Configuration éditoriale V1. Toute mention PLACEHOLDER reste à remplacer.
-export const APP_VERSION = "1.4.63";
+export const APP_VERSION = "1.4.64";
 
 // D8 is deliberately late: the distant future precedes the return to Majorca.
 const JOURNEY_CHAPTERS = [
@@ -93,7 +93,7 @@ export const CONFIG = {
         { id: "D2_G2", decor: "assets/challenge-1/v1-4-45/D2_G2_decor.png", full: "assets/challenge-1/v1-4-45/D2_G2_final.png" },
         { id: "D2_G3", decor: "assets/challenge-1/v1-4-45/D2_G3_decor.png", full: "assets/challenge-1/v1-4-45/D2_G3_final.png" },
         { id: "D2_G4", decor: "assets/challenge-1/v1-4-45/D2_G4_decor.png", full: "assets/challenge-1/v1-4-45/D2_G4_final.png" },
-        { id: "D2_G5", decor: "assets/challenge-1/v1-4-45/D2_G5_decor.png", full: "assets/challenge-1/v1-4-45/D2_G5_final.png" },
+        { id: "D2_G5", decor: "assets/challenge-2/v1-4-64/D2_G5_decor.png", full: "assets/challenge-2/v1-4-64/D2_G5_final.png" },
       ],
       soundtrack: null,
       profiles: {
