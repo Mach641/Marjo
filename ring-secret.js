@@ -63,11 +63,11 @@ function renderIntro() {
       <p>Tu te doutes bien que celle-ci n’est pas la vraie bague.</p>
       <p>Mais je n’ai pas oublié de chercher.</p>
       <p>On peut le dire je crois... Tes goûts sont affirmés !</p>
-      <p>J'ai longtemps hésite à me lancer et t'en choisir une... avec le risque de me tromper. J'ai pesé le pour et le contre, j'ai meme fait appel à une amie pour te sonder ;)</p>
+      <p>J'ai longtemps hésité à me lancer et t'en choisir une... avec le risque de me tromper. J'ai pesé le pour et le contre, j'ai meme fait appel à une amie pour te sonder ;)</p>
       <p>Finalement, je préfère te montrer mes 3 bagues préférées.<br>Et j'aimerais que ce soit toi qui choisisse la bague que tu porteras toute ta vie.</p>
       <p>Pour les découvrir, je te laisse le choix.</p>
       <p>Tu peux voir les bagues avec leur marque…</p>
-      <p>…ou ne rien savoir du tout et choisir uniquement avec tes yeux.</p>
+      <p>…ou ne rien savoir du tout et choisir uniquement avec tes yeux et ton coeur</p>
     </div>
     <div class="secret-actions">
       ${button("Voir les bagues et les marques", "branded", "primary", "Je veux tout savoir")}
