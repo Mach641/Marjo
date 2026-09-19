@@ -1,4 +1,4 @@
-const CACHE_NAME = "voyage-majorque-v1-4-69-secret-ring-direct-final";
+const CACHE_NAME = "voyage-majorque-v1-4-70-d6-g5";
 const APP_SHELL = [
   "./un-dernier-petit-detail.html",
   "./ring-secret.css?v=1.0.0",
@@ -46,7 +46,7 @@ const APP_SHELL = [
   "./assets/challenge-1/v1-4-45/D1_G3_final.png",
   "./assets/challenge-1/v1-4-45/D1_G5_decor.png",
   "./assets/challenge-1/v1-4-45/D1_G5_final.png",
-  "./journey-state.js?v=1.4.62",
+  "./journey-state.js?v=1.4.63",
   "./assets/challenge-1/v1-4-38/d1-handover.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-decor.png",
   "./assets/challenge-1/v1-4-36/d1-duomo-portrait-full.png",
@@ -104,8 +104,8 @@ const APP_SHELL = [
   "./manifest.webmanifest?v=1.4.8",
   "./manifest-debug.webmanifest?v=1.4.8",
   "./styles.css?v=1.4.62",
-  "./script.js?v=1.4.62-d7-d8-gallery",
-  "./config.js?v=1.4.62",
+  "./script.js?v=1.4.63-d6-g5",
+  "./config.js?v=1.4.63",
   "./challenge-one.js?v=1.4.57",
   "./family-game.js?v=1.4.23",
   "./gallery-soundtrack.js?v=1.2.1",
@@ -151,6 +151,8 @@ const APP_SHELL = [
   "./assets/challenge-6/v1-4-61/D6_G3_final.png",
   "./assets/challenge-6/v1-4-61/D6_G4_decor.png",
   "./assets/challenge-6/v1-4-61/D6_G4_final.png",
+  "./assets/challenge-6/v1-4-63/D6_G5_decor.png",
+  "./assets/challenge-6/v1-4-63/D6_G5_final.png",
   "./assets/challenge-7/v1-4-62/D7_G1_decor.png",
   "./assets/challenge-7/v1-4-62/D7_G1_final.png",
   "./assets/challenge-7/v1-4-62/D7_G2_decor.png",
