@@ -2,13 +2,13 @@ export const RINGS = [
   {
     id: "ring-1",
     label: "Bague 1",
-    brand: "MARQUE À RENSEIGNER",
-    model: "MODÈLE À RENSEIGNER",
+    brand: "CARTIER",
+    model: "Destinée",
     details: "",
     images: [
-      "PLACEHOLDER_RING_1_VIEW_1",
-      "PLACEHOLDER_RING_1_VIEW_2",
-      "PLACEHOLDER_RING_1_VIEW_3",
+      "assets/secret-ring/v1/ring-1-view-1.png",
+      "assets/secret-ring/v1/ring-1-view-2.png",
+      "assets/secret-ring/v1/ring-1-view-3.png",
     ],
   },
   {
